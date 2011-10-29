@@ -1,0 +1,6 @@
+--markup markdown
+--no-private
+--protected
+--hide-void-return
+cosmos.rb
+cosmos/**/*.rb
