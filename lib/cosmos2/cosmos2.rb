@@ -264,7 +264,7 @@ module Cosmos2
     # @return [Hash] The plugin's config or an empty hash if not found or no name given
     def get_plugin_config(params)
       if @config[:plugins] && params[:name]
-        @config[:plugins][params[:name].to_sym]
+        @config[:plugins][params[:name].to_sym] || {}
       else
         {}
       end
