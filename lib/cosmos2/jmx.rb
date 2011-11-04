@@ -23,10 +23,11 @@ module Cosmos2
     # Creates a new jmx plugin instance.
     #
     # @param [Environment] environment The cosmos environment
+    # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [JMX] The new instance
-    def initialize(environment)
+    def initialize(environment, name = :jmx)
       @environment = environment
-      @config = @environment.get_plugin_config(:name => :jmx)
+      @config = @environment.get_plugin_config(:name => name.to_sym)
       @connections = {}
       @environment.resolve_service_auth(:service_name => :jmx, :config => @config)
     end

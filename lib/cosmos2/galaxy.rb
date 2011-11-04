@@ -5,7 +5,7 @@ begin
   require 'galaxy/console'
   require 'galaxy/versioning'
 rescue
-  puts "In order to use the galaxy plugin please install the galaxy gem version 2.5.1 or newer (2.5.1.1 if using (J)Ruby 1.9)'"
+  puts "In order to use the galaxy plugin please install the galaxy gem version 2.5.1 or newer (2.5.1.1 if using (J)Ruby 1.9)"
   exit
 end
 
@@ -69,10 +69,11 @@ module Cosmos2
     # Creates a new galaxy plugin instance.
     #
     # @param [Environment] environment The cosmos2 environment
+    # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Galaxy] The new instance
-    def initialize(environment)
+    def initialize(environment, name = :galaxy)
       @environment = environment
-      @config = @environment.get_plugin_config(:name => :galaxy)
+      @config = @environment.get_plugin_config(:name => name.to_sym)
       @galaxy_options = { :console => ::Galaxy::Transport.locate("druby://#{@config[:host] || 'localhost'}:#{@config[:port] || 4440}"),
                           :versioning_policy => @config[:relaxed_versioning] ?
                                                    ::Galaxy::Versioning::RelaxedVersioningPolicy :

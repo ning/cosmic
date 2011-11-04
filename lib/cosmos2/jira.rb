@@ -3,13 +3,7 @@ require 'cosmos2/plugin'
 require 'uri'
 require 'net/http'
 require 'net/https'
-require_with_hint 'jira4r', "In order to use the jira plugin please run 'gem install jira4r'"
-begin
-  gem "soap4r"
-rescue
-  puts "In order to use the jira plugin please run 'gem install soap4r'"
-  exit
-end
+require_with_hint 'jira4r', "In order to use the jira plugin please run 'gem install tomdz-jira4r'"
 require_with_hint 'nokogiri', "In order to use the jira plugin please run 'gem install nokogiri'"
 
 module Cosmos2
@@ -84,12 +78,13 @@ module Cosmos2
     # dryrun mode it will not actually connect but instead create a message tagged as `:dryrun`.
     #
     # @param [Environment] environment The cosmos2 environment
+    # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [JIRA] The new instance
-    def initialize(environment)
+    def initialize(environment, name = :jira)
       @environment = environment
-      @config = @environment.get_plugin_config(:name => :jira)
+      @config = @environment.get_plugin_config(:name => name.to_sym)
       @config[:address] ||= 'http://localhost'
-      @environment.resolve_service_auth(:service_name => :jira, :config => @config)
+      @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       authenticate
     end
 

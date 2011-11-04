@@ -342,29 +342,7 @@ In this example, the script first writes an explicit message to the `#status` IR
 ## JIRA
 
 The JIRA plugin can be used to create and update JIRA issues. For instance, you can use to create issues that track deployments, and add comments for each individual step of the deployment.
-This plugin uses the [jruby4r gem](https://github.com/tastyhat/jira4r) which itself uses the [soap4r gem](https://rubygems.org/gems/soap4r). Unfortunately the latter is not compatible with (J)Ruby 1.9. There are two ways to make it work with 1.9 (this is not needed if you only use 1.8.x):
-
-* Install the `jruby4r` and `soap4r` gems the normal way:
-
-    gem install jruby4r soap4r
-
-  Then update the `soap4r` installation with the fixed files from the [soap4r-spox](https://github.com/spox/soap4r-spox) fork:
-
-    curl -kL "https://github.com/spox/soap4r-spox/tarball/1.5.8.4" -o soap4r-spox-1.5.8.4.tar.gz
-    tar -xzf soap4r-spox-1.5.8.4.tar.gz
-    cp -r spox-soap4r-spox-345a6cb/bin/* <gem home>/soap4r-1.5.8/bin/
-    cp -r spox-soap4r-spox-345a6cb/lib/* <gem home>/soap4r-1.5.8/lib/
-    cp -r spox-soap4r-spox-345a6cb/test/* <gem home>/soap4r-1.5.8/test/
-
-* Install the [rubyjedi-soap4r](https://github.com/rubyjedi/soap4r) gem which includes the (J)Ruby 1.9 fix, and then clone and build your own gem of the [tritonrc-jira4r](https://github.com/tritonrc/jira4r) fork:
-
-    git clone git://github.com/tritonrc/jira4r.git
-    cd jira4r
-    gem install rake -v 0.8.7
-    gem install httpclient -v 2.1.5.2
-    gem install rubyjedi-soap4r bundler shoulda thoughtbot-shoulda
-    bundle exec rake gem
-    gem install jira4r-0.5.0.gem
+This plugin uses the [tomdz-jruby4r gem](https://github.com/tomdz/jira4r) which itself uses the [tomdz-soap4r gem](https://github.com/tomdz/soap4r). These two are forks of forks of the original [soap4r](https://github.com/felipec/soap4r) and [jira4r](https://github.com/remi/jira4r) gems, which have been updated to work with (J)Ruby 1.9 and with each other.
 
 The JIRA plugin is configured as follows:
 
@@ -416,6 +394,10 @@ The Galaxy plugin makes it straightforward to use Galaxy commands from within Co
 
 This script first connects an IRC channel to all messages created by the Galaxy plugin. Next it takes a snapshot of the current state of the Galaxy environment and then selects all services of type `echo`. It then tries to update these services and in case of failure, attempts to revert them to the previous snapshot. Finally it starts the services.
 
+## JMX
+
+TBD
+
 # Planned plugins
 
 These are the currently planned plugins:
@@ -423,7 +405,6 @@ These are the currently planned plugins:
 * Exec using [Open3](http://www.ruby-doc.org/stdlib-1.9.2/libdoc/open3/rdoc/Open3.html)
 * SSH using [Net::SSH](http://net-ssh.rubyforge.org/)
 * E-mail using [mail](https://github.com/mikel/mail)
-* JMX using [jmx4r](https://github.com/jmesnil/jmx4r)
 * Nagios probably using [ruby-nagios](https://code.google.com/p/ruby-nagios/)
 * F5 using [iControl](https://devcentral.f5.com/Tutorials/TechTips/tabid/63/articleType/ArticleView/articleId/1086421/Getting-Started-With-Ruby-and-iControl.aspx)
 * Chef using [Knife](http://wiki.opscode.com/display/chef/Knife)

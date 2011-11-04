@@ -137,16 +137,17 @@ module Cosmos2
     # dryrun mode it will not actually connect but instead create a message tagged as `:dryrun`.
     #
     # @param [Environment] environment The cosmos environment
+    # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [IRC] The new instance
-    def initialize(environment)
+    def initialize(environment, name = :irc)
       @environment = environment
-      @config = @environment.get_plugin_config(:name => :irc)
+      @config = @environment.get_plugin_config(:name => name.to_sym)
       @config[:nick] ||= 'cosmos'
       @config[:host] ||= 'localhost'
       @config[:port] ||= 6667
       @config[:connection_timeout_sec] ||= 60
       @joined_channels = {}
-      @environment.resolve_service_auth(:service_name => :irc, :config => @config)
+      @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       authenticate
     end
 
