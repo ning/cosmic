@@ -56,7 +56,7 @@ module Cosmos2
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
     # @option params [String] :port The node's port
     # @option params [String] :pool The pool name
-    # @return [Hash] The member as a hash with `:ip`, `:port`, `:availability`, and `:enabled` entries
+    # @return [Hash,nil] The member as a hash with `:ip`, `:port`, `:availability`, and `:enabled` entries
     def get_member(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
@@ -81,7 +81,7 @@ module Cosmos2
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
-    # @return [Hash] The member as a hash with `:ip`, `:availability`, and `:enabled` entries
+    # @return [Hash,nil] The member as a hash with `:ip`, `:availability`, and `:enabled` entries
     def get_node(params)
       node_ip = get_ip(params)
       notify(:msg => "[F5] Retrieving node #{node_ip} from load balancer #{@config[:host]}",
@@ -100,14 +100,37 @@ module Cosmos2
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
     # @option params [String] :port The node's port
     # @option params [String] :pool The pool name
-    # @return [Hash] The statistics as a hash
+    # @return [Hash,nil] The statistics as a hash of statistics name to current value
     def get_member_stats(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[F5] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
-      puts @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]]).to_yaml
+      stats = @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+      result = {}
+      if stats[0] && stats[0]['statistics'] && stats[0]['statistics'][0] && stats[0]['statistics'][0]['statistics']
+        stats[0]['statistics'][0]['statistics'].each do |stat|
+          name = extract_type(stat)
+          if name
+            # TODO: switch on the type and create the proper value
+            if extract_type(stat.value) == 'iControl:Common.ULong64'
+              result[name] = (stat.value.high << 32) | stat.value.low
+            end
+          end
+        end
+      end
+      result
+    end
+
+    def extract_type(soap_xml_elem)
+      soap_xml_elem.__xmlele.each do |item|
+        return item[1] if item[0].name == 'type'
+      end
+      soap_xml_elem.__xmlattr.each do |attribute|
+        return attribute[1] if attribute[0].name == 'type'
+      end
+      nil
     end
 
     # Enables a node in one or all pools if not already enabled. This method will do nothing in dryrun mode
@@ -119,7 +142,7 @@ module Cosmos2
     # @option params [String] :port The node's port, only need if a pool is specified
     # @option params [String] :pool The pool name; if not specified then the node will be enabled
     #                               in all pools that it is a member of
-    # @return [Hash] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly `:port` entries
+    # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly `:port` entries
     def enable(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
@@ -146,7 +169,7 @@ module Cosmos2
     # @option params [String] :port The node's port, only need if a pool is specified
     # @option params [String] :pool The pool name; if not specified then the node will be disabled
     #                               in all pools that it is a member of
-    # @return [Hash] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly `:port` entries
+    # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly `:port` entries
     def disable(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
