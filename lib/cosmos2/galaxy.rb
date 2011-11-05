@@ -60,7 +60,7 @@ module Cosmos2
   #
   # The galaxy plugin emits messages tagged as `:galaxy` and `:info` for most of its actions.
   # Note that in dry-run mode this plugin will still connect to galaxy and perform non-destructive operations
-  # (e.g. #select and #take_snapshot) but not destructive ones (such as #update). Instead, it will send
+  # (e.g. {#select} and {#take_snapshot}) but not destructive ones (such as {#update}). Instead, it will send
   # messages tagged as `:galaxy` and `:dryrun` in those cases.
   class Galaxy < Plugin
     # The plugin's configuration

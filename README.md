@@ -441,3 +441,7 @@ All API methods that have arguments, should only take parameter hashes with symb
 API method names should be actions and so the names should be or at least use verbs (e.g. `take_snapshot` instead of `snapshot`).
 API methods should objects that are useful to the script. For instance, a lot of the JIRA plugin methods deal with JIRA issues. All of these methods return an object representing the JIRA issue which can be passed in again to other methods on the plugin.
 
+## Error handling
+
+For now, error handling is up to the plugin. All built-in plugins simply pass the error from the underlying library up to the calling script (unless they can handle the error). No error wrapping is performed, primarily because Ruby has unchecked errors anyways.
+

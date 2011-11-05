@@ -25,7 +25,8 @@ else
   cosmos2 = Cosmos2::Environment.from_config_file(options)
   script_file = ARGV.shift
   with cosmos2 do
-    eval(IO.read(script_file))
+    # Unfortunately this won't give us proper line info in case of errors (see https://redmine.ruby-lang.org/issues/4352)
+    eval(IO.read(script_file), binding, script_file, __LINE__)
   end
 end
 

@@ -385,18 +385,19 @@ module Cosmos2
       instance = @cached_plugins[name.downcase]
       return instance if instance
 
-      # Next we'll check if there is a class of that name in namespace Cosmos2
+      # Now let's check if there is a plugin configured for that name, or if
+      # there is a class of that name in namespace Cosmos2
       clazz = find_plugin_class(name)
       if clazz
-        instance = clazz.new(self)
+        instance = clazz.new(self, name.to_sym)
         @cached_plugins[name.downcase] = instance
         instance
       else
         begin
           super
-        rescue NoMethodError => e
+        rescue Exception => e
           if required
-            throw e
+            raise "No such plugin instance configured or configuration is invalid for '#{name}'"
           else
             HoneyPot.new
           end
@@ -453,8 +454,11 @@ module Cosmos2
 
     def find_plugin_class(name)
       if @config[:plugins] && @config[:plugins][name.to_sym]
-        clazz = load_class(@config[:plugins][name.to_sym][:plugin_class])
-        return clazz if clazz
+        plugin_class = @config[:plugins][name.to_sym][:plugin_class]
+        if plugin_class
+          clazz = load_class(plugin_class)
+          return clazz if clazz
+        end
       end
       camel_case_name = name.gsub!(/^[a-z]/) { |a| a.upcase }
       clazz_names = ["Cosmos2::#{name}",
@@ -476,7 +480,7 @@ module Cosmos2
         begin
           clazz = eval(name)
           return clazz if clazz && clazz.is_a?(Class)
-        rescue NameError
+        rescue Exception => e
           # ignored
         end
       end
