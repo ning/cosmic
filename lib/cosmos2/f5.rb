@@ -93,24 +93,32 @@ module Cosmos2
       end
     end
 
-    # Retrieves statistics for a pool member.
+    # Retrieves statistics for a node or pool member. If `pool_name` is specified, then
+    # only the stats for that pool are returned.
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
-    # @option params [String] :port The node's port
-    # @option params [String] :pool The pool name
+    # @option params [String] :port The node's port; only required if a pool name is given
+    # @option params [String] :pool The pool name; optional
     # @return [Hash,nil] The statistics as a hash of statistics name to current value
-    def get_member_stats(params)
+    def get_stats(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
-      node_port = (params[:port] || 80).to_i
-      notify(:msg => "[F5] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-             :tags => [:f5, :info])
-      stats = @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
       result = {}
-      if stats[0] && stats[0]['statistics'] && stats[0]['statistics'][0] && stats[0]['statistics'][0]['statistics']
-        stats[0]['statistics'][0]['statistics'].each do |stat|
+      if pool_name
+        node_port = (params[:port] || 80).to_i
+        notify(:msg => "[F5] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :info])
+        stats = @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        stats = stats[0] if stats[0]
+      else
+        notify(:msg => "[F5] Retrieving stats for node #{node_ip} on load balancer #{@config[:host]}",
+               :tags => [:f5, :info])
+        stats = @f5['LocalLB.NodeAddress'].get_statistics([ node_ip ])
+      end
+      if stats['statistics'] && stats['statistics'][0] && stats['statistics'][0]['statistics']
+        stats['statistics'][0]['statistics'].each do |stat|
           name = extract_type(stat)
           if name
             # TODO: switch on the type and create the proper value
@@ -123,14 +131,17 @@ module Cosmos2
       result
     end
 
-    def extract_type(soap_xml_elem)
-      soap_xml_elem.__xmlele.each do |item|
-        return item[1] if item[0].name == 'type'
-      end
-      soap_xml_elem.__xmlattr.each do |attribute|
-        return attribute[1] if attribute[0].name == 'type'
-      end
-      nil
+    # Retrieves the number of active connections for a node or pool member. If `pool_name` is specified,
+    # then only the stats for that pool are returned.
+    #
+    # @param [Hash] params The parameters
+    # @option params [String] :host The node's hostname; specify this or the node's `:ip`
+    # @option params [String] :ip The node's ip address; specify this or the node's `:host`
+    # @option params [String] :port The node's port; only required if a pool name is given
+    # @option params [String] :pool The pool name; optional
+    # @return [Integer,nil] The number of active connections
+    def get_num_connections(params)
+      get_stats(params)['STATISTIC_SERVER_SIDE_CURRENT_CONNECTIONS']
     end
 
     # Enables a node in one or all pools if not already enabled. This method will do nothing in dryrun mode
@@ -187,7 +198,6 @@ module Cosmos2
       end
     end
 
-    # number of connections
     # add/remove to/from pool (set 'name' if defined, e.g. to hostname)
     # health check ?
 
@@ -240,6 +250,16 @@ module Cosmos2
     def set_node_status(node_ip, object_status_hash)
       @f5['LocalLB.NodeAddress'].set_monitor_state([ node_ip ], [ object_status_hash ])
       get_node(:ip => node_ip)
+    end
+
+    def extract_type(soap_xml_elem)
+      soap_xml_elem.__xmlele.each do |item|
+        return item[1] if item[0].name == 'type'
+      end
+      soap_xml_elem.__xmlattr.each do |attribute|
+        return attribute[1] if attribute[0].name == 'type'
+      end
+      nil
     end
   end
 end
