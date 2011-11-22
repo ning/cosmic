@@ -33,16 +33,55 @@ module Cosmos2
       authenticate
     end
 
+    # Adds a node to a pool.
+    #
+    # @param [Hash] params The parameters
+    # @option params [String] :host The node's hostname; specify this or the node's `:ip`
+    # @option params [String] :ip The node's ip address; specify this or the node's `:host`
+    # @option params [String] :port The node's port
+    # @option params [String] :pool The pool name
+    # @return [Hash,nil] The member as a hash with `:ip`, `:port`, `:availability`, and `:enabled` entries
+    def add_to_pool(params)
+      pool_name = params[:pool]
+      node_ip = get_ip(params)
+      node_port = (params[:port] || 80).to_i
+      notify(:msg => "[F5] Adding node #{node_ip} with port #{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
+             :tags => [:f5, :info])
+      @monitor.synchronize do
+        @f5['LocalLB.Pool'].add_member_v2([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+      end
+      get_member(params)
+    end
+
+    # Removes a node from a pool.
+    #
+    # @param [Hash] params The parameters
+    # @option params [String] :host The node's hostname; specify this or the node's `:ip`
+    # @option params [String] :ip The node's ip address; specify this or the node's `:host`
+    # @option params [String] :port The node's port
+    # @option params [String] :pool The pool name
+    # @return [void]
+    def remove_from_pool(params)
+      pool_name = params[:pool]
+      node_ip = get_ip(params)
+      node_port = (params[:port] || 80).to_i
+      notify(:msg => "[F5] Removing node #{node_ip} with port #{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
+             :tags => [:f5, :info])
+      @monitor.synchronize do
+        @f5['LocalLB.Pool'].remove_member_v2([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+      end
+    end
+
     # Retrieves the members of a pool.
     #
     # @param [Hash] params The parameters
     # @option params [String] :pool The pool name
-    # @return [Array<Hash>] The members as hashes with `:ip`, `:port`, `:availability`, and `:enabled` entries
+    # @return [Array<Hash>] The members as hashes with `:ip`, `:port`, `:availability`, `:enabled` and `:monitor_rule` entries
     def get_members(params)
       pool_name = params[:pool]
       notify(:msg => "[F5] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
-      @monitor.synchronize do
+      members = @monitor.synchronize do
         @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
           member = pool_member['member']
           status = pool_member['object_status']
@@ -52,6 +91,23 @@ module Cosmos2
             :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
         end
       end
+      members_hash = members.inject({}) { |h, member| h[member[:ip].to_s + ':' + member[:port].to_s] = member; h }
+      pool_members = members.map { |member| { 'address' => member[:ip], 'port' => member[:port] } }
+      @monitor.synchronize do
+        @f5['LocalLB.PoolMember'].get_monitor_association([ pool_name ])[0].each do |monitor_associations|
+          address = monitor_associations['member']['ipport']
+          member = members_hash[address['address'].to_s + ':' + address['port'].to_s]
+          if member
+            monitor_rule = monitor_associations['monitor_rule']
+            member[:monitor_rule] = { :type => monitor_rule['type'],
+                                      :quorum => monitor_rule['quorum'],
+                                      :templates => monitor_rule['monitor_templates'] }
+          end
+        end
+      end
+
+      puts members
+      members
     end
 
     # Retrieves a member of a pool.
@@ -61,26 +117,42 @@ module Cosmos2
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
     # @option params [String] :port The node's port
     # @option params [String] :pool The pool name
-    # @return [Hash,nil] The member as a hash with `:ip`, `:port`, `:availability`, and `:enabled` entries
+    # @return [Hash,nil] The member as a hash with `:ip`, `:port`, `:availability`, `:enabled` and `:monitor_rule` entries
     def get_member(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[F5] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
+      member = nil
       @monitor.synchronize do
-        @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
-          member = pool_member['member']
+        @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].each do |pool_member|
+          member_info = pool_member['member']
           status = pool_member['object_status']
-          if member['address'] == node_ip && member['port'] == node_port
-            return { :ip => member['address'],
-                     :port => member['port'],
-                     :availability => status['availability_status'],
-                     :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+          if member_info['address'] == node_ip && member_info['port'] == node_port
+            member = { :ip => member_info['address'],
+                       :port => member_info['port'],
+                       :availability => status['availability_status'],
+                       :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+            break
           end
         end
-        nil
       end
+      if member
+        @monitor.synchronize do
+          @f5['LocalLB.PoolMember'].get_monitor_association([ pool_name ])[0].each do |monitor_associations|
+            address = monitor_associations['member']['ipport']
+            if address['address'] == node_ip && address['port'] == node_port
+              monitor_rule = monitor_associations['monitor_rule']
+              member[:monitor_rule] = { :type => monitor_rule['type'],
+                                        :quorum => monitor_rule['quorum'],
+                                        :templates => monitor_rule['monitor_templates'] }
+              break
+            end
+          end
+        end
+      end
+      member
     end
 
     # Retrieves a node.
