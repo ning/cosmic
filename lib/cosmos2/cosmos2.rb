@@ -460,7 +460,7 @@ module Cosmos2
           return clazz if clazz
         end
       end
-      camel_case_name = name.gsub!(/^[a-z]/) { |a| a.upcase }
+      camel_case_name = name.gsub(/^[a-z]/) { |a| a.upcase }
       clazz_names = ["Cosmos2::#{name}",
                      "Cosmos2::#{name.upcase}",
                      "Cosmos2::#{camel_case_name}",
