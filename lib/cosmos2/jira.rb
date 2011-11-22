@@ -81,6 +81,8 @@ module Cosmos2
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [JIRA] The new instance
     def initialize(environment, name = :jira)
+      # Using Monitor instead of Mutex as the former is reentrant
+      @monitor = Monitor.new
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @config[:address] ||= 'http://localhost'
@@ -113,9 +115,11 @@ module Cosmos2
       project = get_project(params[:project])
       if project
         type_id = nil
-        @jira.getIssueTypesForProject(project.id).each do |issue_type|
-          if issue_type.name == params[:type]
-            type_id = issue_type.id
+        @monitor.synchronize do
+          @jira.getIssueTypesForProject(project.id).each do |issue_type|
+            if issue_type.name == params[:type]
+              type_id = issue_type.id
+            end
           end
         end
         raise "The type '#{type}' does not seem to be defined for project '#{project.name}'" unless type_id
@@ -126,7 +130,9 @@ module Cosmos2
         issue.description = params[:description] || ''
         issue.type = type_id
         issue.assignee = params[:assignee] || @config[:credentials][:username]
-        @jira.createIssue(issue)
+        @monitor.synchronize do
+          @jira.createIssue(issue)
+        end
       elsif !@environment.in_dry_run_mode
         raise "Could not find JIRA project #{params[:project]}"
       end
@@ -147,7 +153,9 @@ module Cosmos2
         comment = Jira4R::V2::RemoteComment.new()
         comment.author = params[:author] || @config[:credentials][:username]
         comment.body = params[:comment] || ''
-        @jira.addComment(issue.key.upcase, comment)
+        @monitor.synchronize do
+          @jira.addComment(issue.key.upcase, comment)
+        end
       elsif !@environment.in_dry_run_mode
         raise "Could not find JIRA issue #{params[:issue]}"
       end
@@ -285,7 +293,9 @@ module Cosmos2
     end
 
     def get_project(key)
-      @jira.getProjectByKey(key)
+      @monitor.synchronize do
+        @jira.getProjectByKey(key)
+      end
     end
 
     def issueify(issue_or_key)
@@ -296,14 +306,18 @@ module Cosmos2
                :tags => [:jira, :dryrun])
         nil
       else
-        @jira.getIssue(issue_or_key.to_s)
+        @monitor.synchronize do
+          @jira.getIssue(issue_or_key.to_s)
+        end
       end
     end
 
     def get_resolution_id(resolution_name)
-      @jira.getResolutions().each do |resolution|
-        if resolution.name == resolution_name
-          return resolution.id
+      @monitor.synchronize do
+        @jira.getResolutions().each do |resolution|
+          if resolution.name == resolution_name
+            return resolution.id
+          end
         end
       end
       raise "The resolution #{resolution_name} does not seem to be supported"
@@ -311,14 +325,18 @@ module Cosmos2
 
     def perform_workflow_action(issue, action_name, args_array = [])
       resolve_action_id = nil
-      @jira.getAvailableActions(issue.key.upcase).each do |action|
-        if action.name == action_name
-          resolve_action_id = action.id
-          break
+      @monitor.synchronize do
+        @jira.getAvailableActions(issue.key.upcase).each do |action|
+          if action.name == action_name
+            resolve_action_id = action.id
+            break
+          end
         end
       end
       raise "The workflow action #{action_name} does not seem to be supported" unless resolve_action_id
-      @jira.progressWorkflowAction(issue.key.upcase, resolve_action_id, args_array)
+      @monitor.synchronize do
+        @jira.progressWorkflowAction(issue.key.upcase, resolve_action_id, args_array)
+      end
     end
   end
 end
