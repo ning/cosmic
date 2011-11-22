@@ -190,7 +190,7 @@ module Cosmos2
                :tags => [:f5, :info])
         set_pool_member_status(pool_name,
                                'member' => { 'address' => node_ip, 'port' => node_port },
-                               'monitor_state' => 'STATE_DISABLED')
+                               'session_state' => 'STATE_DISABLED')
       else
         notify(:msg => "[F5] Disabling node #{node_ip} on load balancer #{@config[:host]}",
                :tags => [:f5, :info])
@@ -241,14 +241,14 @@ module Cosmos2
     end
 
     def set_pool_member_status(pool_name, object_status_hash)
-      @f5['LocalLB.PoolMember'].set_monitor_state([ pool_name ], [[ object_status_hash ]])
+      @f5['LocalLB.PoolMember'].set_session_enabled_state([ pool_name ], [[ object_status_hash ]])
       get_member(:ip => object_status_hash['member']['address'],
                  :port => object_status_hash['member']['port'],
                  :pool => pool_name)
     end
 
     def set_node_status(node_ip, object_status_hash)
-      @f5['LocalLB.NodeAddress'].set_monitor_state([ node_ip ], [ object_status_hash ])
+      @f5['LocalLB.NodeAddress'].set_session_enabled_state([ node_ip ], [ object_status_hash ])
       get_node(:ip => node_ip)
     end
 
