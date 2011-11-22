@@ -1,6 +1,7 @@
 require 'cosmos2'
 require 'cosmos2/plugin'
-require "socket"
+require 'socket'
+require 'monitor'
 require_with_hint 'f5-icontrol', "In order to use the F5 plugin please install the f5-icontrol gem, version 11.0.0.1 or newer"
 
 module Cosmos2
@@ -24,6 +25,8 @@ module Cosmos2
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Galaxy] The new instance
     def initialize(environment, name = :f5)
+      # Using Monitor instead of Mutex as the former is reentrant
+      @monitor = Monitor.new
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
@@ -39,13 +42,15 @@ module Cosmos2
       pool_name = params[:pool]
       notify(:msg => "[F5] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
-      @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
-        member = pool_member['member']
-        status = pool_member['object_status']
-        { :ip => member['address'],
-          :port => member['port'],
-          :availability => status['availability_status'],
-          :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+      @monitor.synchronize do
+        @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
+          member = pool_member['member']
+          status = pool_member['object_status']
+          { :ip => member['address'],
+            :port => member['port'],
+            :availability => status['availability_status'],
+            :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+        end
       end
     end
 
@@ -63,17 +68,19 @@ module Cosmos2
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[F5] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
-      @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
-        member = pool_member['member']
-        status = pool_member['object_status']
-        if member['address'] == node_ip && member['port'] == node_port
-          return { :ip => member['address'],
-                   :port => member['port'],
-                   :availability => status['availability_status'],
-                   :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+      @monitor.synchronize do
+        @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
+          member = pool_member['member']
+          status = pool_member['object_status']
+          if member['address'] == node_ip && member['port'] == node_port
+            return { :ip => member['address'],
+                     :port => member['port'],
+                     :availability => status['availability_status'],
+                     :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+          end
         end
+        nil
       end
-      nil
     end
 
     # Retrieves a node.
@@ -86,10 +93,12 @@ module Cosmos2
       node_ip = get_ip(params)
       notify(:msg => "[F5] Retrieving node #{node_ip} from load balancer #{@config[:host]}",
              :tags => [:f5, :info])
-      @f5['LocalLB.NodeAddress'].get_object_status([ node_ip ]).each do |status|
-        return { :ip => node_ip,
-                 :availability => status['availability_status'],
-                 :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+      @monitor.synchronize do
+        @f5['LocalLB.NodeAddress'].get_object_status([ node_ip ]).each do |status|
+          return { :ip => node_ip,
+                   :availability => status['availability_status'],
+                   :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+        end
       end
     end
 
@@ -110,12 +119,16 @@ module Cosmos2
         node_port = (params[:port] || 80).to_i
         notify(:msg => "[F5] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :info])
-        stats = @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        stats = @monitor.synchronize do
+          @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        end
         stats = stats[0] if stats[0]
       else
         notify(:msg => "[F5] Retrieving stats for node #{node_ip} on load balancer #{@config[:host]}",
                :tags => [:f5, :info])
-        stats = @f5['LocalLB.NodeAddress'].get_statistics([ node_ip ])
+        stats = @monitor.synchronize do
+          @f5['LocalLB.NodeAddress'].get_statistics([ node_ip ])
+        end
       end
       if stats['statistics'] && stats['statistics'][0] && stats['statistics'][0]['statistics']
         stats['statistics'][0]['statistics'].each do |stat|
@@ -241,14 +254,18 @@ module Cosmos2
     end
 
     def set_pool_member_status(pool_name, object_status_hash)
-      @f5['LocalLB.PoolMember'].set_session_enabled_state([ pool_name ], [[ object_status_hash ]])
+      @monitor.synchronize do
+        @f5['LocalLB.PoolMember'].set_session_enabled_state([ pool_name ], [[ object_status_hash ]])
+      end
       get_member(:ip => object_status_hash['member']['address'],
                  :port => object_status_hash['member']['port'],
                  :pool => pool_name)
     end
 
     def set_node_status(node_ip, object_status_hash)
-      @f5['LocalLB.NodeAddress'].set_session_enabled_state([ node_ip ], [ object_status_hash ])
+      @monitor.synchronize do
+        @f5['LocalLB.NodeAddress'].set_session_enabled_state([ node_ip ], [ object_status_hash ])
+      end
       get_node(:ip => node_ip)
     end
 
