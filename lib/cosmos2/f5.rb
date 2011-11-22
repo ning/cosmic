@@ -222,10 +222,12 @@ module Cosmos2
     # @return [void]
     def sync(params)
       group = params[:group]
-      if group
-        @f5['System.ConfigSync'].synchronize_to_group(group)
-      else
-        @f5['System.ConfigSync'].synchronize_configuration('CONFIGSYNC_ALL')
+      @monitor.synchronize do
+        if group
+          @f5['System.ConfigSync'].synchronize_to_group(group)
+        else
+          @f5['System.ConfigSync'].synchronize_configuration('CONFIGSYNC_ALL')
+        end
       end
     end
 
