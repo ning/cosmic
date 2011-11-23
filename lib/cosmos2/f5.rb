@@ -33,17 +33,8 @@ module Cosmos2
       authenticate
     end
 
-    # Adds a node to a pool. Optionally you can specifiy the monitor rule which defines
-    # how the load balancer monitors the member. The `:monitor_rule` parameter is a hash
-    # consisting of
-    #
-    # * `:type` - The type of the monitoring rule, one of `MONITOR_RULE_TYPE_SINGLE` for a
-    #             single monitor, `MONITOR_RULE_TYPE_AND_LIST` for a list of monitors that
-    #             all have to succeed, or `MONITOR_RULE_TYPE_M_OF_N` if a quorum of monitors
-    #             have to succeed
-    # * `:quorum` - The optional number of monitors that have to succeed, only used if the
-    #               type is `MONITOR_RULE_TYPE_M_OF_N`
-    # * `:templates` - An array of the names of the monitoring rule templates to use
+    # Adds a node to a pool. If a monitor rule is specified, then it will also set it on the
+    # member using the {#set_monitor_rule} method.
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
@@ -63,6 +54,41 @@ module Cosmos2
         @f5['LocalLB.Pool'].add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
       end
       if params[:monitor_rule]
+        set_monitor_rule(params)
+      else
+        get_member(params)
+      end
+    end
+
+    # Sets the monitor rule for a pool member which defines how the load balancer monitors the member.
+    # The `:monitor_rule` parameter is a hash consisting of
+    #
+    # * `:type` - The type of the monitoring rule, one of `MONITOR_RULE_TYPE_SINGLE` for a
+    #             single monitor, `MONITOR_RULE_TYPE_AND_LIST` for a list of monitors that
+    #             all have to succeed, or `MONITOR_RULE_TYPE_M_OF_N` if a quorum of monitors
+    #             have to succeed
+    # * `:quorum` - The optional number of monitors that have to succeed, only used if the
+    #               type is `MONITOR_RULE_TYPE_M_OF_N`
+    # * `:templates` - An array of the names of the monitoring rule templates to use
+    #
+    # If `:monitor_rule` is not specified, then this method will remove any monitoring rules for
+    # the member.
+    #
+    # @param [Hash] params The parameters
+    # @option params [String] :host The node's hostname; specify this or the node's `:ip`
+    # @option params [String] :ip The node's ip address; specify this or the node's `:host`
+    # @option params [String] :port The node's port
+    # @option params [String] :pool The pool name
+    # @option params [String] :monitor_rule The monitoring rule
+    # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
+    #                       `:availability`, `:enabled` and `:monitor_rule` entries
+    def set_monitor_rule(params)
+      pool_name = params[:pool]
+      node_ip = get_ip(params)
+      node_port = (params[:port] || 80).to_i
+      notify(:msg => "[F5] Setting monitor rule for node #{node_ip} with port #{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+             :tags => [:f5, :info])
+      if params[:monitor_rule]
         ip_port = { 'address' => node_ip,
                     'port' => node_port }
         monitor_ip_port = { 'address_type' => 'ATYPE_EXPLICIT_ADDRESS_EXPLICIT_PORT',
@@ -70,11 +96,13 @@ module Cosmos2
         monitor_rule = { 'type' => params[:monitor_rule][:type] || 'MONITOR_RULE_TYPE_SINGLE',
                          'quorum' => params[:monitor_rule][:quorum] || 0,
                          'monitor_templates' => params[:monitor_rule][:templates] || [] }
-        monitor_association = { 'member' => monitor_ip_port,
-                                'monitor_rule' => monitor_rule }
-        @monitor.synchronize do
-          @f5['LocalLB.PoolMember'].set_monitor_association([ pool_name ], [[ monitor_association ]])
-        end
+        monitor_associations = [{ 'member' => monitor_ip_port,
+                                  'monitor_rule' => monitor_rule }]
+      else
+        monitor_associations = []
+      end
+      @monitor.synchronize do
+        @f5['LocalLB.PoolMember'].set_monitor_association([ pool_name ], [ monitor_associations ])
       end
       get_member(params)
     end
