@@ -33,14 +33,26 @@ module Cosmos2
       authenticate
     end
 
-    # Adds a node to a pool.
+    # Adds a node to a pool. Optionally you can specifiy the monitor rule which defines
+    # how the load balancer monitors the member. The `:monitor_rule` parameter is a hash
+    # consisting of
+    #
+    # * `:type` - The type of the monitoring rule, one of `MONITOR_RULE_TYPE_SINGLE` for a
+    #             single monitor, `MONITOR_RULE_TYPE_AND_LIST` for a list of monitors that
+    #             all have to succeed, or `MONITOR_RULE_TYPE_M_OF_N` if a quorum of monitors
+    #             have to succeed
+    # * `:quorum` - The optional number of monitors that have to succeed, only used if the
+    #               type is `MONITOR_RULE_TYPE_M_OF_N`
+    # * `:templates` - An array of the names of the monitoring rule templates to use
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
     # @option params [String] :port The node's port
     # @option params [String] :pool The pool name
-    # @return [Hash,nil] The member as a hash with `:ip`, `:port`, `:availability`, and `:enabled` entries
+    # @option params [String] :monitor_rule The monitoring rule
+    # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
+    #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def add_to_pool(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
@@ -48,7 +60,21 @@ module Cosmos2
       notify(:msg => "[F5] Adding node #{node_ip} with port #{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
       @monitor.synchronize do
-        @f5['LocalLB.Pool'].add_member_v2([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        @f5['LocalLB.Pool'].add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+      end
+      if params[:monitor_rule]
+        ip_port = { 'address' => node_ip,
+                    'port' => node_port }
+        monitor_ip_port = { 'address_type' => 'ATYPE_EXPLICIT_ADDRESS_EXPLICIT_PORT',
+                            'ipport' => ip_port }
+        monitor_rule = { 'type' => params[:monitor_rule][:type] || 'MONITOR_RULE_TYPE_SINGLE',
+                         'quorum' => params[:monitor_rule][:quorum] || 0,
+                         'monitor_templates' => params[:monitor_rule][:templates] || [] }
+        monitor_association = { 'member' => monitor_ip_port,
+                                'monitor_rule' => monitor_rule }
+        @monitor.synchronize do
+          @f5['LocalLB.PoolMember'].set_monitor_association([ pool_name ], [[ monitor_association ]])
+        end
       end
       get_member(params)
     end
@@ -68,7 +94,7 @@ module Cosmos2
       notify(:msg => "[F5] Removing node #{node_ip} with port #{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
       @monitor.synchronize do
-        @f5['LocalLB.Pool'].remove_member_v2([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        @f5['LocalLB.Pool'].remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
       end
     end
 
@@ -76,7 +102,8 @@ module Cosmos2
     #
     # @param [Hash] params The parameters
     # @option params [String] :pool The pool name
-    # @return [Array<Hash>] The members as hashes with `:ip`, `:port`, `:availability`, `:enabled` and `:monitor_rule` entries
+    # @return [Array<Hash>] The members as hashes with `:pool_name`,, `:ip`, `:port`,
+    #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def get_members(params)
       pool_name = params[:pool]
       notify(:msg => "[F5] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
@@ -88,7 +115,8 @@ module Cosmos2
           { :ip => member['address'],
             :port => member['port'],
             :availability => status['availability_status'],
-            :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+            :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED'),
+            :pool => pool_name }
         end
       end
       members_hash = members.inject({}) { |h, member| h[member[:ip].to_s + ':' + member[:port].to_s] = member; h }
@@ -106,7 +134,6 @@ module Cosmos2
         end
       end
 
-      puts members
       members
     end
 
@@ -117,7 +144,8 @@ module Cosmos2
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
     # @option params [String] :port The node's port
     # @option params [String] :pool The pool name
-    # @return [Hash,nil] The member as a hash with `:ip`, `:port`, `:availability`, `:enabled` and `:monitor_rule` entries
+    # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
+    #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def get_member(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
@@ -133,7 +161,8 @@ module Cosmos2
             member = { :ip => member_info['address'],
                        :port => member_info['port'],
                        :availability => status['availability_status'],
-                       :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
+                       :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED'),
+                       :pool => pool_name }
             break
           end
         end
@@ -238,7 +267,8 @@ module Cosmos2
     # @option params [String] :port The node's port, only need if a pool is specified
     # @option params [String] :pool The pool name; if not specified then the node will be enabled
     #                               in all pools that it is a member of
-    # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly `:port` entries
+    # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly
+    #                    `:pool_name`, `:port`, and `:monitor_rule` entries
     def enable(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
@@ -265,7 +295,8 @@ module Cosmos2
     # @option params [String] :port The node's port, only need if a pool is specified
     # @option params [String] :pool The pool name; if not specified then the node will be disabled
     #                               in all pools that it is a member of
-    # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly `:port` entries
+    # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly
+    #                    `:pool_name`, `:port`, and `:monitor_rule` entries
     def disable(params)
       pool_name = params[:pool]
       node_ip = get_ip(params)
