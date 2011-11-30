@@ -2,6 +2,7 @@ require 'cosmos2'
 require 'cosmos2/plugin'
 
 require_with_hint 'net/ssh', "In order to use the ssh plugin please run 'gem install net-ssh'"
+require_with_hint 'net/scp', "In order to use the ssh plugin please run 'gem install net-scp'"
 
 module Cosmos2
   # A plugin that makes SSH and SCP available to cosmos scripts, e.g. to perform actions on remote
@@ -48,10 +49,10 @@ module Cosmos2
     # @option params [String] :cmd The command to run on the host
     # @return [String] All output of the command (stdout and stderr combined)
     def exec(params)
-      host = params[:host]
+      host = params[:host] or raise "No :host argument given"
       user = params[:user] || @config[:credentials][:username]
       password = @config[:credentials][:password]
-      cmd = params[:cmd]
+      cmd = params[:cmd] or raise "No :cmd argument given"
       if @environment.in_dry_run_mode
         notify(:msg => "Would connect as user #{user} to host #{host} and execute command '#{cmd}'",
                :tags => [:ssh, :dryrun])
@@ -78,10 +79,10 @@ module Cosmos2
     #        of the file
     # @return [void]
     def upload(params, &block)
-      host = params[:host]
+      host = params[:host] or raise "No :host argument given"
       user = params[:user] || @config[:credentials][:username]
       password = @config[:credentials][:password]
-      local = params[:local]
+      local = params[:local] or raise "No :local argument given"
       remote = params[:remote] || params[:local]
       if @environment.in_dry_run_mode
         notify(:msg => "Would upload local file #{local} as user #{user} to host #{host} at #{remote}",
@@ -89,7 +90,7 @@ module Cosmos2
       else
         response = nil
         Net::SCP.start(host, user, :password => password) do |scp|
-          scp.upload!(local, remote, block)
+          scp.upload!(local, remote, &block)
         end
       end
     end
@@ -108,18 +109,18 @@ module Cosmos2
     #        of the file
     # @return [void]
     def download(params, &block)
-      host = params[:host]
+      host = params[:host] or raise "No :host argument given"
       user = params[:user] || @config[:credentials][:username]
       password = @config[:credentials][:password]
       local = params[:local] || params[:remote]
-      remote = params[:remote]
+      remote = params[:remote] or raise "No :remote argument given"
       if @environment.in_dry_run_mode
         notify(:msg => "Would download remote file #{remote} as user #{user} from host #{host} to local file #{local}",
                :tags => [:ssh, :dryrun])
       else
         response = nil
         Net::SCP.start(host, user, :password => password) do |scp|
-          scp.download!(remote, local, block)
+          scp.download!(remote, local, &block)
         end
       end
     end
