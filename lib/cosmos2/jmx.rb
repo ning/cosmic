@@ -1,14 +1,14 @@
 require 'cosmos2'
 require 'cosmos2/plugin'
 
-require_with_hint 'jmx4r', "In order to use the cinch plugin please run 'gem install jmx4r'"
+require_with_hint 'jmx4r', "In order to use the jmx plugin please run 'gem install jmx4r'"
 
 module Cosmos2
   # A plugin that makes JMX available to cosmos scripts, e.g. to read out values or perform
   # operations on running Java services. You'd typically use it in a cosmos context like so:
   #
   #     with jmx do
-  #       TBD
+  #       TODO
   #     end
   #
   # This plugin does not require a section in the config file unless you want to instantiate
@@ -29,7 +29,7 @@ module Cosmos2
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @connections = {}
-      @environment.resolve_service_auth(:service_name => :jmx, :config => @config)
+      @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
     end
 
     # Returns an mbean by name. This method will do nothing in dryrun mode except create
