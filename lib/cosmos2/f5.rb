@@ -48,15 +48,21 @@ module Cosmos2
       pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
-      notify(:msg => "[F5] Adding node #{node_ip} with port #{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
-             :tags => [:f5, :info])
-      @monitor.synchronize do
-        @f5['LocalLB.Pool'].add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
-      end
-      if params[:monitor_rule]
-        set_monitor_rule(params)
-      else
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would add node node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :dryrun])
         get_member(params)
+      else
+        notify(:msg => "[F5] Adding node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :info])
+        @monitor.synchronize do
+          @f5['LocalLB.Pool'].add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        end
+        if params[:monitor_rule]
+          set_monitor_rule(params)
+        else
+          get_member(params)
+        end
       end
     end
 
@@ -86,23 +92,28 @@ module Cosmos2
       pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
-      notify(:msg => "[F5] Setting monitor rule for node #{node_ip} with port #{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-             :tags => [:f5, :info])
-      if params[:monitor_rule]
-        ip_port = { 'address' => node_ip,
-                    'port' => node_port }
-        monitor_ip_port = { 'address_type' => 'ATYPE_EXPLICIT_ADDRESS_EXPLICIT_PORT',
-                            'ipport' => ip_port }
-        monitor_rule = { 'type' => params[:monitor_rule][:type] || 'MONITOR_RULE_TYPE_SINGLE',
-                         'quorum' => params[:monitor_rule][:quorum] || 0,
-                         'monitor_templates' => params[:monitor_rule][:templates] || [] }
-        monitor_associations = [{ 'member' => monitor_ip_port,
-                                  'monitor_rule' => monitor_rule }]
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would set monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :dryrun])
       else
-        monitor_associations = []
-      end
-      @monitor.synchronize do
-        @f5['LocalLB.PoolMember'].set_monitor_association([ pool_name ], [ monitor_associations ])
+        notify(:msg => "[F5] Setting monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :info])
+        if params[:monitor_rule]
+          ip_port = { 'address' => node_ip,
+                      'port' => node_port }
+          monitor_ip_port = { 'address_type' => 'ATYPE_EXPLICIT_ADDRESS_EXPLICIT_PORT',
+                              'ipport' => ip_port }
+          monitor_rule = { 'type' => params[:monitor_rule][:type] || 'MONITOR_RULE_TYPE_SINGLE',
+                           'quorum' => params[:monitor_rule][:quorum] || 0,
+                           'monitor_templates' => params[:monitor_rule][:templates] || [] }
+          monitor_associations = [{ 'member' => monitor_ip_port,
+                                    'monitor_rule' => monitor_rule }]
+        else
+          monitor_associations = []
+        end
+        @monitor.synchronize do
+          @f5['LocalLB.PoolMember'].set_monitor_association([ pool_name ], [ monitor_associations ])
+        end
       end
       get_member(params)
     end
@@ -119,10 +130,15 @@ module Cosmos2
       pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
-      notify(:msg => "[F5] Removing node #{node_ip} with port #{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
-             :tags => [:f5, :info])
-      @monitor.synchronize do
-        @f5['LocalLB.Pool'].remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would remote node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :dryrun])
+      else
+        notify(:msg => "[F5] Removing node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :info])
+        @monitor.synchronize do
+          @f5['LocalLB.Pool'].remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        end
       end
     end
 
@@ -263,7 +279,7 @@ module Cosmos2
         stats['statistics'][0]['statistics'].each do |stat|
           name = extract_type(stat)
           if name
-            # TODO: switch on the type and create the proper value
+            # TODO: switch on the type and support all possible values
             if extract_type(stat.value) == 'iControl:Common.ULong64'
               result[name] = (stat.value.high << 32) | stat.value.low
             end
@@ -302,15 +318,27 @@ module Cosmos2
       node_ip = get_ip(params)
       if pool_name
         node_port = (params[:port] || 80).to_i
-        notify(:msg => "[F5] Enabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
-        set_pool_member_status(pool_name,
-                               'member' => { 'address' => node_ip, 'port' => node_port },
-                               'monitor_state' => 'STATE_ENABLED')
+        if @environment.in_dry_run_mode
+          notify(:msg => "Would enable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :dryrun])
+          get_member(params)
+        else
+          notify(:msg => "[F5] Enabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :info])
+          set_pool_member_status(pool_name,
+                                 'member' => { 'address' => node_ip, 'port' => node_port },
+                                 'monitor_state' => 'STATE_ENABLED')
+        end
       else
-        notify(:msg => "[F5] Enabling node #{node_ip} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
-        set_node_status(node_ip, 'STATE_ENABLED')
+        if @environment.in_dry_run_mode
+          notify(:msg => "Would enable node #{node_ip} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :dryrun])
+          get_member(params)
+        else
+          notify(:msg => "[F5] Enabling node #{node_ip} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :info])
+          set_node_status(node_ip, 'STATE_ENABLED')
+        end
       end
     end
 
@@ -330,15 +358,27 @@ module Cosmos2
       node_ip = get_ip(params)
       if pool_name
         node_port = (params[:port] || 80).to_i
-        notify(:msg => "[F5] Disabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
-        set_pool_member_status(pool_name,
-                               'member' => { 'address' => node_ip, 'port' => node_port },
-                               'session_state' => 'STATE_DISABLED')
+        if @environment.in_dry_run_mode
+          notify(:msg => "Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :dryrun])
+          get_member(params)
+        else
+          notify(:msg => "[F5] Disabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :info])
+          set_pool_member_status(pool_name,
+                                 'member' => { 'address' => node_ip, 'port' => node_port },
+                                 'session_state' => 'STATE_DISABLED')
+        end
       else
-        notify(:msg => "[F5] Disabling node #{node_ip} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
-        set_node_status(node_ip, 'STATE_DISABLED')
+        if @environment.in_dry_run_mode
+          notify(:msg => "Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :dryrun])
+          get_member(params)
+        else
+          notify(:msg => "[F5] Disabling node #{node_ip} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :info])
+          set_node_status(node_ip, 'STATE_DISABLED')
+        end
       end
     end
 
@@ -365,15 +405,10 @@ module Cosmos2
     private
 
     def authenticate
-      if @environment.in_dry_run_mode
-        notify(:msg => "Would connect to F5 instance #{@config[:host]}",
-               :tags => [:f5, :dryrun])
-      else
-        @f5 = ::F5::IControl.new(@config[:host],
-                                 @config[:credentials][:username],
-                                 @config[:credentials][:password],
-                                 ['LocalLB.Pool', 'LocalLB.PoolMember', 'LocalLB.NodeAddress', 'System.ConfigSync']).get_interfaces
-      end
+      @f5 = ::F5::IControl.new(@config[:host],
+                               @config[:credentials][:username],
+                               @config[:credentials][:password],
+                               ['LocalLB.Pool', 'LocalLB.PoolMember', 'LocalLB.NodeAddress', 'System.ConfigSync']).get_interfaces
     end
 
     def get_ip(params)
