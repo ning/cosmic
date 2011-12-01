@@ -331,7 +331,7 @@ module Cosmos2
 
     def dry_run_or_not(params, dry_run_msg)
       if @environment.in_dry_run_mode
-      to = params[:to] or raise "No :to argument given"
+        to = params[:to] or raise "No :to argument given"
         services = params[:services] || arrayify(params[:service])
         services.each do |agent|
           notify(:msg => eval('"' + dry_run_msg + '"'), :tags => [:galaxy, :dryrun])

@@ -114,31 +114,36 @@ module Cosmos2
     # @return [Jira4R::V2::RemoteIssue,nil] The new issue
     def create_issue(params)
       project_name = params[:project] or raise "No :project argument given"
-      project = get_project(project_name)
       type = params[:type] or raise "No :type argument given"
       summary = params[:summary] or raise "No :summary argument given"
-      if project
-        type_id = nil
-        @monitor.synchronize do
-          @jira.getIssueTypesForProject(project.id).each do |issue_type|
-            if issue_type.name == type
-              type_id = issue_type.id
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would create a new issue in project #{project_name} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+               :tags => [:jira, :dryrun])
+      else
+        project = get_project(project_name)
+        if project
+          type_id = nil
+          @monitor.synchronize do
+            @jira.getIssueTypesForProject(project.id).each do |issue_type|
+              if issue_type.name == type
+                type_id = issue_type.id
+              end
             end
           end
-        end
-        raise "The type '#{type}' does not seem to be defined for project '#{project.name}'" unless type_id
+          raise "The type '#{type}' does not seem to be defined for project '#{project.name}'" unless type_id
 
-        issue = Jira4R::V2::RemoteIssue.new
-        issue.project = project.key
-        issue.summary = summary
-        issue.description = params[:description] || ''
-        issue.type = type_id
-        issue.assignee = params[:assignee] || @config[:credentials][:username]
-        @monitor.synchronize do
-          @jira.createIssue(issue)
+          issue = Jira4R::V2::RemoteIssue.new
+          issue.project = project.key
+          issue.summary = summary
+          issue.description = params[:description] || ''
+          issue.type = type_id
+          issue.assignee = params[:assignee] || @config[:credentials][:username]
+          @monitor.synchronize do
+            @jira.createIssue(issue)
+          end
+        else
+          raise "Could not find JIRA project #{project_nam}"
         end
-      elsif !@environment.in_dry_run_mode
-        raise "Could not find JIRA project #{params[:project]}"
       end
     end
 
@@ -153,18 +158,23 @@ module Cosmos2
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def comment_on(params)
       key = params[:issue] or raise "No :issue argument given"
-      issue = issueify(key)
-      if issue
-        comment = Jira4R::V2::RemoteComment.new()
-        comment.author = params[:author] || @config[:credentials][:username]
-        comment.body = params[:comment] || ''
-        @monitor.synchronize do
-          @jira.addComment(issue.key.upcase, comment)
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would comment on issue #{key} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+               :tags => [:jira, :dryrun])
+      else
+        issue = issueify(key)
+        if issue
+          comment = Jira4R::V2::RemoteComment.new()
+          comment.author = params[:author] || @config[:credentials][:username]
+          comment.body = params[:comment] || ''
+          @monitor.synchronize do
+            @jira.addComment(issue.key.upcase, comment)
+          end
+        else
+          raise "Could not find JIRA issue #{params[:issue]}"
         end
-      elsif !@environment.in_dry_run_mode
-        raise "Could not find JIRA issue #{params[:issue]}"
+        issue
       end
-      issue
     end
 
     # Links an issue to another one. This method will do nothing in dryrun mode except create
@@ -180,51 +190,56 @@ module Cosmos2
       from_key = params[:issue] or raise "No :issue argument given"
       to_key = params[:to] or raise "No :to argument given"
       kind = params[:kind] or raise "No :kind argument given"
-      issue = issueify(from_key)
-      to = issueify(to_key)
-      if issue && to
-        # The SOAP and RPC apis don't support linking so we have go via the web form instead
-        uri = URI.parse(@config[:address])
-        http = Net::HTTP.new(uri.host, uri.port)
-        if uri.scheme == 'https'
-          http.use_ssl = true
-          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-        end
-        # Login first to get the cookie and token
-        req = Net::HTTP::Post.new('/login.jsp')
-        req.set_form_data('os_authType' => 'basic', 'os_cookie' => true)
-        req.basic_auth(@config[:credentials][:username], @config[:credentials][:password])
-
-        response = http.request(req)
-
-        if response.code.to_i == 200
-          cookies = response.get_fields('set-cookie').collect { |cookie| cookie.split(';')[0] }
-          doc = Nokogiri::HTML(response.body)
-          token = ''
-          doc.xpath("//meta[@id='atlassian-token']").each do |meta_tag|
-            token = meta_tag['content']
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would create a link of type #{kind} from issue #{from_key} to #{to_key} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+               :tags => [:jira, :dryrun])
+      else
+        issue = issueify(from_key)
+        to = issueify(to_key)
+        if issue && to
+          # The SOAP and RPC apis don't support linking so we have go via the web form instead
+          uri = URI.parse(@config[:address])
+          http = Net::HTTP.new(uri.host, uri.port)
+          if uri.scheme == 'https'
+            http.use_ssl = true
+            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
           end
-
-          req = Net::HTTP::Post.new('/secure/LinkExistingIssue.jspa')
-          req.set_form_data('id' => issue.id,
-                            'linkKey' => to.key,
-                            'linkDesc' => kind,
-                            'comment' => params[:comment] || '',
-                            'atl_token' => token)
-          req['Cookie'] = cookies.to_s
+          # Login first to get the cookie and token
+          req = Net::HTTP::Post.new('/login.jsp')
+          req.set_form_data('os_authType' => 'basic', 'os_cookie' => true)
+          req.basic_auth(@config[:credentials][:username], @config[:credentials][:password])
 
           response = http.request(req)
-          if response.code.to_i >= 400
-            raise "Could not link JIRA issue #{issue.key} to #{to.key}, response status was #{response.code.to_i}"
+
+          if response.code.to_i == 200
+            cookies = response.get_fields('set-cookie').collect { |cookie| cookie.split(';')[0] }
+            doc = Nokogiri::HTML(response.body)
+            token = ''
+            doc.xpath("//meta[@id='atlassian-token']").each do |meta_tag|
+              token = meta_tag['content']
+            end
+
+            req = Net::HTTP::Post.new('/secure/LinkExistingIssue.jspa')
+            req.set_form_data('id' => issue.id,
+                              'linkKey' => to.key,
+                              'linkDesc' => kind,
+                              'comment' => params[:comment] || '',
+                              'atl_token' => token)
+            req['Cookie'] = cookies.to_s
+
+            response = http.request(req)
+            if response.code.to_i >= 400
+              raise "Could not link JIRA issue #{issue.key} to #{to.key}, response status was #{response.code.to_i}"
+            end
+          else
+            raise "Could not login to JIRA via http/https, response status was #{response.code.to_i}"
           end
         else
-          raise "Could not login to JIRA via http/https, response status was #{response.code.to_i}"
+          raise "Could not find the JIRA issue #{from_key}" unless issue
+          raise "Could not find the target JIRA issue #{to_key}" unless to
         end
-      elsif !@environment.in_dry_run_mode
-        raise "Could not find the JIRA issue #{from_key}" unless issue
-        raise "Could not find the target JIRA issue #{to_key}" unless to
+        issue
       end
-      issue
     end
 
     # Resolves an issue after disconnecting it from the message bus if necessary. This method will do
@@ -236,17 +251,22 @@ module Cosmos2
     # @option params [String,nil] :resolution The resolution. If not specified, then `Fixed` will be used
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def resolve(params)
-      issue = disconnect(params)
-      if issue
-        action_name = params[:action] || 'Resolve Issue'
-        resolution_field = Jira4R::V2::RemoteFieldValue.new
-        resolution_field.id = "resolution"
-        resolution_field.values = get_resolution_id(params[:resolution] || 'Fixed')
-        perform_workflow_action(issue, action_name, [resolution_field])
-      elsif !@environment.in_dry_run_mode
-        raise "Could not find JIRA issue #{params[:issue]}"
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would resolve issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+               :tags => [:jira, :dryrun])
+      else
+        issue = disconnect(params)
+        if issue
+          action_name = params[:action] || 'Resolve Issue'
+          resolution_field = Jira4R::V2::RemoteFieldValue.new
+          resolution_field.id = "resolution"
+          resolution_field.values = get_resolution_id(params[:resolution] || 'Fixed')
+          perform_workflow_action(issue, action_name, [resolution_field])
+        else
+          raise "Could not find JIRA issue #{params[:issue]}"
+        end
+        issue
       end
-      issue
     end
 
     # Connects an existing JIRA issue to the message bus. All messages with the given tags
@@ -261,13 +281,18 @@ module Cosmos2
     def connect(params)
       key = params[:issue] or raise "No :issue argument given"
       tags = params[:to] or raise "No :to argument given"
-      issue = issueify(key)
-      if issue
-        @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => tags)
-      elsif !@environment.in_dry_run_mode
-        raise "Could not find JIRA issue #{key}"
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would connect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:credentials][:username]} to the message bus",
+               :tags => [:jira, :dryrun])
+      else
+        issue = issueify(key)
+        if issue
+          @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => tags)
+        elsif !@environment.in_dry_run_mode
+          raise "Could not find JIRA issue #{key}"
+        end
+        issue
       end
-      issue
     end
 
     # Disconnects an existing JIRA issue from the message bus. This does not change anything in the JIRA issue itself,
@@ -279,11 +304,16 @@ module Cosmos2
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def disconnect(params)
       key = params[:issue] or raise "No :issue argument given"
-      issue = issueify(key)
-      if issue
-        @environment.disconnect_message_listener(:listener => IssueMessageListener.new(self, issue))
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would disconnect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:credentials][:username]} from the message bus",
+               :tags => [:jira, :dryrun])
+      else
+        issue = issueify(key)
+        if issue
+          @environment.disconnect_message_listener(:listener => IssueMessageListener.new(self, issue))
+        end
+        issue
       end
-      issue
     end
 
     private
