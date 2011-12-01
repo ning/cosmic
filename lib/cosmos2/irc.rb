@@ -159,9 +159,10 @@ module Cosmos2
     # @option params [String,Array<String>,Cinch::Channel,Array<Cinch::Channel>] :channels The channels to write to
     # @return [void]
     def write(params)
-      msg = params[:msg]
+      msg = params[:msg] or raise "No :msg argument given"
+      raise "No :channels argument given" unless params[:channels]
       channels = arrayify(params[:channels])
-      if msg && !channels.empty?
+      if !channels.empty?
         if @environment.in_dry_run_mode
           notify(:msg => "Would write message '#{msg}' to channels #{channels.join(',')}",
                  :tags => [:irc, :dryrun])
@@ -178,7 +179,8 @@ module Cosmos2
     # @option params [String] :channel The channel to join
     # @return [Cinch::Channel,nil] The channel if the plugin was able to join it
     def join(params)
-      get_channel_internal(params[:channel])
+      channel_name = params[:channel] or raise "No :channel argument given"
+      get_channel_internal(channel_name)
     end
 
     # Joins a channel and connects it to the message bus. This method will do nothing in dryrun mode except create
@@ -189,7 +191,8 @@ module Cosmos2
     # @option params [Array<String>,String] :to The tags for the messages that the plugin should write to the channel
     # @return [Cinch::Channel,nil] The channel if the plugin was able to connect it
     def connect(params)
-      channel = get_channel_internal(params[:channel])
+      channel_name = params[:channel] or raise "No :channel argument given"
+      channel = get_channel_internal(channel_name)
       if channel
         @environment.connect_message_listener(:listener => ChannelMessageListener.new(channel), :tags => params[:to])
       end
@@ -203,7 +206,8 @@ module Cosmos2
     # @option params [String] :channel The channel to disconnect from the message bus
     # @return [Cinch::Channel,nil] The channel
     def disconnect(params)
-      channel = get_channel_internal(params[:channel])
+      channel_name = params[:channel] or raise "No :channel argument given"
+      channel = get_channel_internal(channel_name)
       if channel
         @environment.disconnect_message_listener(:listener => ChannelMessageListener.new(channel))
       end

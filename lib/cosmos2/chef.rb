@@ -12,8 +12,8 @@ module Cosmos2
   #       TODO
   #     end
   #
-  # Note that this plugin will not actually talk to Chef in dry-run mode.
-  # Instead it will only send messages tagged as `:chef` and `:dryrun`.
+  # Note that this plugin will only perform read-only operations (e.g. {#get_info} when in dry-run mode.
+  # For other operations it will only send messages tagged as `:chef` and `:dryrun`.
   class Chef < Plugin
     # The plugin's configuration
     attr_reader :config

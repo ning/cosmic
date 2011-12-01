@@ -36,8 +36,8 @@ module Cosmos2
     # a message tagged as `:dryrun`.
     #
     # @param [Hash] params The parameters
-    # @option params [String] :host The host to query for the mbean; 'localhost' by default
-    # @option params [String] :port The JMX port on the host; 3000 by default
+    # @option params [String] :host The host to query for the mbean
+    # @option params [String] :port The JMX port on the host
     # @option params [String] :name The mbean name
     # @return [::JMX::MBean,nil] The mbean
     def get_mbean(params)
@@ -48,12 +48,12 @@ module Cosmos2
     # a message tagged as `:dryrun`.
     #
     # @param [Hash] params The parameters
-    # @option params [String] :host The host to query for the mbean; 'localhost' by default
-    # @option params [String] :port The JMX port on the host; 3000 by default
+    # @option params [String] :host The host to query for the mbean
+    # @option params [String] :port The JMX port on the host
     # @option params [String] :filter The mbean filter; default value is '*:*' for all mbeans
     # @return [Array<::JMX::MBean>] The found mbeans
     def find_mbeans(params)
-      conn = get_connection(params[:host] || 'localhost', params[:port] || 3000)
+      conn = get_connection(params)
       if conn
         ::JMX::MBean.find_all_by_name(params[:filter] || '*:*', :connection => conn)
       else
@@ -72,9 +72,10 @@ module Cosmos2
     # @option params [String] :attribute The attribute to retrieve
     # @return [Object] The attribute value
     def get_attribute(params)
+      attribute = params[:attribute] or raise "No :attribute argument given"
       mbean = mbeanify(params)
       if mbean
-        mbean.send(params[:attribute].snake_case)
+        mbean.send(attribute.snake_case)
       else
         nil
       end
@@ -92,9 +93,11 @@ module Cosmos2
     # @option params [Object] :value What to set the attribute to
     # @return [::JMX::MBean] The mbean
     def set_attribute(params)
+      attribute = params[:attribute] or raise "No :attribute argument given"
+      value = params[:value] or raise "No :value argument given"
       mbean = mbeanify(params)
       if mbean
-        mbean.send(params[:attribute].snake_case + '=', params[:value])
+        mbean.send(attribute.snake_case + '=', value)
       end
       mbean
     end
@@ -108,12 +111,13 @@ module Cosmos2
     # @option params [String,nil] :port The JMX port on the host; 3000 by default
     # @option params [String,nil] :name The mbean name
     # @option params [String] :operation The operation to invoke
-    # @option params [Array<Object>,nil] :args The arguments to use when invoking the mbean operation
+    # @option params [Array<Object>,nil] :args The (optional) arguments to use when invoking the mbean operation
     # @return [Object,nil] The return value of the operation if any
     def invoke(params)
+      operation = params[:operation] or raise "No :operation argument given"
       mbean = mbeanify(params)
       if mbean
-        mbean.send(params[:operation].snake_case, *(params[:args] || []))
+        mbean.send(operation.snake_case, *(params[:args] || []))
       else
         nil
       end
@@ -121,7 +125,9 @@ module Cosmos2
 
     private
 
-    def get_connection(host, port)
+    def get_connection(params)
+      host = params[:host] or raise "No :host argument given"
+      port = params[:port] or raise "No :port argument given"
       if @environment.in_dry_run_mode
         notify(:msg => "Would try to connect to JMX on host '#{host}:#{port}'",
                :tags => [:jmx, :dryrun])
@@ -141,9 +147,10 @@ module Cosmos2
 
     def mbeanify(params)
       return params[:mbean] if params[:mbean]
-      conn = get_connection(params[:host] || 'localhost', params[:port] || 3000)
+      name = params[:name] or raise "No :name argument given"
+      conn = get_connection(params)
       if conn
-        ::JMX::MBean.find_by_name(params[:name], :connection => conn)
+        ::JMX::MBean.find_by_name(name, :connection => conn)
       else
         nil
       end

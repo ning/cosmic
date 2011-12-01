@@ -97,7 +97,8 @@ module Cosmos2
     # @option params [String] :key The key of the issue
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def get_issue(params)
-      issueify(params[:key])
+      key = params[:key] or raise "No :key argument given"
+      issueify(key)
     end
 
     # Creates a new JIRA issue. This method will do nothing in dryrun mode except create
@@ -112,12 +113,15 @@ module Cosmos2
     #                                       used to authenticate with JIRA will be used
     # @return [Jira4R::V2::RemoteIssue,nil] The new issue
     def create_issue(params)
-      project = get_project(params[:project])
+      project_name = params[:project] or raise "No :project argument given"
+      project = get_project(project_name)
+      type = params[:type] or raise "No :type argument given"
+      summary = params[:summary] or raise "No :summary argument given"
       if project
         type_id = nil
         @monitor.synchronize do
           @jira.getIssueTypesForProject(project.id).each do |issue_type|
-            if issue_type.name == params[:type]
+            if issue_type.name == type
               type_id = issue_type.id
             end
           end
@@ -126,7 +130,7 @@ module Cosmos2
 
         issue = Jira4R::V2::RemoteIssue.new
         issue.project = project.key
-        issue.summary = params[:summary]
+        issue.summary = summary
         issue.description = params[:description] || ''
         issue.type = type_id
         issue.assignee = params[:assignee] || @config[:credentials][:username]
@@ -148,7 +152,8 @@ module Cosmos2
     # @option params [String,nil] :comment The comment
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def comment_on(params)
-      issue = issueify(params[:issue])
+      key = params[:issue] or raise "No :issue argument given"
+      issue = issueify(key)
       if issue
         comment = Jira4R::V2::RemoteComment.new()
         comment.author = params[:author] || @config[:credentials][:username]
@@ -172,8 +177,11 @@ module Cosmos2
     # @option params [String,nil] :comment The link comment
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def link(params)
-      issue = issueify(params[:issue])
-      to = issueify(params[:to])
+      from_key = params[:issue] or raise "No :issue argument given"
+      to_key = params[:to] or raise "No :to argument given"
+      kind = params[:kind] or raise "No :kind argument given"
+      issue = issueify(from_key)
+      to = issueify(to_key)
       if issue && to
         # The SOAP and RPC apis don't support linking so we have go via the web form instead
         uri = URI.parse(@config[:address])
@@ -200,21 +208,21 @@ module Cosmos2
           req = Net::HTTP::Post.new('/secure/LinkExistingIssue.jspa')
           req.set_form_data('id' => issue.id,
                             'linkKey' => to.key,
-                            'linkDesc' => params[:kind],
+                            'linkDesc' => kind,
                             'comment' => params[:comment] || '',
                             'atl_token' => token)
           req['Cookie'] = cookies.to_s
 
           response = http.request(req)
           if response.code.to_i >= 400
-            raise "Could not link JIRA issue #{issue.key} to #{params[:to]}, response status was #{response.code.to_i}"
+            raise "Could not link JIRA issue #{issue.key} to #{to.key}, response status was #{response.code.to_i}"
           end
         else
           raise "Could not login to JIRA via http/https, response status was #{response.code.to_i}"
         end
       elsif !@environment.in_dry_run_mode
-        raise "Could not find the JIRA issue #{params[:issue]}" unless issue
-        raise "Could not find the target JIRA issue #{params[:to]}" unless to
+        raise "Could not find the JIRA issue #{from_key}" unless issue
+        raise "Could not find the target JIRA issue #{to_key}" unless to
       end
       issue
     end
@@ -251,11 +259,13 @@ module Cosmos2
     # @return [Cinch::Channel,nil] The channel if the plugin was able to connect it
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def connect(params)
-      issue = issueify(params[:issue])
+      key = params[:issue] or raise "No :issue argument given"
+      tags = params[:to] or raise "No :to argument given"
+      issue = issueify(key)
       if issue
-        @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => params[:to])
+        @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => tags)
       elsif !@environment.in_dry_run_mode
-        raise "Could not find JIRA issue #{params[:issue]}"
+        raise "Could not find JIRA issue #{key}"
       end
       issue
     end
@@ -268,7 +278,8 @@ module Cosmos2
     # @option params [Jira4R::V2::RemoteIssue,String] :issue The issue or its key
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def disconnect(params)
-      issue = issueify(params[:issue])
+      key = params[:issue] or raise "No :issue argument given"
+      issue = issueify(key)
       if issue
         @environment.disconnect_message_listener(:listener => IssueMessageListener.new(self, issue))
       end

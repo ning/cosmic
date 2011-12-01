@@ -39,13 +39,13 @@ module Cosmos2
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
-    # @option params [String] :port The node's port
+    # @option params [String] :port The node's port, 80 by default
     # @option params [String] :pool The pool name
     # @option params [String] :monitor_rule The monitoring rule
     # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def add_to_pool(params)
-      pool_name = params[:pool]
+      pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[F5] Adding node #{node_ip} with port #{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
@@ -77,13 +77,13 @@ module Cosmos2
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
-    # @option params [String] :port The node's port
+    # @option params [String] :port The node's port, 80 by default
     # @option params [String] :pool The pool name
     # @option params [String] :monitor_rule The monitoring rule
     # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def set_monitor_rule(params)
-      pool_name = params[:pool]
+      pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[F5] Setting monitor rule for node #{node_ip} with port #{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
@@ -112,11 +112,11 @@ module Cosmos2
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
-    # @option params [String] :port The node's port
+    # @option params [String] :port The node's port, 80 by default
     # @option params [String] :pool The pool name
     # @return [void]
     def remove_from_pool(params)
-      pool_name = params[:pool]
+      pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[F5] Removing node #{node_ip} with port #{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
@@ -133,7 +133,7 @@ module Cosmos2
     # @return [Array<Hash>] The members as hashes with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def get_members(params)
-      pool_name = params[:pool]
+      pool_name = params[:pool] or raise "No :pool argument given"
       notify(:msg => "[F5] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :info])
       members = @monitor.synchronize do
@@ -170,12 +170,12 @@ module Cosmos2
     # @param [Hash] params The parameters
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
-    # @option params [String] :port The node's port
+    # @option params [String] :port The node's port, 80 by default
     # @option params [String] :pool The pool name
     # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def get_member(params)
-      pool_name = params[:pool]
+      pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[F5] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
@@ -238,7 +238,7 @@ module Cosmos2
     # @option params [String] :host The node's hostname; specify this or the node's `:ip`
     # @option params [String] :ip The node's ip address; specify this or the node's `:host`
     # @option params [String] :port The node's port; only required if a pool name is given
-    # @option params [String] :pool The pool name; optional
+    # @option params [String] :pool The pool name, 80 by default if a pool name is given
     # @return [Hash,nil] The statistics as a hash of statistics name to current value
     def get_stats(params)
       pool_name = params[:pool]
@@ -382,7 +382,7 @@ module Cosmos2
       elsif params[:ip]
         params[:ip]
       else
-        raise "Need either :host or :ip parameter"
+        raise "No :host or :ip argument given"
       end
     end
 

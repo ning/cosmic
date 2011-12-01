@@ -145,8 +145,11 @@ module Cosmos2
     # @option params [String] :hosts The hosts to assign
     # @return [Array<Galaxy::Agent>] The assigned services
     def assign(params)
+      env = params[:env] or raise "No :env argument given"
+      version = params[:version] or raise "No :version argument given"
+      type = params[:type] or raise "No :type argument given"
       dry_run_or_not(params, 'Would assign #{agent.host} to /#{params[:env]}/#{params[:version]}/#{params[:type]}') {
-        command = ::Galaxy::Commands::AssignCommand.new([ params[:env], params[:version], params[:type] ], @galaxy_options)
+        command = ::Galaxy::Commands::AssignCommand.new([ env, version, type ], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment)
         command.execute(services_from_params(params))
         command.report.results
@@ -222,9 +225,10 @@ module Cosmos2
     # @option params [String] :hosts The hosts to update
     # @return [Array<Galaxy::Agent>] The updated services
     def update(params)
+      to = params[:to] or raise "No :to argument given"
       dry_run_or_not(params, 'Would update #{agent.host} to version #{params[:to]}') {
         command = ::Galaxy::Commands::UpdateCommand.new([ params[:to] ], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated #{agent.host} to ' + params[:to], [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated #{agent.host} to #{to}', [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
       }
@@ -242,9 +246,10 @@ module Cosmos2
     # @option params [String] :hosts The hosts to update the confguration of
     # @return [Array<Galaxy::Agent>] The updated services
     def update_config(params)
+      to = params[:to] or raise "No :to argument given"
       dry_run_or_not(params, 'Would update the config of #{agent.host} to version #{params[:to]}') {
         command = ::Galaxy::Commands::UpdateConfigCommand.new([ params[:to] ], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated the configuration of #{agent.host} to ' + params[:to], [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated the configuration of #{agent.host} to #{to}', [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
       }
@@ -287,9 +292,10 @@ module Cosmos2
     # @option params [String] :hosts The hosts to revert
     # @return [Array<Galaxy::Agent>] The reverted services
     def revert(params)
+      to = params[:to] or raise "No :to argument given"
       services = services_from_params(params)
       ips = services.inject(Set.new) { |ips, agent| ips << agent.ip }
-      agents_by_version = arrayify(params[:to]).inject(Hash.new) do |by_version, agent|
+      agents_by_version = arrayify(to).inject(Hash.new) do |by_version, agent|
         if ips.include?(agent.ip)
           version = version_of?(agent)
           for_version = by_version[version]
@@ -325,6 +331,7 @@ module Cosmos2
 
     def dry_run_or_not(params, dry_run_msg)
       if @environment.in_dry_run_mode
+      to = params[:to] or raise "No :to argument given"
         services = params[:services] || arrayify(params[:service])
         services.each do |agent|
           notify(:msg => eval('"' + dry_run_msg + '"'), :tags => [:galaxy, :dryrun])
@@ -350,6 +357,7 @@ module Cosmos2
     end
 
     def services_from_params(params)
+      raise "No :service or :services or :host or :hosts argument given" unless params[:service] || params[:services] || params[:host] || params[:hosts]
       services = arrayify(params[:services]) & arrayify(params[:service])
       if params[:host] || params[:hosts]
         host_names = arrayify(params[:host]) & arrayify(params[:hosts])

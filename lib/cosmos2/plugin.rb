@@ -15,8 +15,8 @@ module Cosmos2
       if @environment
         @environment.notify(params)
       elsif params[:msg] && params[:tags]
-        # Fallback to stdout - this is mostly for errors during setup
-        stdout.puts '[' + arraify(params[:tags]).join(',') + ']' + params[:msg]
+        # Fallback to $stdout - this is mostly for messages during setup
+        $stdout.puts '[' + arraify(params[:tags]).join(',') + ']' + params[:msg]
       end
     end
 
