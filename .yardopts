@@ -2,5 +2,7 @@
 --no-private
 --protected
 --hide-void-return
-cosmos.rb
-cosmos/**/*.rb
+lib/**/*.rb
+LICENSE.txt
+README.md
+

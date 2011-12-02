@@ -53,6 +53,13 @@ def arrayify(obj)
   end
 end
 
+# A version of the `require` method that prints out an optional text telling the user
+# how to fix the load problem.
+#
+# @param [String] what What to load
+# @param [String] hint An optional hint to show if the thing could not be loaded
+# @return [true,false] Whether the module was loaded (`true`) or it was already loaded
+#                      before (`false`)
 def require_with_hint(what, hint)
   begin
     require what

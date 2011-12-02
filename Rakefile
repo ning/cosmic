@@ -27,9 +27,7 @@ task :default => :build
 begin
   require 'yard'
 
-  YARD::Rake::YardocTask.new do |t|
-    t.files = ['lib/**/*.rb', 'LICENSE.txt', 'README.md']
-  end
+  YARD::Rake::YardocTask.new
 rescue LoadError
   puts "Yard (or a dependency) not available. Install it with: gem install yard"
 end
