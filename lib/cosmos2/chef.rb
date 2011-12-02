@@ -9,7 +9,7 @@ module Cosmos2
   # a server from Ohai or apply a role to a node. You'd typically use it in a cosmos context like so:
   #
   #     response = with chef do
-  #       TODO
+  #       puts get_info :host => 'foo'
   #     end
   #
   # Note that this plugin will only perform read-only operations (e.g. {#get_info} when in dry-run mode.

@@ -312,6 +312,7 @@ The API documentation has more details about the capabilities of the individual 
 ## IRC
 
 The Cosmos2 IRC plugin allows Cosmos2 scripts to interact with an IRC server. The IRC support however is limited to posting messages and similar things, it intentionally does not provide a full IRC bot that can be interacted with.
+
 The plugin uses the [Cinch library](https://github.com/cinchrb/cinch) and thus requires (J)Ruby 1.9. You'll need to install the cinch and atomic gems in order to be able to use the plugin:
 
     gem install cinch atomic
@@ -342,7 +343,10 @@ In this example, the script first writes an explicit message to the `#status` IR
 ## JIRA
 
 The JIRA plugin can be used to create and update JIRA issues. For instance, you can use to create issues that track deployments, and add comments for each individual step of the deployment.
+
 This plugin uses the [tomdz-jruby4r gem](https://github.com/tomdz/jira4r) which itself uses the [tomdz-soap4r gem](https://github.com/tomdz/soap4r). These two are forks of forks of the original [soap4r](https://github.com/felipec/soap4r) and [jira4r](https://github.com/remi/jira4r) gems, which have been updated to work with (J)Ruby 1.9 and with each other.
+
+    gem install tomdz-jruby4r tomdz-soap4r
 
 The JIRA plugin is configured as follows:
 
@@ -363,7 +367,9 @@ Similar to the IRC plugin, the JIRA plugin is typically used to update JIRA issu
 
 ## Galaxy
 
-This plugin makes the [Galaxy](https://github.com/ning/galaxy) software deployment tool available to Cosmos2 scripts. Cosmos2 requires Galaxy version 2.5.1 or newer, or 2.5.1.1 for (J)Ruby 1.9 compatibility. You can install Galaxy via
+This plugin makes the [Galaxy](https://github.com/ning/galaxy) software deployment tool available to Cosmos2 scripts.
+
+Cosmos2 requires Galaxy version 2.5.1 or newer, or 2.5.1.1 for Ruby/JRuby 1.9 compatibility. You can install Galaxy via
 
     gem install galaxy
 
@@ -396,18 +402,141 @@ This script first connects an IRC channel to all messages created by the Galaxy 
 
 ## JMX
 
-TBD
+The JMX plugin allows Cosmos2 scripts to interact with exposes [JMX resources](http://docs.oracle.com/javase/tutorial/jmx/index.html) exposed by services running on the JVM.
 
-# Planned plugins
+This plugin requires JRuby and the [jmx4r](https://github.com/jmesnil/jmx4r) gem:
+
+    gem install jmx4r
+
+The only configuration for the plugin is for authentication in cases where the JMX resources require it:
+
+    jmx:
+      <authentication configuration as explained above>
+
+The plugin supports reading and setting attributes as well as invoking operations. For instance
+
+    require 'cosmos2/galaxy'
+    require 'cosmos2/jmx'
+
+    services = with galaxy do
+      select :type => /^echo$?/
+    end
+    with jmx do
+      mbeans = services.collect {|service| get_mbean :host => service.host, :port => 12345, :name => 'some.company:name=MyMBean'}
+      mbeans.each do |mbean|
+        old_value = get_attribute :mbean => mbean, :attribute => 'SomeAttribute'
+        set_attribute :mbean => mbean, :attribute => 'SomeAttribute', :value => old_value + 1
+
+        invoke :mbean => mbean, :operation => 'DoSomething', :args => [ 'test' ]
+      end
+    end
+
+This collects `some.company:name=MyMBean` mbeans from all `echo` servers on galaxy, then increments the `SomeAttribute` attribute and finally invokes the `DoSomething` operation with a single string argument.
+
+## F5
+
+The F5 plugin allows Cosmos2 scripts to manipulate certain aspects of [F5 BIG-IP load balancers](https://www.f5.com/products/big-ip/) such as registration of hosts, pool membership, monitoring configuration etc.
+
+It uses the [iControl library](https://devcentral.f5.com/Tutorials/TechTips/tabid/63/articleType/ArticleView/articleId/1086421/Getting-Started-With-Ruby-and-iControl.aspx) version 11.0.0.1 or newer which can be downloaded from F5's developer website.
+
+    gem install f5-icontrol
+
+The configuration for the plugin consists of the load balancer host and the authentication credentials for it:
+
+    primary_lb:
+      plugin_class: Cosmos2::F5
+      host:         <load balancer host>
+      <authentication configuration as explained above>
+
+Typically, you would want to have one plugin entry for each primary load balancer that the Cosmos2 scripts need access to, and use the sync method provided by the plugin, to sync configuration changes to any secondary load balancers.
+
+    require 'cosmos2/galaxy'
+    require 'cosmos2/f5'
+
+    services = with galaxy do
+      select :type => /^echo$?/
+    end
+
+    with primary_lb do
+      services.each do |service|
+        node = disable :ip => service.ip
+        remove_from_pool node.merge { :pool => 'echo-12345' }
+        add_to_pool node.merge { : pool => 'echo-23456' }
+        enable node
+      end
+      sync
+    end
+
+This sample script determines all `echo` servies from galaxy, then disables them on the primary load balancer, removes them from one pool and adds them to another pool, reenables the services and finally syncs the configuration with any secondary load balancers.
+
+## SSH
+
+With the SSH plugin Cosmos2 scripts can execute commands on remote hosts and upload files to/download files from them.
+
+It uses the [Net::SSH and Net::SCP](http://net-ssh.github.com/) libraries:
+
+    gem install net-ssh net-scp
+
+The plugin only requires configuration if ssh authentication with the remote host requires username/password instead of ssh keys:
+
+    ssh:
+      <authentication configuration as explained above>
+
+Using it is fairly straightforward:
+
+    require 'cosmos2/galaxy'
+    require 'cosmos2/ssh'
+
+    services = with galaxy do
+      select :type => /^echo$?/
+    end
+    with ssh do
+      services.each do |service|
+        puts exec :host => service.host, :user => 'eng', :cmd => 'uname -a'
+
+        first = true
+        upload :host => service.host, :user => 'eng', :local => ARGV[0] do |ch, name, sent, total|
+          print "\r" unless first
+          print "#{name}: #{sent}/#{total}"
+          first = false
+        end
+        print "\n"
+      end
+    end
+
+In this sample script, we first find all `echo` services on galaxy and then run `uname -a` on them. Then we upload a local file (passed in as a commandline argument) to the same path on the remote service. The script also prints out the progress of the upload while it is uploading the file.
+
+## Chef
+
+This plugin allows Cosmos2 scripts to interact with [Chef](http://www.opscode.com/chef/) in scripts. Currently this interaction is limited to retrieving information about nodes that Chef knows about, but support for applying roles to hosts and for [Chef Solo](http://wiki.opscode.com/display/chef/Chef+Solo) is planned.
+
+The plugin uses the [Chef gem](https://rubygems.org/gems/chef):
+
+    gem install chef
+
+Currently the only available functionality is to retrieve information about a node that Chef knows about:
+
+    require 'cosmos2/galaxy'
+    require 'cosmos2/chef'
+    require 'pp'
+
+    with chef do
+      pp get_info(:host => 'foo')
+    end
+
+This will print a hash with all data that Chef has about that particular host.
+
+# Planned work
 
 These are the currently planned plugins:
 
 * Exec using [Open3](http://www.ruby-doc.org/stdlib-1.9.2/libdoc/open3/rdoc/Open3.html)
-* SSH using [Net::SSH](http://net-ssh.rubyforge.org/)
 * E-mail using [mail](https://github.com/mikel/mail)
 * Nagios probably using [ruby-nagios](https://code.google.com/p/ruby-nagios/)
-* F5 using [iControl](https://devcentral.f5.com/Tutorials/TechTips/tabid/63/articleType/ArticleView/articleId/1086421/Getting-Started-With-Ruby-and-iControl.aspx)
-* Chef using [Knife](http://wiki.opscode.com/display/chef/Knife)
+
+In addition, these are the planned improvements to existing plugins
+
+* Support in the Chef plugin for applying roles to hosts, plus support for Chef Solo
 
 # Writing new plugins
 
