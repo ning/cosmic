@@ -8,7 +8,10 @@ module Cosmos2
   # A plugin to interact with an F5 load balancer:
   #
   #     with f5 do
-  #       enable :ip => node_ip
+  #       disable :host => 'foo'
+  #       add_to_pool :host => 'foo', :port => 12345, :pool => 'prod-foo'
+  #                   :monitor_rule => { :type => 'MONITOR_RULE_TYPE_SINGLE', :templates => 'foo' }
+  #       enable :host => 'foo'
   #     end
   #
   # The F5 plugin emits messages tagged as `:f5` and `:info` for most of its actions.

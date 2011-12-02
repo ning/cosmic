@@ -10,6 +10,14 @@ module Cosmos2
   #
   #     response = with ssh do
   #       exec :host => host, :user => user, :cmd => "uname -a"
+  #
+  #       first = true
+  #       upload :host => service.host, :user => 'eng', :local => local, :remote => remote do |ch, name, sent, total|
+  #         print "\r" unless first
+  #         print "#{name}: #{sent}/#{total}"
+  #         first = false
+  #       end
+  #       print "\n"
   #     end
   #
   # The plugin assumes that the locally running ssh agent process is configured to interact

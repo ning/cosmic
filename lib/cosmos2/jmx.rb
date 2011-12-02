@@ -8,7 +8,12 @@ module Cosmos2
   # operations on running Java services. You'd typically use it in a cosmos context like so:
   #
   #     with jmx do
-  #       TODO
+  #       mbeans = services.collect do |service|
+  #         get_mbean :host => service.host, :port => 12345, :name => 'some.company:name=MyMBean'
+  #       end
+  #       mbeans.each do |mbean|
+  #         set_attribute :mbean => mbean, :attribute => 'SomeValue', :value => 1
+  #       end
   #     end
   #
   # This plugin does not require a section in the config file unless you want to instantiate
