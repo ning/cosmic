@@ -1,12 +1,12 @@
-require 'cosmos2'
-require 'cosmos2/plugin'
+require 'cosmic'
+require 'cosmic/plugin'
 require 'uri'
 require 'net/http'
 require 'net/https'
 require_with_hint 'jira4r', "In order to use the jira plugin please run 'gem install tomdz-jira4r'"
 require_with_hint 'nokogiri', "In order to use the jira plugin please run 'gem install nokogiri'"
 
-module Cosmos2
+module Cosmic
   # A listener for the message bus that outputs messages as comments on a JIRA issue.
   class IssueMessageListener
     # The JIRA server connection
@@ -77,7 +77,7 @@ module Cosmos2
     # Creates a new jira plugin instance and connect it to the configrued JIRA server. In
     # dryrun mode it will not actually connect but instead create a message tagged as `:dryrun`.
     #
-    # @param [Environment] environment The cosmos2 environment
+    # @param [Environment] environment The cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [JIRA] The new instance
     def initialize(environment, name = :jira)
@@ -324,10 +324,10 @@ module Cosmos2
                :tags => [:jira, :dryrun])
       else
         @jira = Jira4R::JiraTool.new(2, @config[:address])
-        log = Cosmos2Logger.new(:environment => @environment,
-                                Logger::WARN => [:jira, :warn],
-                                Logger::ERROR => [:jira, :error],
-                                Logger::FATAL => [:jira, :error])
+        log = CosmicLogger.new(:environment => @environment,
+                               Logger::WARN => [:jira, :warn],
+                               Logger::ERROR => [:jira, :error],
+                               Logger::FATAL => [:jira, :error])
         @jira.logger = log
         @jira.login(@config[:credentials][:username], @config[:credentials][:password])
       end

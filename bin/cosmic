@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 require 'rubygems'
-require 'cosmos2'
+require 'cosmic'
 require 'optparse'
 
 options = {}
 optparse = OptionParser.new do |opts|
-  opts.banner = "Usage: cosmos2 [options] <script> [<commandline arguments for the script>]"
+  opts.banner = "Usage: cosmic [options] <script> [<commandline arguments for the script>]"
   opts.on('-h', '--help', 'Display this screen') do
     puts opts
     exit
@@ -22,9 +22,9 @@ optparse.parse!
 if ARGV.empty?
   puts optparse.help
 else
-  cosmos2 = Cosmos2::Environment.from_config_file(options)
+  cosmic = Cosmic::Environment.from_config_file(options)
   script_file = ARGV.shift
-  with cosmos2 do
+  with cosmic do
     # Unfortunately this won't give us proper line info in case of errors (see https://redmine.ruby-lang.org/issues/4352)
     eval(IO.read(script_file), binding, script_file, __LINE__)
   end

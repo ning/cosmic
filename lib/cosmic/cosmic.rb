@@ -69,8 +69,8 @@ def require_with_hint(what, hint)
   end
 end
 
-# The main cosmos2 namespace.
-module Cosmos2
+# The main cosmic namespace.
+module Cosmic
   # Represents the message passing facility in between the environment or plugins.
   # Each message on the bus has a set of tags. Interested parties register
   # themselves as listeners for messages that have specific tags. The bus then
@@ -178,14 +178,14 @@ module Cosmos2
   end
 
   # Custom logger for plugins that puts log messages onto the message bus.
-  class Cosmos2Logger < Logger
+  class CosmicLogger < Logger
     # Creates a new logger instance. The parameters are used to configure
     # the environment to log to, plus the tags for each log level. For
     # example:
     #
-    #     Cosmos2Logger.new(:environment => @environment,
-    #                       Logger::WARN => :warn,
-    #                       Logger::ERROR => [:error,:fatal])
+    #     CosmicLogger.new(:environment => @environment,
+    #                      Logger::WARN => :warn,
+    #                     Logger::ERROR => [:error,:fatal])
     #
     # Only messages with log levels that are mapped to tags will be put onto
     # the message bus, all others will be silently ignored.
@@ -198,7 +198,7 @@ module Cosmos2
     # @option params [Array<Symbol>,Symbol] Logger::ERROR The tags that error messages should be mapped to
     # @option params [Array<Symbol>,Symbol] Logger::FATAL The tags that fatal messages should be mapped to
     # @option params [Array<Symbol>,Symbol] Logger::UNKNOWN The tags that messages with unknown severity should be mapped to
-    # @return [Cosmos2Logger] The new logger instance
+    # @return [CosmicLogger] The new logger instance
     def initialize(params)
       @environment = params[:environment]
       @level_map = {}
@@ -235,8 +235,8 @@ module Cosmos2
     # Creates a new environment instance from the configuration in a file. The 
     # passed-in parameters hash is merged on top of the file configuration
     # thus allowing to modify configuration settings before the environment is
-    # created. If no file was specified, then it will try to load `.cosmos2rc` in
-    # the current folder first, and if that fails, then `.cosmos2rc` in the home
+    # created. If no file was specified, then it will try to load `.cosmicrc` in
+    # the current folder first, and if that fails, then `.cosmicrc` in the home
     # folder of the current user. If these don't exist either, then it will return
     # an environment which is configured using only the passed in parameters.
     #
@@ -355,14 +355,14 @@ module Cosmos2
     # try to instantiate the class and return the instance. Otherwise, it will
     # check if there is a class of the following form:
     #
-    # * `Cosmos2::<name>`
-    # * `Cosmos2::<name in all uppercase>`
-    # * `Cosmos2::<name in camel case>`
+    # * `Cosmic::<name>`
+    # * `Cosmic::<name in all uppercase>`
+    # * `Cosmic::<name in camel case>`
     # * `::<name>`
     # * `::<name in all uppercase>`
     # * `::<name in camel case>`
     #
-    # E.g. for `irc`, it would look for `Cosmos2::irc`, `Cosmos2::IRC`, `Cosmos2::Irc`,
+    # E.g. for `irc`, it would look for `Cosmic::irc`, `Cosmic::IRC`, `Cosmic::Irc`,
     # `::irc`, `::IRC`, `::Irc`. If it finds one, it will instantiate it and return
     # it.
     # The environment also caches the instantiated plugins so that the second call
@@ -393,7 +393,7 @@ module Cosmos2
       return instance if instance
 
       # Now let's check if there is a plugin configured for that name, or if
-      # there is a class of that name in namespace Cosmos2
+      # there is a class of that name in namespace Cosmic
       clazz = find_plugin_class(name)
       if clazz
         instance = clazz.new(self, name.to_sym)
@@ -435,10 +435,10 @@ module Cosmos2
       if config_file
         YAML.load_file(config_file)
       else
-        if File.exist?(".cosmos2rc")
-          YAML.load_file(".cosmos2rc")
-        elsif File.exists?("#{ENV['HOME']}/.cosmos2rc")
-          YAML.load_file("#{ENV['HOME']}/.cosmos2rc")
+        if File.exist?(".cosmicrc")
+          YAML.load_file(".cosmicrc")
+        elsif File.exists?("#{ENV['HOME']}/.cosmicrc")
+          YAML.load_file("#{ENV['HOME']}/.cosmicrc")
         end
       end
     end
@@ -468,9 +468,9 @@ module Cosmos2
         end
       end
       camel_case_name = name.gsub(/^[a-z]/) { |a| a.upcase }
-      clazz_names = ["Cosmos2::#{name}",
-                     "Cosmos2::#{name.upcase}",
-                     "Cosmos2::#{camel_case_name}",
+      clazz_names = ["Cosmic::#{name}",
+                     "Cosmic::#{name.upcase}",
+                     "Cosmic::#{camel_case_name}",
                      "Module::#{name}",
                      "Module::#{name.upcase}",
                      "Module::#{camel_case_name}"]

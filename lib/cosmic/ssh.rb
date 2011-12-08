@@ -1,10 +1,10 @@
-require 'cosmos2'
-require 'cosmos2/plugin'
+require 'cosmic'
+require 'cosmic/plugin'
 
 require_with_hint 'net/ssh', "In order to use the ssh plugin please run 'gem install net-ssh'"
 require_with_hint 'net/scp', "In order to use the ssh plugin please run 'gem install net-scp'"
 
-module Cosmos2
+module Cosmic
   # A plugin that makes SSH and SCP available to cosmos scripts, e.g. to perform actions on remote
   # servers or to transfer files. You'd typically use it in a cosmos context like so:
   #

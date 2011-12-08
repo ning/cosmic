@@ -1,11 +1,11 @@
-require 'cosmos2'
-require 'cosmos2/plugin'
+require 'cosmic'
+require 'cosmic/plugin'
 
 if RUBY_VERSION < '1.9'
   desc = defined?(RUBY_DESCRIPTION) ? RUBY_DESCRIPTION : "ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE})"
   abort <<-end_message
 
-    The IRC cosmos2 plugin requires Ruby 1.9 or newer. You're running #{desc}
+    The IRC cosmic plugin requires Ruby 1.9 or newer. You're running #{desc}
     Please upgrade to use it.
 
   end_message
@@ -14,7 +14,7 @@ end
 require_with_hint 'cinch', "In order to use the cinch plugin please run 'gem install cinch'"
 require_with_hint 'atomic', "In order to use the cinch plugin please run 'gem install atomic'"
 
-module Cosmos2
+module Cosmic
   # A listener for the message bus that outputs messages to an IRC channel.
   class ChannelMessageListener
     # The channel

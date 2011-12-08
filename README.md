@@ -1,43 +1,43 @@
 # Overview
 
-Cosmos2 is a Ruby library and commandline tool for service deployment automation. The core idea is that deployments of machines & services should be scripted so that they are reproducable and easier to understand. Cosmos2' aim is to help writing these scripts by providing a simplified interface to services commonly used during deployment plus a little bit of DSL sugar to keep the scripts concise and easy to understand. The DSL part is kept to a minimum however, Cosmos2 scripts are still normal Ruby scripts with all the benfits that that brings.
+Cosmic is a Ruby library and commandline tool for service deployment automation. The core idea is that deployments of machines & services should be scripted so that they are reproducable and easier to understand. Cosmic' aim is to help writing these scripts by providing a simplified interface to services commonly used during deployment plus a little bit of DSL sugar to keep the scripts concise and easy to understand. The DSL part is kept to a minimum however, Cosmic scripts are still normal Ruby scripts with all the benfits that that brings.
 
-Cosmos2 itself requires Ruby 1.8.7 or newer, however some plugins require Ruby 1.9 (e.g. the IRC plugin) or JRuby (e.g. the JMX plugin).
+Cosmic itself requires Ruby 1.8.7 or newer, however some plugins require Ruby 1.9 (e.g. the IRC plugin) or JRuby (e.g. the JMX plugin).
 
 # Concepts
 
 ## Plugins
 
-The Cosmos2 core provides little in terms of actual deployment support, all that is contained in the plugins. Each Cosmos2 plugin is a wrapper around an existing ruby library or external API that simplifies interaction with the service specifically for deployments. This also means that you won't have access to all capabilities of that service, only to those that make sense for deploying machines/services. However, plugins usually provide access to the underlying library/API so that you can interact with that directly if necessary.
+The Cosmic core provides little in terms of actual deployment support, all that is contained in the plugins. Each Cosmic plugin is a wrapper around an existing ruby library or external API that simplifies interaction with the service specifically for deployments. This also means that you won't have access to all capabilities of that service, only to those that make sense for deploying machines/services. However, plugins usually provide access to the underlying library/API so that you can interact with that directly if necessary.
 
 ## Authentication system
 
-Cosmos2 provides built-in support for authentication that can be used by all plugins. The goal there is to perform deployments as a specific person and not using some general account such as `root` or `eng` or something like that. This allows to track deployments more accurately and also to have more fine-grained control over who can perform which deployment steps. 
+Cosmic provides built-in support for authentication that can be used by all plugins. The goal there is to perform deployments as a specific person and not using some general account such as `root` or `eng` or something like that. This allows to track deployments more accurately and also to have more fine-grained control over who can perform which deployment steps. 
 
-Cosmos2 itself can currently authenticate against an LDAP server, and then pull credentials from there to authenticate other services, or use the LDAP credentials themselves for LDAP-enabled services. Depending on the service setup, this would allow a single-sign-on style deployment where the person performing the deployment only has to authenticate once at the start of the deployment, and from then on all other steps would be automatically authenticated by Cosmos2.
+Cosmic itself can currently authenticate against an LDAP server, and then pull credentials from there to authenticate other services, or use the LDAP credentials themselves for LDAP-enabled services. Depending on the service setup, this would allow a single-sign-on style deployment where the person performing the deployment only has to authenticate once at the start of the deployment, and from then on all other steps would be automatically authenticated by Cosmic.
 
 ## Messages
 
-The environment that Cosmos2 plugins run in, provides the ability to send and listen to messages. These messages are basically tagged strings. A plugin then can express interest in messages with specific tags. In addition, deployment scripts can wire some plugins to specific tags, e.g.:
+The environment that Cosmic plugins run in, provides the ability to send and listen to messages. These messages are basically tagged strings. A plugin then can express interest in messages with specific tags. In addition, deployment scripts can wire some plugins to specific tags, e.g.:
 
     irc.connect :channel => '#test', :to => [:info, :galaxy]
     notify :msg => 'A message, yay !', :tags => :info
 
 This example wires a specific IRC channel, `#test`, to all messages that are tagged `:info` or `:galaxy`, and then sends an explicit message tagged as `:info`, which because of the wiring will then be posted by the IRC plugin to that channel.
 
-Cosmos2 plugins usually either produce messages (these are typically the plugins that perform actual deployment steps) or consume message (e.g. for keeping record of the deployment progress).
+Cosmic plugins usually either produce messages (these are typically the plugins that perform actual deployment steps) or consume message (e.g. for keeping record of the deployment progress).
 
 ## Dry-run
 
-One of the core concepts of Cosmos2 is the dry-run mode. When it is turned on (via configuration or commandline switch), then all plugins will omit messages that by default are output to standard out, instead of performing the actions. In effect, the script will output the steps it would take, but not actually perform these steps.
+One of the core concepts of Cosmic is the dry-run mode. When it is turned on (via configuration or commandline switch), then all plugins will omit messages that by default are output to standard out, instead of performing the actions. In effect, the script will output the steps it would take, but not actually perform these steps.
 
 ## DSL
 
-Cosmos2 adds only a few pieces of syntactic sugar, all geared at eliminating syntactic noise and keeping the scripts short and to the point.
+Cosmic adds only a few pieces of syntactic sugar, all geared at eliminating syntactic noise and keeping the scripts short and to the point.
 
 ### `with` construct
 
-Cosmos2 borrows the `with` construct from languages such as JavaScript or Pascal:
+Cosmic borrows the `with` construct from languages such as JavaScript or Pascal:
 
     with irc do
       write :msg => 'Hello world', :channels => '#test'
@@ -53,11 +53,11 @@ The other benefit is that this makes optional sections possible as explained bel
 
 ### Simplified plugin interaction
 
-Within the context of a cosmos2 environment instance, plugins can simply be instantiated and used by their name.
+Within the context of a Cosmic environment instance, plugins can simply be instantiated and used by their name.
 
-    cosmos2 = Cosmos2::Environment.from_config_file
+    cosmic = Cosmic::Environment.from_config_file
 
-    with cosmos2 do
+    with cosmic do
       with irc do
         write :msg => 'Hello world', :channels => '#test'
       end
@@ -71,7 +71,7 @@ This will automatically create an IRC instance in the first `with irc` block usi
 
 ### Optional sections
 
-Optional sections are groups of statements that get executed if a certain plugin is defined, otherwise they are ignored. Usually you would use `if` or `unless` statements in Ruby. Cosmos2 provides a shortcut syntax that makes this more concise:
+Optional sections are groups of statements that get executed if a certain plugin is defined, otherwise they are ignored. Usually you would use `if` or `unless` statements in Ruby. Cosmic provides a shortcut syntax that makes this more concise:
 
     with irc? do
       write :msg => 'Hello world', :channels => '#test'
@@ -86,7 +86,7 @@ One common use case for this is using the same deployment script in production a
 
 ### Optional error handling
 
-In a similar way to optional sections, Cosmos2 allows to make potential errors raised by a method call optional. The typical use case for this would be to differenciate required functionality from optional functionality that should not affect the deployment. For example in:
+In a similar way to optional sections, Cosmic allows to make potential errors raised by a method call optional. The typical use case for this would be to differenciate required functionality from optional functionality that should not affect the deployment. For example in:
 
     with irc do
       write msg: 'Hello world', channels: '#test'
@@ -100,41 +100,41 @@ if the call to `write` causes an error, for instance because the connection to t
 
 then an error raised by the `write` method will be emitted as an error message (see below) but otherwise ignored and the deployment can continue.
 
-# How to use Cosmos2
+# How to use Cosmic
 
-Cosmos2 can be used in three ways: via the commandline tool `cosmos2` that gets installed as part of the gem, as a library from your own ruby scripts, or via a standalone executable.
+Cosmic can be used in three ways: via the commandline tool `cosmic` that gets installed as part of the gem, as a library from your own ruby scripts, or via a standalone executable.
 
 ## Commandline tool
 
-The commandline tool `cosmos2` is installed as part of the cosmos2 gem. It provides a simple ruby commandline script that automatically creates a cosmos2 environment and then executes your script in it. This means that your script shouldn't instantiate the cosmos environment and instead should simply depend on it being available:
+The commandline tool `cosmic` is installed as part of the cosmic gem. It provides a simple ruby commandline script that automatically creates a Cosmic environment and then executes your script in it. This means that your script shouldn't instantiate the cosmos environment and instead should simply depend on it being available:
 
-    require 'cosmos2/irc'
+    require 'cosmic/irc'
 
     with irc do
       write :msg => ARGV[0], :channels => '#test'
     end
     ...
 
-You will still have to require all plugins that you want to use - Cosmos2 will not require them automatically.
+You will still have to require all plugins that you want to use - Cosmic will not require them automatically.
 
 The above script `irc-test.rb` could then be invoked as:
 
-    cosmos2 irc-test.rb 'Hello World'
+    cosmic irc-test.rb 'Hello World'
 
 ## Standalone tool
 
-This is a separate project [cosmos2-standalone](https://github.com/ning/cosmos2-standalone) that bundles the gem with all plugins that it is allowed to bundle (some are omitted due to license restrictions) with jruby into an executable jar file. You can simply download the executable and, provided you jave Java 6 or newer installed, run as is. See the documentation for that project for more details about which plugins are included and which have to be installed separately.
+This is a separate project [cosmic-standalone](https://github.com/ning/cosmic-standalone) that bundles the gem with all plugins that it is allowed to bundle (some are omitted due to license restrictions) with jruby into an executable jar file. You can simply download the executable and, provided you jave Java 6 or newer installed, run as is. See the documentation for that project for more details about which plugins are included and which have to be installed separately.
 
-## Using cosmos2 in your own scripts
+## Using Cosmic in your own scripts
 
-You can also require the cosmos2 gem in your scripts. You will then have to create the Cosmos2 environment yourself, e.g.:
+You can also require the cosmic gem in your scripts. You will then have to create the Cosmic environment yourself, e.g.:
 
-    require 'cosmos2'
-    require 'cosmos2/irc'
+    require 'cosmic'
+    require 'cosmic/irc'
 
-    cosmos2 = Cosmos2::Environment.from_config_file
+    cosmic = Cosmic::Environment.from_config_file
 
-    with cosmos2 do
+    with cosmic do
       with irc do
         write :msg => 'Hello world', :channels => '#test'
       end
@@ -143,7 +143,7 @@ You can also require the cosmos2 gem in your scripts. You will then have to crea
 
 # Configuration
 
-Cosmos2 and the plugins are configured via a single YAML file. The default location for the file is `$HOME/.cosmos2rc`, but both the commandline tool and the `Cosmos2::Environment` constructor support specifying a different file.
+Cosmic and the plugins are configured via a single YAML file. The default location for the file is `$HOME/.cosmicrc`, but both the commandline tool and the `Cosmic::Environment` constructor support specifying a different file.
 
 The basic environment configuration looks like this:
 
@@ -168,7 +168,7 @@ For example:
       irc:
         host:      irc.example.com
         port:      6667
-        nick:      cosmos2
+        nick:      cosmic
         auth_type: credentials_from_env
         ldap:
           path:          o=irc.example.com,ou=apps,dc=example,dc=com
@@ -176,11 +176,11 @@ For example:
 
 ## Authentication types
 
-Cosmos2 currently supports these authentication types:
+Cosmic currently supports these authentication types:
 
 #### ldap
 
-Cosmos2 will authenticate with a configured LDAP server before proceeding, using [net-ldap](http://net-ldap.rubyforge.org/). The LDAP configuration has the following form:
+Cosmic will authenticate with a configured LDAP server before proceeding, using [net-ldap](http://net-ldap.rubyforge.org/). The LDAP configuration has the following form:
 
     ldap:
       host:       <LDAP host>
@@ -192,19 +192,19 @@ Cosmos2 will authenticate with a configured LDAP server before proceeding, using
         username: <The LDAP username to authenticate with if simple auth is chosen, e.g. cn=Directory Manager>
         password: <The LDAP password>
 
-If `simple` is chosen as the authentication method and username/password are not specified in the config, then Cosmos2 will prompt the user for username and password before proceeding.
+If `simple` is chosen as the authentication method and username/password are not specified in the config, then Cosmic will prompt the user for username and password before proceeding.
 
 See e.g. this [introduction to LDAP](http://www.ldapman.org/articles/intro_to_ldap.html) for more info about LDAP.
 
 #### credentials
 
-With this authentication form, Cosmos2 will not authenticate itself but provide the credentials to plugins if they use the `credentials_from_env` authentication type (see below). The configuration looks like this:
+With this authentication form, Cosmic will not authenticate itself but provide the credentials to plugins if they use the `credentials_from_env` authentication type (see below). The configuration looks like this:
 
     credentials:
       username: <The username>
       password: <The password>
 
-If username/password are not specified in the config, then Cosmos2 will prompt the user for username and password before proceeding.
+If username/password are not specified in the config, then Cosmic will prompt the user for username and password before proceeding.
 
 ## Plugin configuration
 
@@ -215,13 +215,13 @@ All plugins are configured under the `plugins` section in the configuration. The
         plugin_class: <Optional plugin class name>
         <Plugin-specific configuration>
 
-Cosmos2 uses the plugin name and, if specified, the plugin class to instantiate the plugin and make it available to scripts. For instance, with this configuration section:
+Cosmic uses the plugin name and, if specified, the plugin class to instantiate the plugin and make it available to scripts. For instance, with this configuration section:
 
     plugins:
       irc:
         <IRC plugin configuration>
 
-Cosmos2 will use this plugin section if used like this in a Cosmos2 environment:
+Cosmic will use this plugin section if used like this in a Cosmic environment:
 
     with irc do
       write :msg => 'Hello world', :channels => '#test'
@@ -233,9 +233,9 @@ or
 
 Since no plugin class is specified, it will search for the plugin under the class names
 
-* `Cosmos2::#{name}`
-* `Cosmos2::#{name.upcase}`
-* `Cosmos2::#{camel_case_name}`
+* `Cosmic::#{name}`
+* `Cosmic::#{name.upcase}`
+* `Cosmic::#{camel_case_name}`
 * `#{name}`
 * `#{name.upcase}`
 * `#{camel_case_name}`
@@ -252,10 +252,10 @@ The `plugin_class` configuration option allows you to specify the plugin class d
 
     plugins:
       irc1:
-        plugin_class: Cosmos2::IRC
+        plugin_class: Cosmic::IRC
         <First IRC plugin configuration>
       irc2:
-        plugin_class: Cosmos2::IRC
+        plugin_class: Cosmic::IRC
         <Second IRC plugin configuration>
 
 These two then can be used like so:
@@ -269,9 +269,9 @@ These two then can be used like so:
 
 ### Plugin authentication
 
-Plugins can perform authentication through the Cosmos2 environment, or they can handle it themselves. Authenticating through Cosmos2 has the benefit that it can reduce the number of times that the user is asked for credentials. For instance, assume a plugin for a service that authenticates via LDAP. That plugin can then use the same LDAP credentials that Cosmos2 asked the user for at the beginning of the deployment session. Likewise, it is possible to store authentication information (e.g. tokens, keys, etc.) in LDAP and have Cosmos2 fetch it from there on behalf of a plugin.
+Plugins can perform authentication through the Cosmic environment, or they can handle it themselves. Authenticating through Cosmic has the benefit that it can reduce the number of times that the user is asked for credentials. For instance, assume a plugin for a service that authenticates via LDAP. That plugin can then use the same LDAP credentials that Cosmic asked the user for at the beginning of the deployment session. Likewise, it is possible to store authentication information (e.g. tokens, keys, etc.) in LDAP and have Cosmic fetch it from there on behalf of a plugin.
 
-For plugins, the Cosmos2 environment currently supports these authentication types:
+For plugins, the Cosmic environment currently supports these authentication types:
 
 #### credentials_from_env
 
@@ -285,15 +285,15 @@ This type is used for cases where the environment stores the credentials and the
           path:          o=irc.example.com,ou=apps,dc=example,dc=com
           password_attr: password
 
-In this example, the `o=irc.example.com,ou=apps,dc=example,dc=com` LDAP entry contains an attribute called `password` which contains the password for the LDAP server. No username is specified, so Cosmos2 will not retrieve it (the IRC plugin doesn't require it if the IRC server doesn't need one).
+In this example, the `o=irc.example.com,ou=apps,dc=example,dc=com` LDAP entry contains an attribute called `password` which contains the password for the LDAP server. No username is specified, so Cosmic will not retrieve it (the IRC plugin doesn't require it if the IRC server doesn't need one).
 
 #### ldap_credentials
 
-The `ldap_credentials` type is used for services that authenticate themselves against LDAP. The Cosmos2 environment in this case is required to use `ldap` authentication, and the plugin will simply use the same credentials as the environment, to authenticate.
+The `ldap_credentials` type is used for services that authenticate themselves against LDAP. The Cosmic environment in this case is required to use `ldap` authentication, and the plugin will simply use the same credentials as the environment, to authenticate.
 
 #### credentials
 
-This type describes the case where the plugin has its own set of credentials independent from the environment. Cosmos2 supports the plugin by dealing with the credential configuration or asking the user as necessary. If you choose to configure the credentials in the config file, then put them in a `credentials` sub section in the plugin configuration:
+This type describes the case where the plugin has its own set of credentials independent from the environment. Cosmic supports the plugin by dealing with the credential configuration or asking the user as necessary. If you choose to configure the credentials in the config file, then put them in a `credentials` sub section in the plugin configuration:
 
     plugins:
       irc:
@@ -303,7 +303,7 @@ This type describes the case where the plugin has its own set of credentials ind
           username: testuser
           password: my-password
 
-Cosmos2 will ask the user for credentials if the element is not present in the configuration.
+Cosmic will ask the user for credentials if the element is not present in the configuration.
 
 # Individual plugins
 
@@ -311,7 +311,7 @@ The API documentation has more details about the capabilities of the individual 
 
 ## IRC
 
-The Cosmos2 IRC plugin allows Cosmos2 scripts to interact with an IRC server. The IRC support however is limited to posting messages and similar things, it intentionally does not provide a full IRC bot that can be interacted with.
+The Cosmic IRC plugin allows Cosmic scripts to interact with an IRC server. The IRC support however is limited to posting messages and similar things, it intentionally does not provide a full IRC bot that can be interacted with.
 
 The plugin uses the [Cinch library](https://github.com/cinchrb/cinch) and thus requires (J)Ruby 1.9. You'll need to install the cinch and atomic gems in order to be able to use the plugin:
 
@@ -367,9 +367,9 @@ Similar to the IRC plugin, the JIRA plugin is typically used to update JIRA issu
 
 ## Galaxy
 
-This plugin makes the [Galaxy](https://github.com/ning/galaxy) software deployment tool available to Cosmos2 scripts.
+This plugin makes the [Galaxy](https://github.com/ning/galaxy) software deployment tool available to Cosmic scripts.
 
-Cosmos2 requires Galaxy version 2.5.1 or newer, or 2.5.1.1 for Ruby/JRuby 1.9 compatibility. You can install Galaxy via
+Cosmic requires Galaxy version 2.5.1 or newer, or 2.5.1.1 for Ruby/JRuby 1.9 compatibility. You can install Galaxy via
 
     gem install galaxy
 
@@ -382,7 +382,7 @@ The plugin is configured as follows:
 
 Galaxy itself does not support authentication, so no such configuration is necessary for it.
 
-The Galaxy plugin makes it straightforward to use Galaxy commands from within Cosmos2 scripts and it adds additional functionality not readily available in Galaxy (e.g. reverting to a previous snapshot). A simple Cosmos2 script using Galaxy would look like:
+The Galaxy plugin makes it straightforward to use Galaxy commands from within Cosmic scripts and it adds additional functionality not readily available in Galaxy (e.g. reverting to a previous snapshot). A simple Cosmic script using Galaxy would look like:
 
     with irc do
       connect channel: '#status', to: [:galaxy]
@@ -402,7 +402,7 @@ This script first connects an IRC channel to all messages created by the Galaxy 
 
 ## JMX
 
-The JMX plugin allows Cosmos2 scripts to interact with exposes [JMX resources](http://docs.oracle.com/javase/tutorial/jmx/index.html) exposed by services running on the JVM.
+The JMX plugin allows Cosmic scripts to interact with exposes [JMX resources](http://docs.oracle.com/javase/tutorial/jmx/index.html) exposed by services running on the JVM.
 
 This plugin requires JRuby and the [jmx4r](https://github.com/jmesnil/jmx4r) gem:
 
@@ -415,8 +415,8 @@ The only configuration for the plugin is for authentication in cases where the J
 
 The plugin supports reading and setting attributes as well as invoking operations. For instance
 
-    require 'cosmos2/galaxy'
-    require 'cosmos2/jmx'
+    require 'cosmic/galaxy'
+    require 'cosmic/jmx'
 
     services = with galaxy do
       select :type => /^echo$?/
@@ -435,7 +435,7 @@ This collects `some.company:name=MyMBean` mbeans from all `echo` servers on gala
 
 ## F5
 
-The F5 plugin allows Cosmos2 scripts to manipulate certain aspects of [F5 BIG-IP load balancers](https://www.f5.com/products/big-ip/) such as registration of hosts, pool membership, monitoring configuration etc.
+The F5 plugin allows Cosmic scripts to manipulate certain aspects of [F5 BIG-IP load balancers](https://www.f5.com/products/big-ip/) such as registration of hosts, pool membership, monitoring configuration etc.
 
 It uses the [iControl library](https://devcentral.f5.com/Tutorials/TechTips/tabid/63/articleType/ArticleView/articleId/1086421/Getting-Started-With-Ruby-and-iControl.aspx) version 11.0.0.1 or newer which can be downloaded from F5's developer website.
 
@@ -444,14 +444,14 @@ It uses the [iControl library](https://devcentral.f5.com/Tutorials/TechTips/tabi
 The configuration for the plugin consists of the load balancer host and the authentication credentials for it:
 
     primary_lb:
-      plugin_class: Cosmos2::F5
+      plugin_class: Cosmic::F5
       host:         <load balancer host>
       <authentication configuration as explained above>
 
-Typically, you would want to have one plugin entry for each primary load balancer that the Cosmos2 scripts need access to, and use the sync method provided by the plugin, to sync configuration changes to any secondary load balancers.
+Typically, you would want to have one plugin entry for each primary load balancer that the Cosmic scripts need access to, and use the sync method provided by the plugin, to sync configuration changes to any secondary load balancers.
 
-    require 'cosmos2/galaxy'
-    require 'cosmos2/f5'
+    require 'cosmic/galaxy'
+    require 'cosmic/f5'
 
     services = with galaxy do
       select :type => /^echo$?/
@@ -471,7 +471,7 @@ This sample script determines all `echo` servies from galaxy, then disables them
 
 ## SSH
 
-With the SSH plugin Cosmos2 scripts can execute commands on remote hosts and upload files to/download files from them.
+With the SSH plugin Cosmic scripts can execute commands on remote hosts and upload files to/download files from them.
 
 It uses the [Net::SSH and Net::SCP](http://net-ssh.github.com/) libraries:
 
@@ -484,8 +484,8 @@ The plugin only requires configuration if ssh authentication with the remote hos
 
 Using it is fairly straightforward:
 
-    require 'cosmos2/galaxy'
-    require 'cosmos2/ssh'
+    require 'cosmic/galaxy'
+    require 'cosmic/ssh'
 
     services = with galaxy do
       select :type => /^echo$?/
@@ -508,7 +508,7 @@ In this sample script, we first find all `echo` services on galaxy and then run 
 
 ## Chef
 
-This plugin allows Cosmos2 scripts to interact with [Chef](http://www.opscode.com/chef/) in scripts. Currently this interaction is limited to retrieving information about nodes that Chef knows about, but support for applying roles to hosts and for [Chef Solo](http://wiki.opscode.com/display/chef/Chef+Solo) is planned.
+This plugin allows Cosmic scripts to interact with [Chef](http://www.opscode.com/chef/) in scripts. Currently this interaction is limited to retrieving information about nodes that Chef knows about, but support for applying roles to hosts and for [Chef Solo](http://wiki.opscode.com/display/chef/Chef+Solo) is planned.
 
 The plugin uses the [Chef gem](https://rubygems.org/gems/chef):
 
@@ -516,8 +516,8 @@ The plugin uses the [Chef gem](https://rubygems.org/gems/chef):
 
 Currently the only available functionality is to retrieve information about a node that Chef knows about:
 
-    require 'cosmos2/galaxy'
-    require 'cosmos2/chef'
+    require 'cosmic/galaxy'
+    require 'cosmic/chef'
     require 'pp'
 
     with chef do
@@ -540,19 +540,19 @@ In addition, these are the planned improvements to existing plugins
 
 # Writing new plugins
 
-Writing Cosmos2 plugins is fairly straightforward, but in order to keep the API consistent, there are a few rules and suggestions
+Writing Cosmic plugins is fairly straightforward, but in order to keep the API consistent, there are a few rules and suggestions
 
 ## Ruby 1.8.x vs. 1.9, Ruby vs. JRuby
 
 In general, plugins should work with both Ruby & JRuby, 1.8.7 and 1.9.x versions, unless 1.9 or JRuby are absolutely needed. In particular, Ruby 1.9-specific syntax should be avoided unless the plugin requires Ruby 1.9.
 
-## Cosmos2 environment integration
+## Cosmic environment integration
 
 Plugins should use the environment's authentication system (if they need authentication) as much as possible. Likewise, plugins should not log directly to a file or stdout/stderr, but instead generate messages tagged with standard tags such as :debug, :info and :error, plus the plugin's name so that scripts and other plugins can operate on all messages from a given plugin.
 
 In addition, if the plugin consumes messages, then the plugin should implement methods called `connect` and `disconnect` to provide a user with a consistent API. See the IRC and JIRA plugins for examples.
 
-Cosmos2 also supports running multiple plugin instances under different names, potentially pointed to the same remote service. It is desirable if plugins support this mode and still be independent of each other.
+Cosmic also supports running multiple plugin instances under different names, potentially pointed to the same remote service. It is desirable if plugins support this mode and still be independent of each other.
 
 ## Dry-run mode
 
@@ -560,7 +560,7 @@ Plugins should always support dry-run mode, even if they only consume messages. 
 
 ## Threading
 
-Cosmos2 is deliberately single-threaded unless it can't be avoided. This means that for instance the message bus will only return from the notify method once all listeners have been notified. Therefore, self referential code such as listening for its own messages should be avoided.
+Cosmic is deliberately single-threaded unless it can't be avoided. This means that for instance the message bus will only return from the notify method once all listeners have been notified. Therefore, self referential code such as listening for its own messages should be avoided.
 
 ## Plugin API
 

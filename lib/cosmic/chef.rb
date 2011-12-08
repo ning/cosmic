@@ -1,10 +1,10 @@
-require 'cosmos2'
-require 'cosmos2/plugin'
+require 'cosmic'
+require 'cosmic/plugin'
 
 require_with_hint 'chef/knife', "In order to use the chef plugin please run 'gem install chef'"
 require_with_hint 'chef/node', "In order to use the chef plugin please run 'gem install chef'"
 
-module Cosmos2
+module Cosmic
   # A plugin that allows to interact with Chef in cosmos scripts, e.g. to retrieve information about
   # a server from Ohai or apply a role to a node. You'd typically use it in a cosmos context like so:
   #

@@ -1,6 +1,6 @@
-require 'cosmos2'
+require 'cosmic'
 
-module Cosmos2
+module Cosmic
   # Base class for plugins.
   class Plugin
     # Helper method for plugins to send events to the environment. The method

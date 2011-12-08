@@ -1,5 +1,5 @@
-require 'cosmos2'
-require 'cosmos2/plugin'
+require 'cosmic'
+require 'cosmic/plugin'
 begin
   require 'galaxy/command'
   require 'galaxy/console'
@@ -9,7 +9,7 @@ rescue
   exit
 end
 
-module Cosmos2
+module Cosmic
   # A galaxy report that gathers results (agents) instead of outputing them to stdout.
   # It optionally can also send messages to the environment. For that purpose, the
   # constructor takes an optional message template and set of tags. The template is
@@ -26,7 +26,7 @@ module Cosmos2
 
     # Creates a new report instance.
     #
-    # @param [Environment] environment The cosmos2 environment
+    # @param [Environment] environment The cosmic environment
     # @param [String,nil] msg_template The message template to use to generate messages
     # @param [Array<Symbol>,Symbol,nil] tags The tags to use for generated messages
     # @return [GalaxyGatheringReport] The new instance
@@ -48,8 +48,8 @@ module Cosmos2
     end
   end
 
-  # A plugin that makes galaxy available to cosmos2 scripts. You'd typically create an `:galaxy` plugin section
-  # in the configuration and then use it in a cosmos2 context like so:
+  # A plugin that makes galaxy available to cosmic scripts. You'd typically create an `:galaxy` plugin section
+  # in the configuration and then use it in a cosmic context like so:
   #
   #     with galaxy do
   #       snapshot = take_snapshot
@@ -68,7 +68,7 @@ module Cosmos2
 
     # Creates a new galaxy plugin instance.
     #
-    # @param [Environment] environment The cosmos2 environment
+    # @param [Environment] environment The cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Galaxy] The new instance
     def initialize(environment, name = :galaxy)

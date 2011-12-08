@@ -1,10 +1,10 @@
-require 'cosmos2'
-require 'cosmos2/plugin'
+require 'cosmic'
+require 'cosmic/plugin'
 require 'socket'
 require 'monitor'
 require_with_hint 'f5-icontrol', "In order to use the F5 plugin please install the f5-icontrol gem, version 11.0.0.1 or newer"
 
-module Cosmos2
+module Cosmic
   # A plugin to interact with an F5 load balancer:
   #
   #     with f5 do
@@ -24,7 +24,7 @@ module Cosmos2
 
     # Creates a new F5 plugin instance.
     #
-    # @param [Environment] environment The cosmos2 environment
+    # @param [Environment] environment The cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Galaxy] The new instance
     def initialize(environment, name = :f5)

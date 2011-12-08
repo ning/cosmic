@@ -1,9 +1,9 @@
-require 'cosmos2'
-require 'cosmos2/plugin'
+require 'cosmic'
+require 'cosmic/plugin'
 
 require_with_hint 'jmx4r', "In order to use the jmx plugin please run 'gem install jmx4r'"
 
-module Cosmos2
+module Cosmic
   # A plugin that makes JMX available to cosmos scripts, e.g. to read out values or perform
   # operations on running Java services. You'd typically use it in a cosmos context like so:
   #

@@ -4,11 +4,11 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "cosmos2"
+    gem.name = "cosmic"
     gem.summary = %Q{Library/tool for automating deployments}
     gem.description = %Q{Library/tool for automating deployments}
     gem.email = "thomas@ning.com"
-    gem.homepage = "https://github.com/ning/cosmos2"
+    gem.homepage = "https://github.com/ning/cosmic"
     gem.authors = ["Thomas Dudziak"]
     gem.license = 'ASL2'
     gem.required_ruby_version = '>= 1.8.7'
