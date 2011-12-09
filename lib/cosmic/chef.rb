@@ -1,8 +1,9 @@
 require 'cosmic'
 require 'cosmic/plugin'
 
-require_with_hint 'chef/knife', "In order to use the chef plugin please run 'gem install chef'"
 require_with_hint 'chef/node', "In order to use the chef plugin please run 'gem install chef'"
+require_with_hint 'chef/knife', "In order to use the chef plugin please run 'gem install chef'"
+require_with_hint 'chef/knife/node_run_list_add', "In order to use the chef plugin please run 'gem install chef'"
 
 module Cosmic
   # A plugin that allows to interact with Chef in cosmos scripts, e.g. to retrieve information about
@@ -27,7 +28,7 @@ module Cosmic
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @connections = {}
-      @knife = Chef::Knife.new
+      @knife = ::Chef::Knife.new
       @knife.config[:verbosity] = 0 # Only error logging for now, TODO configure a cosmos logger
       @knife.configure_chef
     end
@@ -36,10 +37,39 @@ module Cosmic
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The host to get the info for
-    # @return [Hash,nil] A hash with the info for the host
+    # @return [::Chef::Node,nil] The chef node object for the host if it knows about the host
     def get_info(params)
       host = params[:host] or raise "No :host argument given"
-      Chef::Node.load(host)
+      begin
+        ::Chef::Node.load(host)
+      rescue Net::HTTPServerException => ex
+        if ex.message =~ /404.*/
+          nil
+        else
+          raise ex
+        end
+      end
+    end
+
+    # Adds a role to the run list of a host or node.
+    #
+    # @param [Hash] params The parameters
+    # @option params [String] :host The host to update; use this or `:node`
+    # @option params [String] :node The node to update; use this or `:host`
+    # @option params [String] :role The name of the role
+    # @return [Hash,nil] A hash with the info for the host
+    def add_role(params)
+      node = params[:node]
+      host = params[:host]
+      if !node && !host
+        raise "No :host or :node argument given"
+      end
+      if !node
+        node = get_info(params)
+      end
+      role = params[:role] or raise "No :role argument given"
+      ::Chef::Knife::NodeRunListAdd.new.add_to_run_list(node, role)
+      get_info(params)
     end
   end
 end
