@@ -8,7 +8,7 @@ module Cosmic
   # A plugin that makes SSH and SCP available to cosmos scripts, e.g. to perform actions on remote
   # servers or to transfer files. You'd typically use it in a cosmos context like so:
   #
-  #     response = with ssh do
+  #     with ssh do
   #       exec :host => host, :user => user, :cmd => "uname -a"
   #
   #       first = true
