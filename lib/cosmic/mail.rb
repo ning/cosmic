@@ -53,7 +53,6 @@ module Cosmic
     def initialize(environment, name = :mail)
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
-      @connections = {}
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       if @config[:delivery_method]
         @delivery_method = @config[:delivery_method].to_sym
