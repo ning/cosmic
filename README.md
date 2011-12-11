@@ -574,11 +574,32 @@ Usage is straightforward:
 
 The first send call uses the simple API which only suppors subject & plain text body sending. The second send call uses the mail creation support via blocks provided by the [Mail gem](https://github.com/mikel/mail) to send a multipart email with both text and html bodies.
 
+## Execute
+
+This plugin allows Cosmic scripts to run simple commands on the current machine. For non-JRuby platforms, it uses the [Open4 gem](https://github.com/ahoward/open4):
+
+    gem install open4
+
+When using JRuby, it will instead use `IO:open4`.
+
+The plugin does not require any configuration.
+
+Usage is straightforward:
+
+    require 'cosmic/execute'
+
+    with maiexecute do
+      status, output = exec :cmd => 'ls -la'
+      puts "Completed with status #{status}:"
+      puts output
+    end
+
+This simply runs `ls -la` and then prints the status code of the command and its output (`stdout` and `stderr` combined) to `stdout`.
+
 # Planned work
 
 These are the currently planned plugins:
 
-* Exec using [Open3](http://www.ruby-doc.org/stdlib-1.9.2/libdoc/open3/rdoc/Open3.html)
 * Nagios
 
 In addition, these are the planned improvements to existing plugins
