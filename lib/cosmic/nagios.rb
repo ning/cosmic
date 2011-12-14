@@ -55,9 +55,8 @@ module Cosmic
       JSON.parse(response.body)
     end
 
-    # Enables all configured Nagios checks for the given host. This is equivalent
-    # to the `ENABLE_HOST_SVC_NOTIFICATIONS` and `ENABLE_SVC_NOTIFICATIONS` Nagios
-    # commands.
+    # Enables all configured Nagios check notifications for the given host. This is equivalent
+    # to the `ENABLE_HOST_SVC_NOTIFICATIONS` and `ENABLE_SVC_NOTIFICATIONS` Nagios commands.
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The host to enable checks for
@@ -67,20 +66,33 @@ module Cosmic
     def enable(params)
       host = params[:host] or raise "No :host argument given"
       service = params[:service]
-      if service
-        request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/ENABLE_SVC_NOTIFICATIONS")
+      if @environment.in_dry_run_mode
+        if service
+          notify(:msg => "Would enable Nagios notifications for service #{service} on host #{host}",
+                 :tags => [:nagios, :dryrun])
+        else
+          notify(:msg => "Would enable Nagios notifications for host #{host}",
+                 :tags => [:nagios, :dryrun])
+        end
       else
-        request = Net::HTTP::Put.new("/hosts/#{host}/command/ENABLE_SVC_NOTIFICATIONS")
+        if service
+          notify(:msg => "[Nagios] Enabling notifications for service #{service} on host #{host}",
+                 :tags => [:nagios, :info])
+          request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/ENABLE_SVC_NOTIFICATIONS")
+        else
+          notify(:msg => "[Nagios] Enabling notifications for host #{host}",
+                 :tags => [:nagios, :info])
+          request = Net::HTTP::Put.new("/hosts/#{host}/command/ENABLE_SVC_NOTIFICATIONS")
+        end
+        request.body = "{}"
+        request["Content-Type"] = "application/json"
+        @nagix.request(request)
       end
-      request.body = "{}"
-      request["Content-Type"] = "application/json"
-      @nagix.request(request)
       status(params)
     end
 
-    # Enables all configured Nagios checks for the given host. This is equivalent
-    # to the `DISABLE_HOST_SVC_NOTIFICATIONS` and `DISABLE_SVC_NOTIFICATIONS` Nagios
-    # commands.
+    # Enables all configured Nagios check notifications for the given host. This is equivalent
+    # to the `DISABLE_HOST_SVC_NOTIFICATIONS` and `DISABLE_SVC_NOTIFICATIONS` Nagios commands.
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The host to disable checks for
@@ -90,14 +102,28 @@ module Cosmic
     def disable(params)
       host = params[:host] or raise "No :host argument given"
       service = params[:service]
-      if service
-        request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/DISABLE_SVC_NOTIFICATIONS")
+      if @environment.in_dry_run_mode
+        if service
+          notify(:msg => "Would disable Nagios notifications for service #{service} on host #{host}",
+                 :tags => [:nagios, :dryrun])
+        else
+          notify(:msg => "Would disable Nagios notifications for host #{host}",
+                 :tags => [:nagios, :dryrun])
+        end
       else
-        request = Net::HTTP::Put.new("/hosts/#{host}/command/DISABLE_SVC_NOTIFICATIONS")
+        if service
+          notify(:msg => "[Nagios] Disabling notifications for service #{service} on host #{host}",
+                 :tags => [:nagios, :info])
+          request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/DISABLE_SVC_NOTIFICATIONS")
+        else
+          notify(:msg => "[Nagios] Disabling notifications for host #{host}",
+                 :tags => [:nagios, :info])
+          request = Net::HTTP::Put.new("/hosts/#{host}/command/DISABLE_SVC_NOTIFICATIONS")
+        end
+        request.body = "{}"
+        request["Content-Type"] = "application/json"
+        @nagix.request(request)
       end
-      request.body = "{}"
-      request["Content-Type"] = "application/json"
-      @nagix.request(request)
       status(params)
     end
   end
