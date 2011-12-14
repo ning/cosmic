@@ -5,14 +5,14 @@ require_with_hint 'net/ssh', "In order to use the ssh plugin please run 'gem ins
 require_with_hint 'net/scp', "In order to use the ssh plugin please run 'gem install net-scp'"
 
 module Cosmic
-  # A plugin that makes SSH and SCP available to cosmos scripts, e.g. to perform actions on remote
-  # servers or to transfer files. You'd typically use it in a cosmos context like so:
+  # A plugin that makes SSH and SCP available to cosmic scripts, e.g. to perform actions on remote
+  # servers or to transfer files. You'd typically use it in a cosmic context like so:
   #
   #     with ssh do
-  #       exec :host => host, :user => user, :cmd => "uname -a"
+  #       exec :host => host, :cmd => "uname -a"
   #
   #       first = true
-  #       upload :host => service.host, :user => 'eng', :local => local, :remote => remote do |ch, name, sent, total|
+  #       upload :host => service.host, :local => local, :remote => remote do |ch, name, sent, total|
   #         print "\r" unless first
   #         print "#{name}: #{sent}/#{total}"
   #         first = false
@@ -47,12 +47,10 @@ module Cosmic
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       @ssh_opts = {}
-      if @config[:keys]
-        @ssh_opts[:keys] = @config[:keys]
-        @ssh_opts[:keys_only] = true
-      elsif @config[:keys_from_ldap]
-        @ssh_opts[:key_data] = @environment.get_from_ldap(@config[:keys_from_ldap])
-        # TODO
+      if @config[:auth][:keys]
+        puts "Using keys #{@config[:auth][:keys]}"
+        @ssh_opts[:keys] = @config[:auth][:keys]
+        @ssh_opts[:key_data] = @config[:auth][:key_data]
         @ssh_opts[:keys_only] = true
       elsif @config[:auth][:password]
         @ssh_opts[:password] = @config[:auth][:password]
@@ -65,7 +63,8 @@ module Cosmic
     # @param [Hash] params The parameters
     # @option params [String] :host The host to connect to 
     # @option params [String] :user The user to use for the ssh connection; if not specified
-    #                               then it will use the username from the configured credentials
+    #                               then it will use the username from the credentials if configured,
+    #                               or the current user
     # @option params [String] :cmd The command to run on the host
     # @return [String] All output of the command (stdout and stderr combined)
     def exec(params)
@@ -89,7 +88,8 @@ module Cosmic
     # @param [Hash] params The parameters
     # @option params [String] :host The host to copy the file to
     # @option params [String] :user The user to use for the ssh connection; if not specified
-    #                               then it will use the username from the configured credentials
+    #                               then it will use the username from the credentials if configured,
+    #                               or the current user
     # @option params [String] :local The local path to the file to upload
     # @option params [String] :remote The remote path to the file to upload; if not specified then
     #                                 it will use the local path for this
@@ -118,7 +118,8 @@ module Cosmic
     # @param [Hash] params The parameters
     # @option params [String] :host The host to copy the file to
     # @option params [String] :user The user to use for the ssh connection; if not specified
-    #                               then it will use the username from the configured credentials
+    #                               then it will use the username from the credentials if configured,
+    #                               or the current user
     # @option params [String] :local The local target path for the downloaded file to upload; if not
     #                                specified then it will use the remote path for this
     # @option params [String] :remote The remote path to the file to download

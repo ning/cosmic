@@ -316,6 +316,8 @@ module Cosmic
             username = ask("Username for #{service_name.to_s}?\n")
             password = ask("Password for #{service_name.to_s}?\n") { |q| q.echo = false }
           end
+        when /keys/
+          auth_config[:keys] = arrayify(service_config[:keys])
         when /keys_from_env/
           if service_config[:ldap] && service_config[:ldap][:auth]
             path = service_config[:ldap][:key_path]
@@ -324,11 +326,11 @@ module Cosmic
               key_entry = get_from_ldap(:path => path)
               if key_entry
                 key_data = []
-                cred_config[:key_attrs].each do |attr_name|
+                attrs.each do |attr_name|
                   attr_value = key_entry[attr_name]
                   key_data << attr_value if attr_value
                 end
-                auth_config[:key_data] = key_data if key_data.length > 0
+                auth_config[:keys] = { :key_data => key_data } if key_data.length > 0
               end
             end
           end
