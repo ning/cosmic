@@ -277,11 +277,13 @@ module Cosmic
       end
     end
 
-    # Helper method for plugins to resolve authentication credentials from the
+    # Helper method for plugins to resolve authentication tokens from the
     # environment. The environment understands several different authentication
     # schemes which are explained in detail in the configuration documentation.
-    # When successful, then it will update `params[:config][:credentials][:username]`
-    # and `params[:config][:credentials][:password]` with the appropriate values.
+    # When successful, then it will update `params[:config][:auth][:username]`
+    # and `params[:config][:auth][:password]` with the resolved credentials,
+    # or `params[:config][:auth][:key_data]` with the key data read from the
+    # environment (e.g. for ssh private keys).
     #
     # @param [Hash] params The parameters
     # @option params [Symbol] :service_name The service name, e.g. `:irc`
@@ -291,11 +293,13 @@ module Cosmic
       return unless params[:service_name] && params[:config]
       service_name = params[:service_name].to_sym
       service_config = params[:config]
-      service_config[:credentials] ||= {}
-      cred_config = service_config[:credentials]
+      service_config[:auth] ||= {}
+      auth_config = service_config[:auth]
 
-      username = cred_config[:username]
-      password = cred_config[:password]
+      if service_config[:credentials]
+        username = service_config[:credentials][:username]
+        password = service_config[:credentials][:password]
+      end
       case service_config[:auth_type]
         when /credentials_from_env/
           username, password = get_service_credentials_from_env(service_name, service_config)
@@ -308,13 +312,46 @@ module Cosmic
             password = @config[:ldap][:auth][:password]
           end
         when /credentials/
-          if !cred_config[:username] && !cred_config[:password]
+          if !username && !password
             username = ask("Username for #{service_name.to_s}?\n")
             password = ask("Password for #{service_name.to_s}?\n") { |q| q.echo = false }
           end
+        when /keys_from_env/
+          if service_config[:ldap] && service_config[:ldap][:auth]
+            path = service_config[:ldap][:key_path]
+            attrs = arrayify(service_config[:ldap][:key_attrs])
+            if path && attrs.length > 0
+              key_entry = get_from_ldap(:path => path)
+              if key_entry
+                key_data = []
+                cred_config[:key_attrs].each do |attr_name|
+                  attr_value = key_entry[attr_name]
+                  key_data << attr_value if attr_value
+                end
+                auth_config[:key_data] = key_data if key_data.length > 0
+              end
+            end
+          end
       end
-      cred_config[:username] = username
-      cred_config[:password] = password
+      auth_config[:username] = username
+      auth_config[:password] = password
+    end
+
+    # If Cosmic is connected to an LDAP server, then this method
+    # will return the entry referenced by the given path.
+    #
+    # @param [Hash] params The parameters
+    # @option params [String] :path The LDAP path to the desired entry
+    # @return [Net::LDAP::Entry,nil] The entry or nil if the path doesn't exist
+    def get_from_ldap(params)
+      case @config[:auth_type]
+        when /ldap/
+          service_ldap_config = service_config[:ldap] || @config[:ldap]
+          if service_ldap_config && @ldap
+            return @ldap.search(:base => params[:path] || '', :return_result => true)
+          end
+      end
+      nil
     end
 
     # Connects a listener with the message bus. Doesn't do anything if

@@ -20,14 +20,16 @@ module Cosmic
   #       print "\n"
   #     end
   #
-  # The plugin assumes that the locally running ssh agent process is configured to interact
-  # with the remote servers without needing passwords (i.e. by having keys registered). In this
-  # case, it will not need a configuration section unless you want more than one instance of the
-  # plugin (which is not really necessary in this case as the plugin does not maintain state).
+  # By default, the plugin assumes that the locally running ssh agent process is configured to
+  # interact with the remote servers without needing passwords (i.e. by having keys registered).
+  # In this case, it will not need a configuration section unless you want more than one instance
+  # of the plugin (which is not really necessary in this case as the plugin does not maintain state).
   #
-  # Alternatively, you can configure the plugin with username and password, either directly or
-  # via the environment's authentication mechanism (e.g. from ldap). In this case, more than one
-  # plugin instance allows you to use different credentials for different remote servers.
+  # Alternatively, you can configure it to use specific ssh keys, which you can either reference
+  # directly in the configuration, or have the plugin fetch them from a specific LDAP path.
+  #
+  # Lastly, the plugin can determine username & password using the normal environment
+  # authentication mechanisms, e.g. from the configuration or from LDAP.
   #
   # Note that this plugin will not actually connect to the remote servers in dry-run mode.
   # Instead it will only send messages tagged as `:ssh` and `:dryrun`.
@@ -43,8 +45,18 @@ module Cosmic
     def initialize(environment, name = :ssh)
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
-      @connections = {}
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
+      @ssh_opts = {}
+      if @config[:keys]
+        @ssh_opts[:keys] = @config[:keys]
+        @ssh_opts[:keys_only] = true
+      elsif @config[:keys_from_ldap]
+        @ssh_opts[:key_data] = @environment.get_from_ldap(@config[:keys_from_ldap])
+        # TODO
+        @ssh_opts[:keys_only] = true
+      elsif @config[:auth][:password]
+        @ssh_opts[:password] = @config[:auth][:password]
+      end
     end
 
     # Executes a command on a remote host and returns the output (stdin & stderr combined) of the
@@ -58,15 +70,14 @@ module Cosmic
     # @return [String] All output of the command (stdout and stderr combined)
     def exec(params)
       host = params[:host] or raise "No :host argument given"
-      user = params[:user] || @config[:credentials][:username]
-      password = @config[:credentials][:password]
+      user = params[:user] || @config[:auth][:username]
       cmd = params[:cmd] or raise "No :cmd argument given"
       if @environment.in_dry_run_mode
         notify(:msg => "Would connect as user #{user} to host #{host} and execute command '#{cmd}'",
                :tags => [:ssh, :dryrun])
       else
         response = nil
-        Net::SSH.start(host, user, :password => password) do |ssh|
+        Net::SSH.start(host, user, @ssh_opts) do |ssh|
           response = ssh.exec!(cmd)
         end
         response
@@ -88,8 +99,7 @@ module Cosmic
     # @return [void]
     def upload(params, &block)
       host = params[:host] or raise "No :host argument given"
-      user = params[:user] || @config[:credentials][:username]
-      password = @config[:credentials][:password]
+      user = params[:user] || @config[:auth][:username]
       local = params[:local] or raise "No :local argument given"
       remote = params[:remote] || params[:local]
       if @environment.in_dry_run_mode
@@ -97,7 +107,7 @@ module Cosmic
                :tags => [:ssh, :dryrun])
       else
         response = nil
-        Net::SCP.start(host, user, :password => password) do |scp|
+        Net::SCP.start(host, user, @ssh_opts) do |scp|
           scp.upload!(local, remote, &block)
         end
       end
@@ -118,8 +128,7 @@ module Cosmic
     # @return [void]
     def download(params, &block)
       host = params[:host] or raise "No :host argument given"
-      user = params[:user] || @config[:credentials][:username]
-      password = @config[:credentials][:password]
+      user = params[:user] || @config[:auth][:username]
       local = params[:local] || params[:remote]
       remote = params[:remote] or raise "No :remote argument given"
       if @environment.in_dry_run_mode
@@ -127,7 +136,7 @@ module Cosmic
                :tags => [:ssh, :dryrun])
       else
         response = nil
-        Net::SCP.start(host, user, :password => password) do |scp|
+        Net::SCP.start(host, user, @ssh_opts) do |scp|
           scp.download!(remote, local, &block)
         end
       end

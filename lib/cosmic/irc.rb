@@ -249,7 +249,7 @@ module Cosmic
             c.nick     = config[:nick]
             c.server   = config[:host]
             c.port     = config[:port]
-            c.password = config[:credentials][:password]
+            c.password = config[:auth][:password]
             c.verbose  = false
           end
         end

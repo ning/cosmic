@@ -139,9 +139,9 @@ module Cosmic
       else
         username = nil
         password = nil
-        if @config[:credentials]
-          username = @config[:credentials][:username]
-          password = @config[:credentials][:password]
+        if @config[:auth]
+          username = @config[:auth][:username]
+          password = @config[:auth][:password]
         end
         @connections[host + ':' + port.to_s] ||= ::JMX::MBean.create_connection(:host => host,
                                                                                 :port => port.to_i,

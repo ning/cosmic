@@ -117,7 +117,7 @@ module Cosmic
       type = params[:type] or raise "No :type argument given"
       summary = params[:summary] or raise "No :summary argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would create a new issue in project #{project_name} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+        notify(:msg => "Would create a new issue in project #{project_name} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
       else
         project = get_project(project_name)
@@ -137,7 +137,7 @@ module Cosmic
           issue.summary = summary
           issue.description = params[:description] || ''
           issue.type = type_id
-          issue.assignee = params[:assignee] || @config[:credentials][:username]
+          issue.assignee = params[:assignee] || @config[:auth][:username]
           @monitor.synchronize do
             @jira.createIssue(issue)
           end
@@ -159,13 +159,13 @@ module Cosmic
     def comment_on(params)
       key = params[:issue] or raise "No :issue argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would comment on issue #{key} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+        notify(:msg => "Would comment on issue #{key} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
       else
         issue = issueify(key)
         if issue
           comment = Jira4R::V2::RemoteComment.new()
-          comment.author = params[:author] || @config[:credentials][:username]
+          comment.author = params[:author] || @config[:auth][:username]
           comment.body = params[:comment] || ''
           @monitor.synchronize do
             @jira.addComment(issue.key.upcase, comment)
@@ -191,7 +191,7 @@ module Cosmic
       to_key = params[:to] or raise "No :to argument given"
       kind = params[:kind] or raise "No :kind argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would create a link of type #{kind} from issue #{from_key} to #{to_key} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+        notify(:msg => "Would create a link of type #{kind} from issue #{from_key} to #{to_key} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
       else
         issue = issueify(from_key)
@@ -207,7 +207,7 @@ module Cosmic
           # Login first to get the cookie and token
           req = Net::HTTP::Post.new('/login.jsp')
           req.set_form_data('os_authType' => 'basic', 'os_cookie' => true)
-          req.basic_auth(@config[:credentials][:username], @config[:credentials][:password])
+          req.basic_auth(@config[:auth][:username], @config[:auth][:password])
 
           response = http.request(req)
 
@@ -252,7 +252,7 @@ module Cosmic
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def resolve(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "Would resolve issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+        notify(:msg => "Would resolve issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
       else
         issue = disconnect(params)
@@ -282,7 +282,7 @@ module Cosmic
       key = params[:issue] or raise "No :issue argument given"
       tags = params[:to] or raise "No :to argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would connect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:credentials][:username]} to the message bus",
+        notify(:msg => "Would connect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} to the message bus",
                :tags => [:jira, :dryrun])
       else
         issue = issueify(key)
@@ -305,7 +305,7 @@ module Cosmic
     def disconnect(params)
       key = params[:issue] or raise "No :issue argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would disconnect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:credentials][:username]} from the message bus",
+        notify(:msg => "Would disconnect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} from the message bus",
                :tags => [:jira, :dryrun])
       else
         issue = issueify(key)
@@ -320,7 +320,7 @@ module Cosmic
 
     def authenticate
       if @environment.in_dry_run_mode
-        notify(:msg => "Would login to JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+        notify(:msg => "Would login to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
       else
         @jira = Jira4R::JiraTool.new(2, @config[:address])
@@ -329,7 +329,7 @@ module Cosmic
                                Logger::ERROR => [:jira, :error],
                                Logger::FATAL => [:jira, :error])
         @jira.logger = log
-        @jira.login(@config[:credentials][:username], @config[:credentials][:password])
+        @jira.login(@config[:auth][:username], @config[:auth][:password])
       end
     end
 
@@ -343,7 +343,7 @@ module Cosmic
       if issue_or_key.is_a?(Jira4R::V2::RemoteIssue)
         issue_or_key
       elsif @environment.in_dry_run_mode
-        notify(:msg => "Would fetch issue #{issue_or_key.to_s} from JIRA server #{@config[:address]} as user #{@config[:credentials][:username]}",
+        notify(:msg => "Would fetch issue #{issue_or_key.to_s} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
         nil
       else

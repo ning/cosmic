@@ -60,9 +60,9 @@ module Cosmic
         if @config[@delivery_method]
           @delivery_config.merge!(@config[@delivery_method])
         end
-        if @config[:credentials]
-          @delivery_config[:user_name] = @config[:credentials][:username]
-          @delivery_config[:password] = @config[:credentials][:password]
+        if @config[:auth]
+          @delivery_config[:user_name] = @config[:auth][:username]
+          @delivery_config[:password] = @config[:auth][:password]
         end
       end
     end
@@ -86,8 +86,8 @@ module Cosmic
       else
         params = args.flatten.first
         mail_sender = params[:from]
-        if !mail_sender && @config[:credentials]
-          mail_sender = @config[:credentials][:username]
+        if !mail_sender && @config[:auth]
+          mail_sender = @config[:auth][:username]
         end
         raise "No :from argument given" unless mail_sender
         mail_recipient = params[:to] or raise "No :to argument given"

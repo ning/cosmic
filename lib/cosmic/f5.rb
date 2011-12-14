@@ -409,8 +409,8 @@ module Cosmic
 
     def authenticate
       @f5 = ::F5::IControl.new(@config[:host],
-                               @config[:credentials][:username],
-                               @config[:credentials][:password],
+                               @config[:auth][:username],
+                               @config[:auth][:password],
                                ['LocalLB.Pool', 'LocalLB.PoolMember', 'LocalLB.NodeAddress', 'System.ConfigSync']).get_interfaces
     end
 
