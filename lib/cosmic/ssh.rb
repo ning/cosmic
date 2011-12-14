@@ -5,8 +5,8 @@ require_with_hint 'net/ssh', "In order to use the ssh plugin please run 'gem ins
 require_with_hint 'net/scp', "In order to use the ssh plugin please run 'gem install net-scp'"
 
 module Cosmic
-  # A plugin that makes SSH and SCP available to cosmic scripts, e.g. to perform actions on remote
-  # servers or to transfer files. You'd typically use it in a cosmic context like so:
+  # A plugin that makes SSH and SCP available to Cosmic scripts, e.g. to perform actions on remote
+  # servers or to transfer files. You'd typically use it in a Cosmic context like so:
   #
   #     with ssh do
   #       exec :host => host, :cmd => "uname -a"
@@ -39,7 +39,7 @@ module Cosmic
 
     # Creates a new ssh plugin instance.
     #
-    # @param [Environment] environment The cosmos environment
+    # @param [Environment] environment The Cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [SSH] The new instance
     def initialize(environment, name = :ssh)

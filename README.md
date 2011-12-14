@@ -45,7 +45,7 @@ Cosmic borrows the `with` construct from languages such as JavaScript or Pascal:
 
 This is equivalent to
 
-    irc.write :msg => 'Hello world', :channels => '#cosmos'
+    irc.write :msg => 'Hello world', :channels => '#cosmic'
 
 The benefit of this is that multiple calls to methods on the same object can be grouped into one `with` statement which reduces the noise and makes the code more readable. It also makes it more obvious that the methods are called on the same object.
 
@@ -81,7 +81,7 @@ or
 
     irc?.write :msg => 'Hello world', :channels => '#test'
 
-The additional question mark after the plugin short name directs Cosmos to only execute the method call if the IRC plugin is configured. If not, then the method call is ignored.
+The additional question mark after the plugin short name directs Cosmic to only execute the method call if the IRC plugin is configured. If not, then the method call is ignored.
 One common use case for this is using the same deployment script in production and QA or development environments. Some services would only be configured in the production environment, so in the script they would be referenced with a `?`.
 
 ### Optional error handling
@@ -106,7 +106,7 @@ Cosmic can be used in three ways: via the commandline tool `cosmic` that gets in
 
 ## Commandline tool
 
-The commandline tool `cosmic` is installed as part of the cosmic gem. It provides a simple ruby commandline script that automatically creates a Cosmic environment and then executes your script in it. This means that your script shouldn't instantiate the cosmos environment and instead should simply depend on it being available:
+The commandline tool `cosmic` is installed as part of the cosmic gem. It provides a simple ruby commandline script that automatically creates a Cosmic environment and then executes your script in it. This means that your script shouldn't instantiate the Cosmic environment and instead should simply depend on it being available:
 
     require 'cosmic/irc'
 
@@ -322,7 +322,7 @@ The plugin configuration looks like this:
     irc:
       host:                   <IRC server; default is localhost>
       port:                   <IRC server port; default is 6667>
-      nick:                   <IRC nick to use; default is cosmos>
+      nick:                   <IRC nick to use; default is cosmic>
       connection_timeout_sec: <Connection timeout; default is 60>
       <authentication configuration as explained above>
 

@@ -4,8 +4,8 @@ require 'cosmic/plugin'
 require_with_hint 'jmx4r', "In order to use the jmx plugin please run 'gem install jmx4r'"
 
 module Cosmic
-  # A plugin that makes JMX available to cosmos scripts, e.g. to read out values or perform
-  # operations on running Java services. You'd typically use it in a cosmos context like so:
+  # A plugin that makes JMX available to Cosmic scripts, e.g. to read out values or perform
+  # operations on running Java services. You'd typically use it in a Cosmic context like so:
   #
   #     with jmx do
   #       mbeans = services.collect do |service|
@@ -27,7 +27,7 @@ module Cosmic
 
     # Creates a new jmx plugin instance.
     #
-    # @param [Environment] environment The cosmos environment
+    # @param [Environment] environment The Cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [JMX] The new instance
     def initialize(environment, name = :jmx)

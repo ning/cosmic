@@ -75,7 +75,7 @@ module Cosmic
     # @option params [Array<Symbol>,Symbol] :incoming The tags that incoming IRC messages should be mapped to
     # @option params [Array<Symbol>,Symbol] :outgoing The tags that outgoing IRC messages should be mapped to
     # @option params [Array<Symbol>,Symbol] :generic The tags that all other messages should be mapped to
-    # @return [CosmosLogger] The new logger instance
+    # @return [MessageBusLogger] The new logger instance
     def initialize(params)
       @environment = params[:environment]
       @kind_map = {}
@@ -117,12 +117,12 @@ module Cosmic
   end
 
 
-  # A plugin that makes IRC available to cosmos scripts, mostly as a output target for
+  # A plugin that makes IRC available to Cosmic scripts, mostly as a output target for
   # messages. You'd typically create an `:irc` plugin section in the configuration and then
-  # use it in a cosmos context like so:
+  # use it in a Cosmic context like so:
   #
   #     with irc do
-  #       connect channel: '#cosmos', to: [:info, :warn, :error, :galaxy]
+  #       connect channel: '#cosmic', to: [:info, :warn, :error, :galaxy]
   #     end
   #
   # The irc plugin emits messages tagged as `:irc` and `:trace` for most of its actions,
@@ -136,13 +136,13 @@ module Cosmic
     # Creates a new irc plugin instance and connect it to the configured IRC server. In
     # dryrun mode it will not actually connect but instead create a message tagged as `:dryrun`.
     #
-    # @param [Environment] environment The cosmos environment
+    # @param [Environment] environment The Cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [IRC] The new instance
     def initialize(environment, name = :irc)
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
-      @config[:nick] ||= 'cosmos'
+      @config[:nick] ||= 'cosmic'
       @config[:host] ||= 'localhost'
       @config[:port] ||= 6667
       @config[:connection_timeout_sec] ||= 60

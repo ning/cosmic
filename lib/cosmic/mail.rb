@@ -4,7 +4,7 @@ require 'cosmic/plugin'
 require_with_hint 'mail', "In order to use the mail plugin please run 'gem install mail'"
 
 module Cosmic
-  # A plugin that allows cosmos scripts to send email:
+  # A plugin that allows Cosmic scripts to send email:
   #
   #     with mail do
   #       send :from => 'me@example.com',
@@ -47,7 +47,7 @@ module Cosmic
 
     # Creates a new mail plugin instance.
     #
-    # @param [Environment] environment The cosmos environment
+    # @param [Environment] environment The Cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Mail] The new instance
     def initialize(environment, name = :mail)

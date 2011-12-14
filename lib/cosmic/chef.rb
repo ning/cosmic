@@ -6,8 +6,8 @@ require_with_hint 'chef/knife', "In order to use the chef plugin please run 'gem
 require_with_hint 'chef/knife/node_run_list_add', "In order to use the chef plugin please run 'gem install chef'"
 
 module Cosmic
-  # A plugin that allows to interact with Chef in cosmos scripts, e.g. to retrieve information about
-  # a server from Ohai or apply a role to a node. You'd typically use it in a cosmos context like so:
+  # A plugin that allows to interact with Chef in Cosmic scripts, e.g. to retrieve information about
+  # a server from Ohai or apply a role to a node. You'd typically use it in a Cosmic context like so:
   #
   #     response = with chef do
   #       puts get_info :host => 'foo'
@@ -21,7 +21,7 @@ module Cosmic
 
     # Creates a new chef plugin instance.
     #
-    # @param [Environment] environment The cosmos environment
+    # @param [Environment] environment The Cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Chef] The new instance
     def initialize(environment, name = :chef)
@@ -29,7 +29,7 @@ module Cosmic
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @connections = {}
       @knife = ::Chef::Knife.new
-      @knife.config[:verbosity] = 0 # Only error logging for now, TODO configure a cosmos logger
+      @knife.config[:verbosity] = 0 # Only error logging for now, TODO configure a Cosmic logger
       @knife.configure_chef
     end
 

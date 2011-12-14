@@ -7,7 +7,7 @@ require_with_hint 'open4', "In order to use the exec plugin please run 'gem inst
 
 module Cosmic
   # A plugin that provides scripts a simple way of executing commands and capturing their output.
-  # You'd typically use it in a cosmos context like so:
+  # You'd typically use it in a Cosmic context like so:
   #
   #     output = with execute do
   #       exec :cmd => "uname -a"
@@ -20,7 +20,7 @@ module Cosmic
   class Execute < Plugin
     # Creates a new exec plugin instance.
     #
-    # @param [Environment] environment The cosmos environment
+    # @param [Environment] environment The Cosmic environment
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Exec] The new instance
     def initialize(environment, name = :execute)
