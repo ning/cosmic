@@ -301,9 +301,9 @@ module Cosmic
         password = service_config[:credentials][:password]
       end
       case service_config[:auth_type]
-        when /credentials_from_env/
+        when /^credentials_from_env$/
           username, password = get_service_credentials_from_env(service_name, service_config)
-        when /ldap_credentials/
+        when /^ldap_credentials$/
           if service_config[:ldap] && service_config[:ldap][:auth]
             username = service_config[:ldap][:auth][:username]
             password = service_config[:ldap][:auth][:password]
@@ -311,26 +311,26 @@ module Cosmic
             username = @config[:ldap][:auth][:username]
             password = @config[:ldap][:auth][:password]
           end
-        when /credentials/
+        when /^credentials$/
           if !username && !password
             username = ask("Username for #{service_name.to_s}?\n")
             password = ask("Password for #{service_name.to_s}?\n") { |q| q.echo = false }
           end
-        when /keys/
+        when /^keys$/
           auth_config[:keys] = arrayify(service_config[:keys])
-        when /keys_from_env/
-          if service_config[:ldap] && service_config[:ldap][:auth]
-            path = service_config[:ldap][:key_path]
+        when /^keys_from_env$/
+          if service_config[:ldap]
+            path = service_config[:ldap][:key_path] || ldapify_username(@config[:ldap][:auth][:username])
             attrs = arrayify(service_config[:ldap][:key_attrs])
             if path && attrs.length > 0
-              key_entry = get_from_ldap(:path => path)
+              key_entry = first_or_nil(get_from_ldap(:path => path))
               if key_entry
                 key_data = []
                 attrs.each do |attr_name|
-                  attr_value = key_entry[attr_name]
+                  attr_value = first_or_nil(key_entry[attr_name])
                   key_data << attr_value if attr_value
                 end
-                auth_config[:keys] = { :key_data => key_data } if key_data.length > 0
+                auth_config[:key_data] = key_data if key_data.length > 0
               end
             end
           end
@@ -347,11 +347,8 @@ module Cosmic
     # @return [Net::LDAP::Entry,nil] The entry or nil if the path doesn't exist
     def get_from_ldap(params)
       case @config[:auth_type]
-        when /ldap/
-          service_ldap_config = service_config[:ldap] || @config[:ldap]
-          if service_ldap_config && @ldap
-            return @ldap.search(:base => params[:path] || '', :return_result => true)
-          end
+        when /^ldap$/
+          return @ldap.search(:base => params[:path] || '', :return_result => true)
       end
       nil
     end
@@ -535,10 +532,18 @@ module Cosmic
 
     def authenticate
       case @config[:auth_type]
-        when /ldap/
+        when /^ldap$/
           authenticate_with_ldap
-        when /credentials/
+        when /^credentials$/
           authenticate_with_credentials
+      end
+    end
+
+    def ldapify_username(username)
+      if username.nil? || username =~ /cn=.*/
+        username
+      else
+        "cn=#{username},ou=users,#{@config[:ldap][:base]}"
       end
     end
 
@@ -553,9 +558,9 @@ module Cosmic
         ldap_config[:auth][:method] = ldap_config[:auth][:method].to_sym if ldap_config[:auth][:method]
 
         case ldap_config[:auth][:method]
-          when /simple/
+          when /^simple$/
             if !ldap_config[:auth][:username]
-              ldap_config[:auth][:username] = ask("LDAP user (path) ?\n")
+              ldap_config[:auth][:username] = ldapify_username(ask("LDAP user ?\n"))
               ldap_config[:auth][:password] = ask("LDAP password ?\n") { |q| q.echo = false }
             end
         end
@@ -586,7 +591,7 @@ module Cosmic
       username = nil
       password = nil
       case @config[:auth_type]
-        when /ldap/
+        when /^ldap$/
           service_ldap_config = service_config[:ldap] || @config[:ldap]
           if service_ldap_config && @ldap
             @ldap.search(:base => service_ldap_config[:path] || '', :return_result => true) do |entry|
