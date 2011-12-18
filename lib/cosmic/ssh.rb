@@ -47,8 +47,7 @@ module Cosmic
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       @ssh_opts = {}
-      if @config[:auth][:keys]
-        puts "Using keys #{@config[:auth][:keys]}"
+      if @config[:auth][:keys] || @config[:auth][:key_data]
         @ssh_opts[:keys] = @config[:auth][:keys]
         @ssh_opts[:key_data] = @config[:auth][:key_data]
         @ssh_opts[:keys_only] = true

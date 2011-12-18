@@ -305,6 +305,28 @@ This type describes the case where the plugin has its own set of credentials ind
 
 Cosmic will ask the user for credentials if the element is not present in the configuration.
 
+#### keys
+
+Some plugins can make use of keys directly (e.g. ssh). For these plugins, Cosmic supports two types of authentication: `keys` and `keys_from_env`. The `keys` type simply allows to specify an array of file paths of the keys to use:
+
+    plugins:
+      ssh:
+        ...
+        auth_type: keys
+        keys: [<path to key 1>, <path to key 2>, ...]
+
+#### keys_from_env
+
+With this authentication type, plugins ask the Cosmic environment to give them keys via whatever means the environment has configured. This is usually used in conjunction with `ldap` authentication for the environment itself, i.e. keys are retrieved from specific paths in the LDAP server. The plugin configuration would then define the paths and attributes to look for the key data:
+
+    plugins:
+      ssh:
+        ...
+        auth_type: keys_from_env
+        ldap:
+          key_path: <LDAP path to the keys; if not specified, then the entry for the current user is used instead>
+          key_attrs: [<key attribute 1>, <key attribute 2>, ...]
+
 # Individual plugins
 
 The API documentation has more details about the capabilities of the individual plugins. This section gives a brief overview over each of the included plugins and describes their configuration.
