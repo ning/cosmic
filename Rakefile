@@ -14,7 +14,7 @@ begin
     gem.required_ruby_version = '>= 1.8.7'
     gem.files = FileList['lib/**/*.rb', 'bin/*', '[A-Z]*'].to_a
     gem.add_development_dependency 'yard', '~> 0.6.1'
-    gem.add_dependency 'highline', '~> 1.6.2'
+    gem.add_dependency 'highline', '~> 1.6.9'
     gem.add_dependency 'net-ldap', '~> 0.2.2'
   end
   Jeweler::GemcutterTasks.new
