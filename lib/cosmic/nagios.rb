@@ -1,5 +1,7 @@
 require 'cosmic'
 require 'cosmic/plugin'
+require 'net/http'
+require 'uri'
 require_with_hint 'nagix', "In order to use the nagios plugin please run 'gem install nagix'"
 require_with_hint 'json', "In order to use the nagios plugin please run 'gem install json'"
 
@@ -31,7 +33,12 @@ module Cosmic
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
-      @nagix = Net::HTTP.new(@config[:nagix_host])
+      uri = URI.parse(@config[:nagix_host])
+      @nagix = Net::HTTP.new(uri.host, uri.port)
+      if uri.scheme == 'https'
+        @nagix.use_ssl = true
+        @nagix.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
     end
 
     # Returns the Nagios status for the given host. This is equivalent to the MK Livestatus
@@ -42,7 +49,7 @@ module Cosmic
     # @option params [String,nil] :service The service on the host to return the status for;
     #                                      if not specified, then the status of the host will
     #                                      be returned
-    # @return [Hash] The Nagios status of the host/service as a Hash
+    # @return [Hash,nil] The Nagios status of the host/service as a Hash
     def status(params)
       host = params[:host] or raise "No :host argument given"
       service = params[:service]
@@ -52,7 +59,30 @@ module Cosmic
         request = Net::HTTP::Get.new("/hosts/#{host}/attributes?format=json")
       end
       response = @nagix.request(request)
-      JSON.parse(response.body)
+      statuses = JSON.parse(response.body)
+      if statuses.length > 0
+        statuses[0]
+      else
+        nil
+      end
+    end
+
+    # This is a simple wrapper around the `#status` method that extracts from the returned
+    # status data whether notifications are enabled for the given host/service.
+    # @param [Hash] params The parameters
+    # @option params [String] :host The host to return the status for
+    # @option params [String,nil] :service The service on the host to return the status for;
+    #                                      if not specified, then the status of the host will
+    #                                      be returned
+    # @return [Boolean,nil] Whether notifications are enabled; returns `nil` if it wasn't
+    #                       able to determine that
+    def enabled?(params)
+      status_hash = status(params)
+      if status_hash && status_hash['notifications_enabled']
+        status_hash['notifications_enabled'].to_i == 1
+      else
+        nil
+      end
     end
 
     # Enables all configured Nagios check notifications for the given host. This is equivalent
