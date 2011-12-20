@@ -2,7 +2,6 @@ require 'cosmic'
 require 'cosmic/plugin'
 require 'net/http'
 require 'uri'
-require_with_hint 'nagix', "In order to use the nagios plugin please run 'gem install nagix'"
 require_with_hint 'json', "In order to use the nagios plugin please run 'gem install json'"
 
 module Cosmic
@@ -116,7 +115,7 @@ module Cosmic
         else
           notify(:msg => "[Nagios] Enabling notifications for host #{host}",
                  :tags => [:nagios, :info])
-          request = Net::HTTP::Put.new("/hosts/#{host}/command/ENABLE_SVC_NOTIFICATIONS")
+          request = Net::HTTP::Put.new("/hosts/#{host}/command/ENABLE_HOST_SVC_NOTIFICATIONS")
         end
         request.body = "{}"
         request["Content-Type"] = "application/json"
@@ -155,7 +154,7 @@ module Cosmic
         else
           notify(:msg => "[Nagios] Disabling notifications for host #{host}",
                  :tags => [:nagios, :info])
-          request = Net::HTTP::Put.new("/hosts/#{host}/command/DISABLE_SVC_NOTIFICATIONS")
+          request = Net::HTTP::Put.new("/hosts/#{host}/command/DISABLE_HOST_SVC_NOTIFICATIONS")
         end
         request.body = "{}"
         request["Content-Type"] = "application/json"
