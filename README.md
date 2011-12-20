@@ -649,6 +649,44 @@ Scripts can then interact with the Nagios server:
 
 * Support in the Chef plugin for applying roles to hosts, plus support for Chef Solo
 
+# Recipes
+
+## Passing arguments to scripts
+
+Cosmic follows standard conventions for separating its own arguments from arguments to the script:
+
+    cosmic <cosmic args> <script name> -- <script args>
+
+E.g.
+
+    cosmic -c ~/.cosmicrc my-script.rb -- -v -t 'foo'
+
+## Configuration for scripts
+
+Scripts can have their own configuration in the cosmic configuration file. Simply add a section to it, e.g.
+
+    < cosmic configuration >
+    scripts:
+      myscript:
+        arg: foo
+
+and then read it out in the script via the `cosmic` instance (which is in scope automatically for scripts
+run via the `cosmic` executable):
+
+    arg = cosmic.config[:scripts][:myscript][:arg]
+
+## Using the same script in different environments (e.g. staging vs. production)
+
+Suppose you have two environments, staging and production, and you want to run the same script in both. The simplest way to achieve that is to use two different configuration files, e.g. `.cosmic-staging` and `.cosmic-production` and pass the configuration to use via the `-c` commandline option.
+In the configuration file you would then configure the plugins appropriately. For services that are not present in an environment (or that you don't want to use), you'd simply not include a configuration section in the corresponding configuration file, and use the `?` operator in the script.
+E.g. let's say we want to interact with IRC only in the production environment. Then in your script you'd use the `irc` plugin like so:
+
+    with irc? do
+      ...
+    end
+
+and only have configuration for the `irc` plugin in the production environment.
+
 # Writing new plugins
 
 Writing Cosmic plugins is fairly straightforward, but in order to keep the API consistent, there are a few rules and suggestions
