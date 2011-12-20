@@ -59,11 +59,15 @@ module Cosmic
         request = Net::HTTP::Get.new("/hosts/#{host}/attributes?format=json")
       end
       response = @nagix.request(request)
-      statuses = JSON.parse(response.body)
-      if statuses.length > 0
-        statuses[0]
+      if response.code.to_i < 300
+        statuses = JSON.parse(response.body)
+        if statuses.length > 0
+          return statuses[0]
+        else
+          nil
+        end
       else
-        nil
+        raise "Got response #{response.code} from Nagix server"
       end
     end
 
@@ -116,7 +120,10 @@ module Cosmic
         end
         request.body = "{}"
         request["Content-Type"] = "application/json"
-        @nagix.request(request)
+        response = @nagix.request(request)
+        if response.code.to_i >= 300
+          raise "Got response #{response.code} from Nagix server"
+        end
       end
       status(params)
     end
@@ -152,7 +159,10 @@ module Cosmic
         end
         request.body = "{}"
         request["Content-Type"] = "application/json"
-        @nagix.request(request)
+        response = @nagix.request(request)
+        if response.code.to_i >= 300
+          raise "Got response #{response.code} from Nagix server"
+        end
       end
       status(params)
     end
