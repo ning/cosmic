@@ -368,7 +368,7 @@ The JIRA plugin can be used to create and update JIRA issues. For instance, you 
 
 This plugin uses the [tomdz-jruby4r gem](https://github.com/tomdz/jira4r) which itself uses the [tomdz-soap4r gem](https://github.com/tomdz/soap4r). These two are forks of forks of the original [soap4r](https://github.com/felipec/soap4r) and [jira4r](https://github.com/remi/jira4r) gems, which have been updated to work with (J)Ruby 1.9 and with each other.
 
-    gem install tomdz-jruby4r tomdz-soap4r
+    gem install tomdz-jira4r tomdz-soap4r
 
 The JIRA plugin is configured as follows:
 
@@ -536,6 +536,8 @@ The plugin uses the [Chef gem](https://rubygems.org/gems/chef):
 
     gem install chef
 
+Please note that chef currently does not support JRuby.
+
 Currently the only available functionality is to retrieve information about a node that Chef knows about:
 
     require 'cosmic/galaxy'
@@ -624,7 +626,7 @@ Nagios currently doesn't provide a simple way to interact with it remotely. To h
 
 The Nagios plugin interacts with a Nagix instance and provides a simplified interface to retrieve status information about hosts and enable/disable notifications for hosts and their services. In order to use it, you'll first have to install the json gem:
 
-    gem install open4
+    gem install json
 
 Currently the only piece of configuration necessary is the host url for the Nagix server:
 
