@@ -612,7 +612,7 @@ Usage is straightforward:
 
     require 'cosmic/execute'
 
-    with maiexecute do
+    with execute do
       status, output = exec :cmd => 'ls -la'
       puts "Completed with status #{status}:"
       puts output
