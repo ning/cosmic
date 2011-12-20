@@ -242,6 +242,26 @@ module Cosmic
       end
     end
 
+    # Performs an arbitrary workflow action. This method will do nothing in dryrun mode except create a message
+    # tagged as `:dryrun`.
+    #
+    # @param [Hash] params The parameters
+    # @option params [Jira4R::V2::RemoteIssue,String] :issue The issue or its key
+    # @option params [String] :action The action
+    # @option params [Array,nil] :params An array of parameters for the workflow action
+    # @return [Jira4R::V2::RemoteIssue,nil] The issue
+    def perform_workflow_action(params)
+      from_key = params[:issue] or raise "No :issue argument given"
+      action_name = params[:action] or raise "No :action argument given"
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would perform workflow action #{action_name} on issue #{from_key} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+               :tags => [:jira, :dryrun])
+      else
+        issue = issueify(from_key)
+        perform_workflow_action_internal(issue, action_name, params[:params] || [])
+      end
+    end
+
     # Resolves an issue after disconnecting it from the message bus if necessary. This method will do
     # nothing in dryrun mode except create a message tagged as `:dryrun`.
     #
@@ -261,7 +281,7 @@ module Cosmic
           resolution_field = Jira4R::V2::RemoteFieldValue.new
           resolution_field.id = "resolution"
           resolution_field.values = get_resolution_id(params[:resolution] || 'Fixed')
-          perform_workflow_action(issue, action_name, [resolution_field])
+          perform_workflow_action_internal(issue, action_name, [resolution_field])
         else
           raise "Could not find JIRA issue #{params[:issue]}"
         end
@@ -364,7 +384,7 @@ module Cosmic
       raise "The resolution #{resolution_name} does not seem to be supported"
     end
 
-    def perform_workflow_action(issue, action_name, args_array = [])
+    def perform_workflow_action_internal(issue, action_name, args_array = [])
       resolve_action_id = nil
       @monitor.synchronize do
         @jira.getAvailableActions(issue.key.upcase).each do |action|
