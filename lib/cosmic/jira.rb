@@ -85,7 +85,7 @@ module Cosmic
       @monitor = Monitor.new
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
-      @config[:address] ||= 'http://localhost'
+      raise "No jira host specified in the configuration" unless @config[:address]
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       authenticate
     end

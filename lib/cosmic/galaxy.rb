@@ -74,6 +74,7 @@ module Cosmic
     def initialize(environment, name = :galaxy)
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
+      raise "No gonsole host specified in the configuration" unless @config[:host]
       @galaxy_options = { :console => ::Galaxy::Transport.locate("druby://#{@config[:host] || 'localhost'}:#{@config[:port] || 4440}"),
                           :versioning_policy => @config[:relaxed_versioning] ?
                                                    ::Galaxy::Versioning::RelaxedVersioningPolicy :

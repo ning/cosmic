@@ -431,19 +431,19 @@ module Cosmic
       # Now let's check if there is a plugin configured for that name, or if
       # there is a class of that name in namespace Cosmic
       clazz = find_plugin_class(name)
-      if clazz
-        instance = clazz.new(self, name.to_sym)
-        @cached_plugins[name.downcase] = instance
-        instance
-      else
-        begin
+      begin
+        if clazz
+          instance = clazz.new(self, name.to_sym)
+          @cached_plugins[name.downcase] = instance
+          instance
+        else
           super
-        rescue Exception => e
-          if required
-            raise "No such plugin instance configured or configuration is invalid for '#{name}'"
-          else
-            HoneyPot.new
-          end
+        end
+      rescue Exception => e
+        if required
+          raise "No such plugin instance configured or configuration is invalid for '#{name}': #{e}"
+        else
+          HoneyPot.new
         end
       end
     end

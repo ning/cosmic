@@ -32,6 +32,7 @@ module Cosmic
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
+      raise "No nagix host specified in the configuration" unless @config[:nagix_host]
       uri = URI.parse(@config[:nagix_host])
       @nagix = Net::HTTP.new(uri.host, uri.port)
       if uri.scheme == 'https'

@@ -142,8 +142,8 @@ module Cosmic
     def initialize(environment, name = :irc)
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
+      raise "No irc host specified in the configuration" unless @config[:host]
       @config[:nick] ||= 'cosmic'
-      @config[:host] ||= 'localhost'
       @config[:port] ||= 6667
       @config[:connection_timeout_sec] ||= 60
       @joined_channels = {}
