@@ -17,7 +17,8 @@ begin
     gem.add_dependency 'highline', '~> 1.6.9'
     gem.add_dependency 'net-ldap', '~> 0.2.2'
   end
-  Jeweler::GemcutterTasks.new
+  # Uncomment this to make rake release push to rubygems
+  #Jeweler::GemcutterTasks.new
 rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
