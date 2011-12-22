@@ -35,7 +35,28 @@ def with(obj, &block)
   end
 end
 
-# Turns the given object into an array unless it is already one. If passed `nil` then
+# This is the same as `#with` except that it will only run the block in the context of the object
+# if the object is not an instance of `Cosmic::HoneyPot`. In effect this means that you'd use
+# this in cases where a plugin is not configured but used in a script and you don't want to
+# run code using the plugin at all.
+#
+# @param [Object, nil] obj The object that serves as the context for the block. If `nil` or an
+#                          instance of `Cosmic::HoneyPot` then the block won't be executed
+# @yield A block of arity 0 or 1 that will be executed in the context of the given object
+# @return [Object, nil] The return value of the block if any. If the block is not
+#                       executed because the object is `nil`, then nothing will be
+#                       returned
+def with_available(obj, &block)
+  if obj && !obj.is_a?(Cosmic::HoneyPot) && block_given?
+    if block.arity == 1
+      yield obj
+    else
+      obj.instance_eval(&block)
+    end
+  end
+end
+
+# Wraps the given object in an array unless it is already one. If passed `nil` then
 # it will return an empty array.
 #
 # @param [Object] obj The object to arrayify

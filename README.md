@@ -35,19 +35,27 @@ One of the core concepts of Cosmic is the dry-run mode. When it is turned on (vi
 
 Cosmic adds only a few pieces of syntactic sugar, all geared at eliminating syntactic noise and keeping the scripts short and to the point.
 
-### `with` construct
+### `with` constructs
 
-Cosmic borrows the `with` construct from languages such as JavaScript or Pascal:
+Cosmic borrows the `with` construct from languages such as JavaScript or Pascal and provides it in two flavors:
 
     with irc do
       write :msg => 'Hello world', :channels => '#test'
     end
 
-This is equivalent to
+or
+
+    with_available irc do
+      write :msg => 'Hello world', :channels => '#test'
+    end
+
+Both of these are equivalent to
 
     irc.write :msg => 'Hello world', :channels => '#cosmic'
 
-The benefit of this is that multiple calls to methods on the same object can be grouped into one `with` statement which reduces the noise and makes the code more readable. It also makes it more obvious that the methods are called on the same object.
+They differ in how they handle the case that the object, in the example above the `irc` plugin, is not available. This is explained in more detail below in the description of optional sections.
+
+The benefit of the `with` constructs is that multiple calls to methods on the same object can be grouped into one `with` statement which reduces the noise and makes the code more readable. It also makes it more obvious that the methods are called on the same object.
 
 The other benefit is that this makes optional sections possible as explained below.
 
@@ -81,8 +89,19 @@ or
 
     irc?.write :msg => 'Hello world', :channels => '#test'
 
-The additional question mark after the plugin short name directs Cosmic to only execute the method call if the IRC plugin is configured. If not, then the method call is ignored.
-One common use case for this is using the same deployment script in production and QA or development environments. Some services would only be configured in the production environment, so in the script they would be referenced with a `?`.
+vs.
+
+    with_available irc? do
+      write :msg => 'Hello world', :channels => '#test'
+    end
+
+The question mark after the plugin's short name directs Cosmic to not fail if the plugin is not configured. Note that this does not matter to all plugins. Some plugins such as the `ssh` plugin don't require any configuration (though they might have optional configuration) and thus would always be available. If however a name is used that does not map to a plugin (e.g. `my-ssh`), then a configuration section for that name is required and optional sections apply.
+
+The first two forms above (`with` section and direct invocation) will actually execute the code, but they will do so against a so-called honey pot. This has the benefit that any code in the `with` block that does not use the plugin itself, will still get executed.
+
+The third form will only execute the code in the block if the plugin is actually available.
+
+One common use case for these forms is using the same deployment script in production and QA or development environments. Some services would only be configured in the production environment, so in the script they would be referenced with a `?`.
 
 ### Optional error handling
 
@@ -679,13 +698,70 @@ run via the `cosmic` executable):
 
 Suppose you have two environments, staging and production, and you want to run the same script in both. The simplest way to achieve that is to use two different configuration files, e.g. `.cosmic-staging` and `.cosmic-production` and pass the configuration to use via the `-c` commandline option.
 In the configuration file you would then configure the plugins appropriately. For services that are not present in an environment (or that you don't want to use), you'd simply not include a configuration section in the corresponding configuration file, and use the `?` operator in the script.
+
 E.g. let's say we want to interact with IRC only in the production environment. Then in your script you'd use the `irc` plugin like so:
 
     with irc? do
       ...
     end
 
-and only have configuration for the `irc` plugin in the production environment.
+and only have configuration for the `irc` plugin in the production environment. This will still execute the block, however it will be executed against a so-called `HoneyPot` instance that stands in for the `irc` instance in this case. This instance will accept all calls to it, then simply not do anything other than return itself.
+
+This will work in a lot of cases, but sometimes it might cause odd errors. In those cases you can either check if the object you are working with is a honey pot:
+
+    with jira? do
+      issue = create ...
+      unless issue.is_honey_pot
+        ...
+      end
+    end
+
+or use `with_available` which will only run the code if the plugin is actually available
+
+    with_available jira? do
+      issue = create ...
+      ...
+    end
+
+## Dealing with dry-run mode
+
+Sometimes it is unavoidable to make the script aware of whether dry-run mode is enabled or not. Typically this is the case when the script relies on the data returned by some action that is not performed during dry-run mode. For instance:
+
+    require 'cosmic/jira'
+
+    issue = with jira? do
+      create_issue :project => 'COS', :type => 'New Feature', :summary => "foo", :description => "bar"
+    end
+
+    puts "Issue is: #{issue.key}"
+
+In dry-run mode, `issue` will be `nil` which leads to an error on the `puts` line:
+
+    NoMethodError: undefined method `key' for nil:NilClass
+
+There are two basic strategies to deal with this: check values for `nil` and react appropriately, or execute code blocks only if dry-run mode is not enabled.
+
+The former could look like this:
+
+    require 'cosmic/jira'
+
+    issue = with jira? do
+      create_issue :project => 'COS', :type => 'New Feature', :summary => "foo", :description => "bar"
+    end
+
+    puts "Issue is: #{issue.key}" if issue
+
+The latter makes use of the implicitly available `cosmic` environment instance:
+
+    require 'cosmic/jira'
+
+    unless cosmic.in_dry_run_mode
+      issue = with jira? do
+        create_issue :project => 'COS', :type => 'New Feature', :summary => "foo", :description => "bar"
+      end
+
+      puts "Issue is: #{issue.key}" if issue
+    end
 
 # Writing new plugins
 
