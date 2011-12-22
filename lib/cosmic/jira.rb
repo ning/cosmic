@@ -85,7 +85,7 @@ module Cosmic
       @monitor = Monitor.new
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
-      raise "No jira host specified in the configuration" unless @config[:address]
+      raise "No jira address specified in the configuration" unless @config[:address]
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       authenticate
     end
@@ -119,6 +119,7 @@ module Cosmic
       if @environment.in_dry_run_mode
         notify(:msg => "Would create a new issue in project #{project_name} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
+        nil
       else
         project = get_project(project_name)
         if project
@@ -157,11 +158,12 @@ module Cosmic
     # @option params [String,nil] :comment The comment
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def comment_on(params)
-      key = params[:issue] or raise "No :issue argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would comment on issue #{key} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "Would comment on issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
+        nil
       else
+        key = params[:issue] or raise "No :issue argument given"
         issue = issueify(key)
         if issue
           comment = Jira4R::V2::RemoteComment.new()
@@ -187,13 +189,14 @@ module Cosmic
     # @option params [String,nil] :comment The link comment
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def link(params)
-      from_key = params[:issue] or raise "No :issue argument given"
-      to_key = params[:to] or raise "No :to argument given"
       kind = params[:kind] or raise "No :kind argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would create a link of type #{kind} from issue #{from_key} to #{to_key} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "Would create a link of type #{kind} from issue #{params[:issue]} to #{params[:to]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
+        nil
       else
+        from_key = params[:issue] or raise "No :issue argument given"
+        to_key = params[:to] or raise "No :to argument given"
         issue = issueify(from_key)
         to = issueify(to_key)
         if issue && to
@@ -251,12 +254,13 @@ module Cosmic
     # @option params [Array,nil] :params An array of parameters for the workflow action
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def perform_workflow_action(params)
-      from_key = params[:issue] or raise "No :issue argument given"
       action_name = params[:action] or raise "No :action argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would perform workflow action #{action_name} on issue #{from_key} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "Would perform workflow action #{action_name} on issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
+        nil
       else
+        from_key = params[:issue] or raise "No :issue argument given"
         issue = issueify(from_key)
         perform_workflow_action_internal(issue, action_name, params[:params] || [])
       end
@@ -274,6 +278,7 @@ module Cosmic
       if @environment.in_dry_run_mode
         notify(:msg => "Would resolve issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
+        nil
       else
         issue = disconnect(params)
         if issue
@@ -299,12 +304,13 @@ module Cosmic
     # @return [Cinch::Channel,nil] The channel if the plugin was able to connect it
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def connect(params)
-      key = params[:issue] or raise "No :issue argument given"
-      tags = params[:to] or raise "No :to argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would connect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} to the message bus",
+        notify(:msg => "Would connect issue #{params[:issue]} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} to the message bus",
                :tags => [:jira, :dryrun])
+        nil
       else
+        key = params[:issue] or raise "No :issue argument given"
+        tags = params[:to] or raise "No :to argument given"
         issue = issueify(key)
         if issue
           @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => tags)
@@ -323,11 +329,12 @@ module Cosmic
     # @option params [Jira4R::V2::RemoteIssue,String] :issue The issue or its key
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def disconnect(params)
-      key = params[:issue] or raise "No :issue argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would disconnect issue #{key} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} from the message bus",
+        notify(:msg => "Would disconnect issue #{params[:issue]} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} from the message bus",
                :tags => [:jira, :dryrun])
+        nil
       else
+        key = params[:issue] or raise "No :issue argument given"
         issue = issueify(key)
         if issue
           @environment.disconnect_message_listener(:listener => IssueMessageListener.new(self, issue))
@@ -362,10 +369,6 @@ module Cosmic
     def issueify(issue_or_key)
       if issue_or_key.is_a?(Jira4R::V2::RemoteIssue)
         issue_or_key
-      elsif @environment.in_dry_run_mode
-        notify(:msg => "Would fetch issue #{issue_or_key.to_s} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
-               :tags => [:jira, :dryrun])
-        nil
       else
         @monitor.synchronize do
           @jira.getIssue(issue_or_key.to_s)

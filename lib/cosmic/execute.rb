@@ -34,11 +34,12 @@ module Cosmic
     # @return [Array<Integer, String>] The status and output of the command (stdout and stderr
     #                                  combined)
     def exec(params)
-      cmd = params[:cmd] or raise "No :cmd argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would execute command '#{cmd}'",
+        notify(:msg => "Would execute command '#{params[:cmd]}'",
                :tags => [:execute, :dryrun])
+        nil
       else
+        cmd = params[:cmd] or raise "No :cmd argument given"
         output = ""
         pid, ignored, stdout, stderr = (JRUBY ? IO : Open4).send(:popen4, cmd)
         threads = []

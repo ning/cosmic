@@ -144,6 +144,7 @@ module Cosmic
           @f5['LocalLB.Pool'].remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
       end
+      nil
     end
 
     # Retrieves the members of a pool.
@@ -386,9 +387,6 @@ module Cosmic
       end
     end
 
-    # add/remove to/from pool (set 'name' if defined, e.g. to hostname)
-    # health check ?
-
     # Synchronizes the configuration to a specified group or all groups that the load balancer is a member of. This
     # method will do nothing in dryrun mode except create a message tagged as `:dryrun`.
     #
@@ -396,14 +394,20 @@ module Cosmic
     # @option params [String] :group The specific group to sync to; if omitted then all groups will be synced to
     # @return [void]
     def sync(params)
-      group = params[:group]
-      @monitor.synchronize do
-        if group
-          @f5['System.ConfigSync'].synchronize_to_group(group)
-        else
-          @f5['System.ConfigSync'].synchronize_configuration('CONFIGSYNC_ALL')
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would sync configurations for load balancer #{@config[:host]}",
+               :tags => [:f5, :dryrun])
+      else
+        group = params[:group]
+        @monitor.synchronize do
+          if group
+            @f5['System.ConfigSync'].synchronize_to_group(group)
+          else
+            @f5['System.ConfigSync'].synchronize_configuration('CONFIGSYNC_ALL')
+          end
         end
       end
+      nil
     end
 
     private

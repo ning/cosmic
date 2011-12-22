@@ -59,17 +59,23 @@ module Cosmic
     # @option params [String] :role The name of the role
     # @return [Hash,nil] A hash with the info for the host
     def add_role(params)
-      node = params[:node]
-      host = params[:host]
-      if !node && !host
-        raise "No :host or :node argument given"
+      if @environment.in_dry_run_mode
+        notify(:msg => "Would add role #{params[:role]} to #{params[:host] || params[:node]} ",
+               :tags => [:chef, :dryrun])
+        nil
+      else
+        node = params[:node]
+        host = params[:host]
+        if !node && !host
+          raise "No :host or :node argument given"
+        end
+        if !node
+          node = get_info(params)
+        end
+        role = params[:role] or raise "No :role argument given"
+        ::Chef::Knife::NodeRunListAdd.new.add_to_run_list(node, role)
+        get_info(params)
       end
-      if !node
-        node = get_info(params)
-      end
-      role = params[:role] or raise "No :role argument given"
-      ::Chef::Knife::NodeRunListAdd.new.add_to_run_list(node, role)
-      get_info(params)
     end
   end
 end
