@@ -1,0 +1,164 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>SSH &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="../index.html" />
+    <link rel="up" title="Plugins" href="../plugins.html" />
+    <link rel="next" title="Recipes" href="../recipes.html" />
+    <link rel="prev" title="Nagios" href="nagios.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../recipes.html" title="Recipes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nagios.html" title="Nagios"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" accesskey="U">Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ssh">
+<h1>SSH<a class="headerlink" href="#ssh" title="Permalink to this headline">¶</a></h1>
+<p>With the SSH plugin Cosmic scripts can execute commands on remote hosts and upload files to/download files from them.</p>
+<p>It uses the <a class="reference external" href="http://net-ssh.github.com/">Net::SSH and Net::SCP</a> libraries:</p>
+<div class="highlight-python"><pre>gem install net-ssh net-scp</pre>
+</div>
+<p>The plugin only requires configuration if ssh authentication with the remote host requires username/password instead of ssh keys:</p>
+<div class="highlight-python"><pre>ssh:
+  &lt;authentication configuration as explained above&gt;</pre>
+</div>
+<p>Using it is fairly straightforward:</p>
+<div class="highlight-python"><pre>require 'cosmic/galaxy'
+require 'cosmic/ssh'
+
+services = with galaxy do
+  select :type =&gt; /^echo$?/
+end
+with ssh do
+  services.each do |service|
+    puts exec :host =&gt; service.host, :user =&gt; 'eng', :cmd =&gt; 'uname -a'
+
+    first = true
+    upload :host =&gt; service.host, :user =&gt; 'eng', :local =&gt; ARGV[0] do |ch, name, sent, total|
+      print "\r" unless first
+      print "#{name}: #{sent}/#{total}"
+      first = false
+    end
+    print "\n"
+  end
+end</pre>
+</div>
+<p>In this sample script, we first find all <tt class="docutils literal"><span class="pre">echo</span></tt> services on galaxy and then run <tt class="docutils literal"><span class="pre">uname</span> <span class="pre">-a</span></tt> on them. Then we upload a local file (passed in as a commandline argument) to the same path on the remote service. The script also prints out the progress of the upload while it is uploading the file.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../plugins.html">Plugins</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chef.html">Chef</a></li>
+<li class="toctree-l2"><a class="reference internal" href="email.html">E-mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute.html">Execute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f5.html">F5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="galaxy.html">Galaxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="irc.html">IRC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jira.html">JIRA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jmx.html">JMX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nagios.html">Nagios</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">SSH</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="nagios.html"
+                        title="previous chapter">Nagios</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../recipes.html"
+                        title="next chapter">Recipes</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../recipes.html" title="Recipes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nagios.html" title="Nagios"
+             >previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" >Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

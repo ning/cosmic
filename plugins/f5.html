@@ -1,0 +1,163 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>F5 &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="../index.html" />
+    <link rel="up" title="Plugins" href="../plugins.html" />
+    <link rel="next" title="Galaxy" href="galaxy.html" />
+    <link rel="prev" title="Execute" href="execute.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="galaxy.html" title="Galaxy"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="execute.html" title="Execute"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" accesskey="U">Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="f5">
+<h1>F5<a class="headerlink" href="#f5" title="Permalink to this headline">¶</a></h1>
+<p>The F5 plugin allows Cosmic scripts to manipulate certain aspects of <a class="reference external" href="https://www.f5.com/products/big-ip/">F5 BIG-IP load balancers</a> such as registration of hosts, pool membership, monitoring configuration etc.</p>
+<p>It uses the <a class="reference external" href="https://devcentral.f5.com/Tutorials/TechTips/tabid/63/articleType/ArticleView/articleId/1086421/Getting-Started-With-Ruby-and-iControl.aspx">iControl library</a> version 11.0.0.1 or newer, which can be downloaded from F5&#8217;s developer website:</p>
+<div class="highlight-python"><pre>gem install f5-icontrol</pre>
+</div>
+<p>The configuration for the plugin consists of the load balancer host and the authentication credentials for it:</p>
+<div class="highlight-python"><pre>primary_lb:
+  plugin_class: Cosmic::F5
+  host:         &lt;load balancer host&gt;
+  &lt;authentication configuration as explained above&gt;</pre>
+</div>
+<p>Typically, you would want to have one plugin entry for each primary load balancer that the Cosmic scripts need access to, and use the sync method provided by the plugin, to sync configuration changes to any secondary load balancers:</p>
+<div class="highlight-python"><pre>require 'cosmic/galaxy'
+require 'cosmic/f5'
+
+services = with galaxy do
+  select :type =&gt; /^echo$?/
+end
+
+with primary_lb do
+  services.each do |service|
+    node = disable :ip =&gt; service.ip
+    remove_from_pool node.merge { :pool =&gt; 'echo-12345' }
+    add_to_pool node.merge { : pool =&gt; 'echo-23456' }
+    enable node
+  end
+  sync
+end</pre>
+</div>
+<p>This sample script determines all <tt class="docutils literal"><span class="pre">echo</span></tt> servies from galaxy, then disables them on the primary load balancer, removes them from one pool and adds them to another pool, reenables the services and finally syncs the configuration with any secondary load balancers.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../plugins.html">Plugins</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chef.html">Chef</a></li>
+<li class="toctree-l2"><a class="reference internal" href="email.html">E-mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute.html">Execute</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">F5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="galaxy.html">Galaxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="irc.html">IRC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jira.html">JIRA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jmx.html">JMX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nagios.html">Nagios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ssh.html">SSH</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="execute.html"
+                        title="previous chapter">Execute</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="galaxy.html"
+                        title="next chapter">Galaxy</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="galaxy.html" title="Galaxy"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="execute.html" title="Execute"
+             >previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" >Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

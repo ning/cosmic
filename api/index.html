@@ -1,0 +1,936 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html" title="Index">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><div id='filecontents'><h1>Overview</h1>
+
+<p>Cosmic is a Ruby library and commandline tool for service deployment automation. The core idea is that deployments of machines &amp; services should be scripted so that they are reproducable and easier to understand. Cosmic&#39; aim is to help writing these scripts by providing a simplified interface to services commonly used during deployment plus a little bit of DSL sugar to keep the scripts concise and easy to understand. The DSL part is kept to a minimum however, Cosmic scripts are still normal Ruby scripts with all the benfits that that brings.</p>
+
+<p>Cosmic itself requires Ruby 1.8.7 or newer, however some plugins require Ruby 1.9 (e.g. the IRC plugin) or JRuby (e.g. the JMX plugin).</p>
+
+<h1>Concepts</h1>
+
+<h2>Plugins</h2>
+
+<p>The Cosmic core provides little in terms of actual deployment support, all that is contained in the plugins. Each Cosmic plugin is a wrapper around an existing ruby library or external API that simplifies interaction with the service specifically for deployments. This also means that you won&#39;t have access to all capabilities of that service, only to those that make sense for deploying machines/services. However, plugins usually provide access to the underlying library/API so that you can interact with that directly if necessary.</p>
+
+<h2>Authentication system</h2>
+
+<p>Cosmic provides built-in support for authentication that can be used by all plugins. The goal there is to perform deployments as a specific person and not using some general account such as <code>root</code> or <code>eng</code> or something like that. This allows to track deployments more accurately and also to have more fine-grained control over who can perform which deployment steps. </p>
+
+<p>Cosmic itself can currently authenticate against an LDAP server, and then pull credentials from there to authenticate other services, or use the LDAP credentials themselves for LDAP-enabled services. Depending on the service setup, this would allow a single-sign-on style deployment where the person performing the deployment only has to authenticate once at the start of the deployment, and from then on all other steps would be automatically authenticated by Cosmic.</p>
+
+<h2>Messages</h2>
+
+<p>The environment that Cosmic plugins run in, provides the ability to send and listen to messages. These messages are basically tagged strings. A plugin then can express interest in messages with specific tags. In addition, deployment scripts can wire some plugins to specific tags, e.g.:</p>
+
+<pre class="code"><span class='rubyid_irc identifier id'>irc</span><span class='dot token'>.</span><span class='rubyid_connect identifier id'>connect</span> <span class='symbol val'>:channel</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:info</span><span class='comma token'>,</span> <span class='symbol val'>:galaxy</span><span class='rbrack token'>]</span>
+<span class='rubyid_notify identifier id'>notify</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'A message, yay !'</span><span class='comma token'>,</span> <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='symbol val'>:info</span>
+</pre>
+
+<p>This example wires a specific IRC channel, <code>#test</code>, to all messages that are tagged <code>:info</code> or <code>:galaxy</code>, and then sends an explicit message tagged as <code>:info</code>, which because of the wiring will then be posted by the IRC plugin to that channel.</p>
+
+<p>Cosmic plugins usually either produce messages (these are typically the plugins that perform actual deployment steps) or consume message (e.g. for keeping record of the deployment progress).</p>
+
+<h2>Dry-run</h2>
+
+<p>One of the core concepts of Cosmic is the dry-run mode. When it is turned on (via configuration or commandline switch), then all plugins will omit messages that by default are output to standard out, instead of performing the actions. In effect, the script will output the steps it would take, but not actually perform these steps.</p>
+
+<h2>DSL</h2>
+
+<p>Cosmic adds only a few pieces of syntactic sugar, all geared at eliminating syntactic noise and keeping the scripts short and to the point.</p>
+
+<h3><code>with</code> constructs</h3>
+
+<p>Cosmic borrows the <code>with</code> construct from languages such as JavaScript or Pascal and provides it in two flavors:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>or</p>
+
+<pre class="code"><span class='rubyid_with_available identifier id'>with_available</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>Both of these are equivalent to</p>
+
+<pre class="code"><span class='rubyid_irc identifier id'>irc</span><span class='dot token'>.</span><span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#cosmic'</span>
+</pre>
+
+<p>They differ in how they handle the case that the object, in the example above the <code>irc</code> plugin, is not available. This is explained in more detail below in the description of optional sections.</p>
+
+<p>The benefit of the <code>with</code> constructs is that multiple calls to methods on the same object can be grouped into one <code>with</code> statement which reduces the noise and makes the code more readable. It also makes it more obvious that the methods are called on the same object.</p>
+
+<p>The other benefit is that this makes optional sections possible as explained below.</p>
+
+<h3>Simplified plugin interaction</h3>
+
+<p>Within the context of a Cosmic environment instance, plugins can simply be instantiated and used by their name.</p>
+
+<pre class="code"><span class='rubyid_cosmic identifier id'>cosmic</span> <span class='assign token'>=</span> <span class='rubyid_Cosmic constant id'>Cosmic</span><span class='colon2 op'>::</span><span class='rubyid_Environment constant id'>Environment</span><span class='dot token'>.</span><span class='rubyid_from_config_file identifier id'>from_config_file</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_cosmic identifier id'>cosmic</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='dot3 op'>...</span>
+  <span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Goodbye world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>This will automatically create an IRC instance in the first <code>with irc</code> block using the environment&#39;s configuration (as explained below) and use it. The plugin then gets cached under that name <code>irc</code>, so that the second block will simply use the same instance.</p>
+
+<h3>Optional sections</h3>
+
+<p>Optional sections are groups of statements that get executed if a certain plugin is defined, otherwise they are ignored. Usually you would use <code>if</code> or <code>unless</code> statements in Ruby. Cosmic provides a shortcut syntax that makes this more concise:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc? fid id'>irc?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>or</p>
+
+<pre class="code"><span class='rubyid_irc? fid id'>irc?</span><span class='dot token'>.</span><span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+</pre>
+
+<p>vs.</p>
+
+<pre class="code"><span class='rubyid_with_available identifier id'>with_available</span> <span class='rubyid_irc? fid id'>irc?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>The question mark after the plugin&#39;s short name directs Cosmic to not fail if the plugin is not configured. Note that this does not matter to all plugins. Some plugins such as the <code>ssh</code> plugin don&#39;t require any configuration (though they might have optional configuration) and thus would always be available. If however a name is used that does not map to a plugin (e.g. <code>my-ssh</code>), then a configuration section for that name is required and optional sections apply.</p>
+
+<p>The first two forms above (<code>with</code> section and direct invocation) will actually execute the code, but they will do so against a so-called honey pot. This has the benefit that any code in the <code>with</code> block that does not use the plugin itself, will still get executed.</p>
+
+<p>The third form will only execute the code in the block if the plugin is actually available.</p>
+
+<p>One common use case for these forms is using the same deployment script in production and QA or development environments. Some services would only be configured in the production environment, so in the script they would be referenced with a <code>?</code>.</p>
+
+<h3>Optional error handling</h3>
+
+<p>In a similar way to optional sections, Cosmic allows to make potential errors raised by a method call optional. The typical use case for this would be to differenciate required functionality from optional functionality that should not affect the deployment. For example in:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='rubyid_msg identifier id'>msg</span><span class='colon op'>:</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='rubyid_channels identifier id'>channels</span><span class='colon op'>:</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>if the call to <code>write</code> causes an error, for instance because the connection to the IRC server was dropped, then this would cause the deployment script to fail even if it is actually not critical to the deployment itself. If instead you write this as:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write? fid id'>write?</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>then an error raised by the <code>write</code> method will be emitted as an error message (see below) but otherwise ignored and the deployment can continue.</p>
+
+<h1>How to use Cosmic</h1>
+
+<p>Cosmic can be used in three ways: via the commandline tool <code>cosmic</code> that gets installed as part of the gem, as a library from your own ruby scripts, or via a standalone executable.</p>
+
+<h2>Commandline tool</h2>
+
+<p>The commandline tool <code>cosmic</code> is installed as part of the cosmic gem. It provides a simple ruby commandline script that automatically creates a Cosmic environment and then executes your script in it. This means that your script shouldn&#39;t instantiate the Cosmic environment and instead should simply depend on it being available:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/irc'</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ARGV constant id'>ARGV</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='dot3 op'>...</span>
+</pre>
+
+<p>You will still have to require all plugins that you want to use - Cosmic will not require them automatically.</p>
+
+<p>The above script <code>irc-test.rb</code> could then be invoked as:</p>
+
+<pre class="code"><span class='rubyid_cosmic identifier id'>cosmic</span> <span class='rubyid_irc identifier id'>irc</span><span class='minus op'>-</span><span class='rubyid_test identifier id'>test</span><span class='dot token'>.</span><span class='rubyid_rb identifier id'>rb</span> <span class='string val'>'Hello World'</span>
+</pre>
+
+<h2>Standalone tool</h2>
+
+<p>This is a separate project <a href="https://github.com/ning/cosmic-standalone">cosmic-standalone</a> that bundles the gem with all plugins that it is allowed to bundle (some are omitted due to license restrictions) with jruby into an executable jar file. You can simply download the executable and, provided you jave Java 6 or newer installed, run as is. See the documentation for that project for more details about which plugins are included and which have to be installed separately.</p>
+
+<h2>Using Cosmic in your own scripts</h2>
+
+<p>You can also require the cosmic gem in your scripts. You will then have to create the Cosmic environment yourself, e.g.:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic'</span>
+<span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/irc'</span>
+
+<span class='rubyid_cosmic identifier id'>cosmic</span> <span class='assign token'>=</span> <span class='rubyid_Cosmic constant id'>Cosmic</span><span class='colon2 op'>::</span><span class='rubyid_Environment constant id'>Environment</span><span class='dot token'>.</span><span class='rubyid_from_config_file identifier id'>from_config_file</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_cosmic identifier id'>cosmic</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='dot3 op'>...</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<h1>Configuration</h1>
+
+<p>Cosmic and the plugins are configured via a single YAML file. The default location for the file is <code>$HOME/.cosmicrc</code>, but both the commandline tool and the <code>Cosmic::Environment</code> constructor support specifying a different file.</p>
+
+<p>The basic environment configuration looks like this:</p>
+
+<pre class="code"><span class='rubyid_auth_type identifier id'>auth_type</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_Authentication constant id'>Authentication</span> <span class='rubyid_type identifier id'>type</span><span class='gt op'>&gt;</span>
+<span class='lt op'>&lt;</span><span class='rubyid_Authentication constant id'>Authentication</span> <span class='rubyid_type identifier id'>type</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='rubyid_section identifier id'>section</span><span class='gt op'>&gt;</span>
+<span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='lt op'>&lt;</span><span class='rubyid_Plugin constant id'>Plugin</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='rubyid_sections identifier id'>sections</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>For example:</p>
+
+<pre class="code"><span class='rubyid_auth_type identifier id'>auth_type</span><span class='colon op'>:</span> <span class='rubyid_ldap identifier id'>ldap</span>
+<span class='rubyid_ldap identifier id'>ldap</span><span class='colon op'>:</span>
+  <span class='rubyid_host identifier id'>host</span><span class='colon op'>:</span>       <span class='rubyid_my identifier id'>my</span><span class='minus op'>-</span><span class='rubyid_ldap identifier id'>ldap</span><span class='minus op'>-</span><span class='rubyid_server identifier id'>server</span><span class='dot token'>.</span><span class='rubyid_example identifier id'>example</span><span class='dot token'>.</span><span class='rubyid_com identifier id'>com</span>
+  <span class='rubyid_port identifier id'>port</span><span class='colon op'>:</span>       <span class='integer val'>1636</span>
+  <span class='rubyid_base identifier id'>base</span><span class='colon op'>:</span>       <span class='rubyid_dc identifier id'>dc</span><span class='assign token'>=</span><span class='rubyid_example identifier id'>example</span><span class='comma token'>,</span><span class='rubyid_dc identifier id'>dc</span><span class='assign token'>=</span><span class='rubyid_com identifier id'>com</span>
+  <span class='rubyid_encryption identifier id'>encryption</span><span class='colon op'>:</span> <span class='rubyid_simple_tls identifier id'>simple_tls</span>
+  <span class='rubyid_auth identifier id'>auth</span><span class='colon op'>:</span>
+    <span class='rubyid_method identifier id'>method</span><span class='colon op'>:</span>   <span class='rubyid_simple identifier id'>simple</span>
+    <span class='rubyid_username identifier id'>username</span><span class='colon op'>:</span> <span class='rubyid_cn identifier id'>cn</span><span class='assign token'>=</span><span class='rubyid_Directory constant id'>Directory</span> <span class='rubyid_Manager constant id'>Manager</span>
+    <span class='rubyid_password identifier id'>password</span><span class='colon op'>:</span> <span class='rubyid_my identifier id'>my</span><span class='minus op'>-</span><span class='rubyid_password identifier id'>password</span>
+<span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='rubyid_irc identifier id'>irc</span><span class='colon op'>:</span>
+    <span class='rubyid_host identifier id'>host</span><span class='colon op'>:</span>      <span class='rubyid_irc identifier id'>irc</span><span class='dot token'>.</span><span class='rubyid_example identifier id'>example</span><span class='dot token'>.</span><span class='rubyid_com identifier id'>com</span>
+    <span class='rubyid_port identifier id'>port</span><span class='colon op'>:</span>      <span class='integer val'>6667</span>
+    <span class='rubyid_nick identifier id'>nick</span><span class='colon op'>:</span>      <span class='rubyid_cosmic identifier id'>cosmic</span>
+    <span class='rubyid_auth_type identifier id'>auth_type</span><span class='colon op'>:</span> <span class='rubyid_credentials_from_env identifier id'>credentials_from_env</span>
+    <span class='rubyid_ldap identifier id'>ldap</span><span class='colon op'>:</span>
+      <span class='rubyid_path identifier id'>path</span><span class='colon op'>:</span>          <span class='rubyid_o identifier id'>o</span><span class='assign token'>=</span><span class='rubyid_irc identifier id'>irc</span><span class='dot token'>.</span><span class='rubyid_example identifier id'>example</span><span class='dot token'>.</span><span class='rubyid_com identifier id'>com</span><span class='comma token'>,</span><span class='rubyid_ou identifier id'>ou</span><span class='assign token'>=</span><span class='rubyid_apps identifier id'>apps</span><span class='comma token'>,</span><span class='rubyid_dc identifier id'>dc</span><span class='assign token'>=</span><span class='rubyid_example identifier id'>example</span><span class='comma token'>,</span><span class='rubyid_dc identifier id'>dc</span><span class='assign token'>=</span><span class='rubyid_com identifier id'>com</span>
+      <span class='rubyid_password_attr identifier id'>password_attr</span><span class='colon op'>:</span> <span class='rubyid_password identifier id'>password</span>
+</pre>
+
+<h2>Authentication types</h2>
+
+<p>Cosmic currently supports these authentication types:</p>
+
+<h4>ldap</h4>
+
+<p>Cosmic will authenticate with a configured LDAP server before proceeding, using <a href="http://net-ldap.rubyforge.org/">net-ldap</a>. The LDAP configuration has the following form:</p>
+
+<pre class="code"><span class='rubyid_ldap identifier id'>ldap</span><span class='colon op'>:</span>
+  <span class='rubyid_host identifier id'>host</span><span class='colon op'>:</span>       <span class='lt op'>&lt;</span><span class='rubyid_LDAP constant id'>LDAP</span> <span class='rubyid_host identifier id'>host</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_port identifier id'>port</span><span class='colon op'>:</span>       <span class='lt op'>&lt;</span><span class='rubyid_LDAP constant id'>LDAP</span> <span class='rubyid_port identifier id'>port</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_base identifier id'>base</span><span class='colon op'>:</span>       <span class='lt op'>&lt;</span><span class='rubyid_Base constant id'>Base</span> <span class='rubyid_distinguished identifier id'>distinguished</span> <span class='rubyid_name identifier id'>name</span> <span class='rubyid_of identifier id'>of</span> <span class='rubyid_the identifier id'>the</span> <span class='rubyid_server identifier id'>server</span><span class='comma token'>,</span> <span class='rubyid_usually identifier id'>usually</span> <span class='rubyid_an identifier id'>an</span> <span class='rubyid_organization identifier id'>organization</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_domain identifier id'>domain</span> <span class='rubyid_component identifier id'>component</span> <span class='rubyid_entry identifier id'>entry</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_encryption identifier id'>encryption</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_Encryption constant id'>Encryption</span> <span class='rubyid_type identifier id'>type</span><span class='comma token'>,</span> <span class='rubyid_has identifier id'>has</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_be identifier id'>be</span> <span class='rubyid_simple_tls identifier id'>simple_tls</span> <span class='rubyid_currently identifier id'>currently</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_auth identifier id'>auth</span><span class='colon op'>:</span>
+    <span class='rubyid_method identifier id'>method</span><span class='colon op'>:</span>   <span class='lt op'>&lt;</span><span class='rubyid_The constant id'>The</span> <span class='rubyid_autentication identifier id'>autentication</span> <span class='rubyid_type identifier id'>type</span><span class='comma token'>,</span> <span class='rubyid_either identifier id'>either</span> <span class='rubyid_simple identifier id'>simple</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_anonymous identifier id'>anonymous</span><span class='gt op'>&gt;</span>
+    <span class='rubyid_username identifier id'>username</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_The constant id'>The</span> <span class='rubyid_LDAP constant id'>LDAP</span> <span class='rubyid_username identifier id'>username</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_authenticate identifier id'>authenticate</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_simple identifier id'>simple</span> <span class='rubyid_auth identifier id'>auth</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_chosen identifier id'>chosen</span><span class='comma token'>,</span> <span class='rubyid_e identifier id'>e</span><span class='dot token'>.</span><span class='rubyid_g identifier id'>g</span><span class='dot token'>.</span> <span class='rubyid_cn identifier id'>cn</span><span class='assign token'>=</span><span class='rubyid_Directory constant id'>Directory</span> <span class='rubyid_Manager constant id'>Manager</span><span class='gt op'>&gt;</span>
+    <span class='rubyid_password identifier id'>password</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_The constant id'>The</span> <span class='rubyid_LDAP constant id'>LDAP</span> <span class='rubyid_password identifier id'>password</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>If <code>simple</code> is chosen as the authentication method and username/password are not specified in the config, then Cosmic will prompt the user for username and password before proceeding.</p>
+
+<p>See e.g. this <a href="http://www.ldapman.org/articles/intro_to_ldap.html">introduction to LDAP</a> for more info about LDAP.</p>
+
+<h4>credentials</h4>
+
+<p>With this authentication form, Cosmic will not authenticate itself but provide the credentials to plugins if they use the <code>credentials_from_env</code> authentication type (see below). The configuration looks like this:</p>
+
+<pre class="code"><span class='rubyid_credentials identifier id'>credentials</span><span class='colon op'>:</span>
+  <span class='rubyid_username identifier id'>username</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_The constant id'>The</span> <span class='rubyid_username identifier id'>username</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_password identifier id'>password</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_The constant id'>The</span> <span class='rubyid_password identifier id'>password</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>If username/password are not specified in the config, then Cosmic will prompt the user for username and password before proceeding.</p>
+
+<h2>Plugin configuration</h2>
+
+<p>All plugins are configured under the <code>plugins</code> section in the configuration. The configuration generally has this format:</p>
+
+<pre class="code"><span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='lt op'>&lt;</span><span class='rubyid_Plugin constant id'>Plugin</span> <span class='rubyid_name identifier id'>name</span><span class='gt op'>&gt;</span><span class='colon op'>:</span>
+    <span class='rubyid_plugin_class identifier id'>plugin_class</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_Optional constant id'>Optional</span> <span class='rubyid_plugin identifier id'>plugin</span> <span class='rubyid_class class kw'>class</span> <span class='rubyid_name identifier id'>name</span><span class='gt op'>&gt;</span>
+    <span class='lt op'>&lt;</span><span class='rubyid_Plugin constant id'>Plugin</span><span class='minus op'>-</span><span class='rubyid_specific identifier id'>specific</span> <span class='rubyid_configuration identifier id'>configuration</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>Cosmic uses the plugin name and, if specified, the plugin class to instantiate the plugin and make it available to scripts. For instance, with this configuration section:</p>
+
+<pre class="code"><span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='rubyid_irc identifier id'>irc</span><span class='colon op'>:</span>
+    <span class='lt op'>&lt;</span><span class='rubyid_IRC constant id'>IRC</span> <span class='rubyid_plugin identifier id'>plugin</span> <span class='rubyid_configuration identifier id'>configuration</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>Cosmic will use this plugin section if used like this in a Cosmic environment:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>or</p>
+
+<pre class="code"><span class='rubyid_irc identifier id'>irc</span><span class='dot token'>.</span><span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+</pre>
+
+<p>Since no plugin class is specified, it will search for the plugin under the class names</p>
+
+<ul>
+<li><code>Cosmic::#{name}</code></li>
+<li><code>Cosmic::#{name.upcase}</code></li>
+<li><code>Cosmic::#{camel_case_name}</code></li>
+<li><code>#{name}</code></li>
+<li><code>#{name.upcase}</code></li>
+<li><code>#{camel_case_name}</code></li>
+</ul>
+
+<p>If it cannot find a plugin class, then it will raise an error unless a <code>?</code> was used. E.g.</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc? fid id'>irc?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>would not fail if no irc configuration section exists or the class could not be found.</p>
+
+<p>The <code>plugin_class</code> configuration option allows you to specify the plugin class directly, and it also makes it possible to configure more than one plugin of the same type. E.g.</p>
+
+<pre class="code"><span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='rubyid_irc1 identifier id'>irc1</span><span class='colon op'>:</span>
+    <span class='rubyid_plugin_class identifier id'>plugin_class</span><span class='colon op'>:</span> <span class='rubyid_Cosmic constant id'>Cosmic</span><span class='colon2 op'>::</span><span class='rubyid_IRC constant id'>IRC</span>
+    <span class='lt op'>&lt;</span><span class='rubyid_First constant id'>First</span> <span class='rubyid_IRC constant id'>IRC</span> <span class='rubyid_plugin identifier id'>plugin</span> <span class='rubyid_configuration identifier id'>configuration</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_irc2 identifier id'>irc2</span><span class='colon op'>:</span>
+    <span class='rubyid_plugin_class identifier id'>plugin_class</span><span class='colon op'>:</span> <span class='rubyid_Cosmic constant id'>Cosmic</span><span class='colon2 op'>::</span><span class='rubyid_IRC constant id'>IRC</span>
+    <span class='lt op'>&lt;</span><span class='rubyid_Second constant id'>Second</span> <span class='rubyid_IRC constant id'>IRC</span> <span class='rubyid_plugin identifier id'>plugin</span> <span class='rubyid_configuration identifier id'>configuration</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>These two then can be used like so:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc1 identifier id'>irc1</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc2 identifier id'>irc2</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Hello world'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#test'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<h3>Plugin authentication</h3>
+
+<p>Plugins can perform authentication through the Cosmic environment, or they can handle it themselves. Authenticating through Cosmic has the benefit that it can reduce the number of times that the user is asked for credentials. For instance, assume a plugin for a service that authenticates via LDAP. That plugin can then use the same LDAP credentials that Cosmic asked the user for at the beginning of the deployment session. Likewise, it is possible to store authentication information (e.g. tokens, keys, etc.) in LDAP and have Cosmic fetch it from there on behalf of a plugin.</p>
+
+<p>For plugins, the Cosmic environment currently supports these authentication types:</p>
+
+<h4>credentials<em>from</em>env</h4>
+
+<p>This type is used for cases where the environment stores the credentials and the plugin can simply ask the environment to retrieve them. It is currently only implemented for environments using LDAP authentication. In this case, the plugin&#39;s configuration is required to have a <code>ldap</code> configuration section that specifies the path to the credentials plus the names of the attributes for the username and password:</p>
+
+<pre class="code"><span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='rubyid_irc identifier id'>irc</span><span class='colon op'>:</span>
+    <span class='dot3 op'>...</span>
+    <span class='rubyid_auth_type identifier id'>auth_type</span><span class='colon op'>:</span> <span class='rubyid_credentials_from_env identifier id'>credentials_from_env</span>
+    <span class='rubyid_ldap identifier id'>ldap</span><span class='colon op'>:</span>
+      <span class='rubyid_path identifier id'>path</span><span class='colon op'>:</span>          <span class='rubyid_o identifier id'>o</span><span class='assign token'>=</span><span class='rubyid_irc identifier id'>irc</span><span class='dot token'>.</span><span class='rubyid_example identifier id'>example</span><span class='dot token'>.</span><span class='rubyid_com identifier id'>com</span><span class='comma token'>,</span><span class='rubyid_ou identifier id'>ou</span><span class='assign token'>=</span><span class='rubyid_apps identifier id'>apps</span><span class='comma token'>,</span><span class='rubyid_dc identifier id'>dc</span><span class='assign token'>=</span><span class='rubyid_example identifier id'>example</span><span class='comma token'>,</span><span class='rubyid_dc identifier id'>dc</span><span class='assign token'>=</span><span class='rubyid_com identifier id'>com</span>
+      <span class='rubyid_password_attr identifier id'>password_attr</span><span class='colon op'>:</span> <span class='rubyid_password identifier id'>password</span>
+</pre>
+
+<p>In this example, the <code>o=irc.example.com,ou=apps,dc=example,dc=com</code> LDAP entry contains an attribute called <code>password</code> which contains the password for the LDAP server. No username is specified, so Cosmic will not retrieve it (the IRC plugin doesn&#39;t require it if the IRC server doesn&#39;t need one).</p>
+
+<h4>ldap_credentials</h4>
+
+<p>The <code>ldap_credentials</code> type is used for services that authenticate themselves against LDAP. The Cosmic environment in this case is required to use <code>ldap</code> authentication, and the plugin will simply use the same credentials as the environment, to authenticate.</p>
+
+<h4>credentials</h4>
+
+<p>This type describes the case where the plugin has its own set of credentials independent from the environment. Cosmic supports the plugin by dealing with the credential configuration or asking the user as necessary. If you choose to configure the credentials in the config file, then put them in a <code>credentials</code> sub section in the plugin configuration:</p>
+
+<pre class="code"><span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='rubyid_irc identifier id'>irc</span><span class='colon op'>:</span>
+    <span class='dot3 op'>...</span>
+    <span class='rubyid_auth_type identifier id'>auth_type</span><span class='colon op'>:</span> <span class='rubyid_credentials identifier id'>credentials</span>
+    <span class='rubyid_credentials identifier id'>credentials</span><span class='colon op'>:</span>
+      <span class='rubyid_username identifier id'>username</span><span class='colon op'>:</span> <span class='rubyid_testuser identifier id'>testuser</span>
+      <span class='rubyid_password identifier id'>password</span><span class='colon op'>:</span> <span class='rubyid_my identifier id'>my</span><span class='minus op'>-</span><span class='rubyid_password identifier id'>password</span>
+</pre>
+
+<p>Cosmic will ask the user for credentials if the element is not present in the configuration.</p>
+
+<h4>keys</h4>
+
+<p>Some plugins can make use of keys directly (e.g. ssh). For these plugins, Cosmic supports two types of authentication: <code>keys</code> and <code>keys_from_env</code>. The <code>keys</code> type simply allows to specify an array of file paths of the keys to use:</p>
+
+<pre class="code"><span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='rubyid_ssh identifier id'>ssh</span><span class='colon op'>:</span>
+    <span class='dot3 op'>...</span>
+    <span class='rubyid_auth_type identifier id'>auth_type</span><span class='colon op'>:</span> <span class='rubyid_keys identifier id'>keys</span>
+    <span class='rubyid_keys identifier id'>keys</span><span class='colon op'>:</span> <span class='lbrack token'>[</span><span class='lt op'>&lt;</span><span class='rubyid_path identifier id'>path</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_key identifier id'>key</span> <span class='integer val'>1</span><span class='gt op'>&gt;</span><span class='comma token'>,</span> <span class='lt op'>&lt;</span><span class='rubyid_path identifier id'>path</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_key identifier id'>key</span> <span class='integer val'>2</span><span class='gt op'>&gt;</span><span class='comma token'>,</span> <span class='dot3 op'>...</span><span class='rbrack token'>]</span>
+</pre>
+
+<h4>keys<em>from</em>env</h4>
+
+<p>With this authentication type, plugins ask the Cosmic environment to give them keys via whatever means the environment has configured. This is usually used in conjunction with <code>ldap</code> authentication for the environment itself, i.e. keys are retrieved from specific paths in the LDAP server. The plugin configuration would then define the paths and attributes to look for the key data:</p>
+
+<pre class="code"><span class='rubyid_plugins identifier id'>plugins</span><span class='colon op'>:</span>
+  <span class='rubyid_ssh identifier id'>ssh</span><span class='colon op'>:</span>
+    <span class='dot3 op'>...</span>
+    <span class='rubyid_auth_type identifier id'>auth_type</span><span class='colon op'>:</span> <span class='rubyid_keys_from_env identifier id'>keys_from_env</span>
+    <span class='rubyid_ldap identifier id'>ldap</span><span class='colon op'>:</span>
+      <span class='rubyid_key_path identifier id'>key_path</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_LDAP constant id'>LDAP</span> <span class='rubyid_path identifier id'>path</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_the identifier id'>the</span> <span class='rubyid_keys identifier id'>keys</span><span class='semicolon token'>;</span> <span class='rubyid_if if kw'>if</span> <span class='rubyid_not not kw'>not</span> <span class='rubyid_specified identifier id'>specified</span><span class='comma token'>,</span> <span class='rubyid_then then kw'>then</span> <span class='rubyid_the identifier id'>the</span> <span class='rubyid_entry identifier id'>entry</span> <span class='rubyid_for for kw'>for</span> <span class='rubyid_the identifier id'>the</span> <span class='rubyid_current identifier id'>current</span> <span class='rubyid_user identifier id'>user</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_used identifier id'>used</span> <span class='rubyid_instead identifier id'>instead</span><span class='gt op'>&gt;</span>
+      <span class='rubyid_key_attrs identifier id'>key_attrs</span><span class='colon op'>:</span> <span class='lbrack token'>[</span><span class='lt op'>&lt;</span><span class='rubyid_key identifier id'>key</span> <span class='rubyid_attribute identifier id'>attribute</span> <span class='integer val'>1</span><span class='gt op'>&gt;</span><span class='comma token'>,</span> <span class='lt op'>&lt;</span><span class='rubyid_key identifier id'>key</span> <span class='rubyid_attribute identifier id'>attribute</span> <span class='integer val'>2</span><span class='gt op'>&gt;</span><span class='comma token'>,</span> <span class='dot3 op'>...</span><span class='rbrack token'>]</span>
+</pre>
+
+<h1>Individual plugins</h1>
+
+<p>The API documentation has more details about the capabilities of the individual plugins. This section gives a brief overview over each of the included plugins and describes their configuration.</p>
+
+<h2>IRC</h2>
+
+<p>The Cosmic IRC plugin allows Cosmic scripts to interact with an IRC server. The IRC support however is limited to posting messages and similar things, it intentionally does not provide a full IRC bot that can be interacted with.</p>
+
+<p>The plugin uses the <a href="https://github.com/cinchrb/cinch">Cinch library</a> and thus requires (J)Ruby 1.9. You&#39;ll need to install the cinch and atomic gems in order to be able to use the plugin:</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_cinch identifier id'>cinch</span> <span class='rubyid_atomic identifier id'>atomic</span>
+</pre>
+
+<p>The plugin configuration looks like this:</p>
+
+<pre class="code"><span class='rubyid_irc identifier id'>irc</span><span class='colon op'>:</span>
+  <span class='rubyid_host identifier id'>host</span><span class='colon op'>:</span>                   <span class='lt op'>&lt;</span><span class='rubyid_IRC constant id'>IRC</span> <span class='rubyid_server identifier id'>server</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_localhost identifier id'>localhost</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_port identifier id'>port</span><span class='colon op'>:</span>                   <span class='lt op'>&lt;</span><span class='rubyid_IRC constant id'>IRC</span> <span class='rubyid_server identifier id'>server</span> <span class='rubyid_port identifier id'>port</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='integer val'>6667</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_nick identifier id'>nick</span><span class='colon op'>:</span>                   <span class='lt op'>&lt;</span><span class='rubyid_IRC constant id'>IRC</span> <span class='rubyid_nick identifier id'>nick</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_use identifier id'>use</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_cosmic identifier id'>cosmic</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_connection_timeout_sec identifier id'>connection_timeout_sec</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_Connection constant id'>Connection</span> <span class='rubyid_timeout identifier id'>timeout</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='integer val'>60</span><span class='gt op'>&gt;</span>
+  <span class='lt op'>&lt;</span><span class='rubyid_authentication identifier id'>authentication</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='rubyid_as identifier id'>as</span> <span class='rubyid_explained identifier id'>explained</span> <span class='rubyid_above identifier id'>above</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>The IRC plugin is typically used to post status updates to specific IRC channels. Code for that would look like:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Starting deployment'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#status'</span>
+  <span class='rubyid_connect identifier id'>connect</span> <span class='symbol val'>:channel</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#status'</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='symbol val'>:info</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='dot3 op'>...</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_write identifier id'>write</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Deployment finished'</span><span class='comma token'>,</span> <span class='symbol val'>:channels</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#status'</span>
+  <span class='rubyid_leave identifier id'>leave</span> <span class='symbol val'>:channel</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'#status'</span><span class='comma token'>,</span> <span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Bye'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>In this example, the script first writes an explicit message to the <code>#status</code> IRC channel, and then connects that channel to all messages tagged as <code>:info</code>. After the deployment has been completed, the script then writes another message to the IRC channel and leaves the channel (which will automatically disconnect it from the message bus).</p>
+
+<h2>JIRA</h2>
+
+<p>The JIRA plugin can be used to create and update JIRA issues. For instance, you can use to create issues that track deployments, and add comments for each individual step of the deployment.</p>
+
+<p>This plugin uses the <a href="https://github.com/tomdz/jira4r">tomdz-jruby4r gem</a> which itself uses the <a href="https://github.com/tomdz/soap4r">tomdz-soap4r gem</a>. These two are forks of forks of the original <a href="https://github.com/felipec/soap4r">soap4r</a> and <a href="https://github.com/remi/jira4r">jira4r</a> gems, which have been updated to work with (J)Ruby 1.9 and with each other.</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_tomdz identifier id'>tomdz</span><span class='minus op'>-</span><span class='rubyid_jira4r identifier id'>jira4r</span> <span class='rubyid_tomdz identifier id'>tomdz</span><span class='minus op'>-</span><span class='rubyid_soap4r identifier id'>soap4r</span>
+</pre>
+
+<p>The JIRA plugin is configured as follows:</p>
+
+<pre class="code"><span class='rubyid_jira identifier id'>jira</span><span class='colon op'>:</span>
+  <span class='rubyid_address identifier id'>address</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_Url constant id'>Url</span> <span class='rubyid_of identifier id'>of</span> <span class='rubyid_the identifier id'>the</span> <span class='rubyid_JIRA constant id'>JIRA</span> <span class='rubyid_server identifier id'>server</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_http identifier id'>http</span><span class='symbol val'>:/</span><span class='regexp val'>/localhost&gt;
+  &lt;authentication configuration as explained above&gt;
+</span></pre>
+
+<p>Similar to the IRC plugin, the JIRA plugin is typically used to update JIRA issues as deployments are performed. For instance, in order to automatically create a JIRA issue for a deployment and update it with comments documenting individual deployment steps, you could use something like:</p>
+
+<pre class="code"><span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_jira identifier id'>jira</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_create_issue identifier id'>create_issue</span> <span class='symbol val'>:project</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'DEPL'</span><span class='comma token'>,</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'New Feature'</span><span class='comma token'>,</span> <span class='symbol val'>:summary</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'New deployment'</span><span class='comma token'>,</span> <span class='symbol val'>:description</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'New deployment'</span>
+  <span class='rubyid_connect identifier id'>connect</span> <span class='symbol val'>:issue</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_issue identifier id'>issue</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='symbol val'>:info</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='dot3 op'>...</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_jira identifier id'>jira</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_resolve identifier id'>resolve</span> <span class='symbol val'>:issue</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_issue identifier id'>issue</span><span class='comma token'>,</span> <span class='symbol val'>:comment</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Deployment completed'</span><span class='comma token'>,</span> <span class='symbol val'>:resolution</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Fixed'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<h2>Galaxy</h2>
+
+<p>This plugin makes the <a href="https://github.com/ning/galaxy">Galaxy</a> software deployment tool available to Cosmic scripts.</p>
+
+<p>Cosmic requires Galaxy version 2.5.1 or newer, or 2.5.1.1 for Ruby/JRuby 1.9 compatibility. You can install Galaxy via</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_galaxy identifier id'>galaxy</span>
+</pre>
+
+<p>The plugin is configured as follows:</p>
+
+<pre class="code"><span class='rubyid_galaxy identifier id'>galaxy</span><span class='colon op'>:</span>
+  <span class='rubyid_host identifier id'>host</span><span class='colon op'>:</span>               <span class='lt op'>&lt;</span><span class='rubyid_The constant id'>The</span> <span class='rubyid_gonsole identifier id'>gonsole</span> <span class='rubyid_host identifier id'>host</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_localhost identifier id'>localhost</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_port identifier id'>port</span><span class='colon op'>:</span>               <span class='lt op'>&lt;</span><span class='rubyid_The constant id'>The</span> <span class='rubyid_galaxy identifier id'>galaxy</span> <span class='rubyid_port identifier id'>port</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='integer val'>4440</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_relaxed_versioning identifier id'>relaxed_versioning</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_Whether constant id'>Whether</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_use identifier id'>use</span> <span class='rubyid_relaxed identifier id'>relaxed</span> <span class='rubyid_versioning identifier id'>versioning</span><span class='semicolon token'>;</span> <span class='rubyid_default identifier id'>default</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_false false kw'>false</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>Galaxy itself does not support authentication, so no such configuration is necessary for it.</p>
+
+<p>The Galaxy plugin makes it straightforward to use Galaxy commands from within Cosmic scripts and it adds additional functionality not readily available in Galaxy (e.g. reverting to a previous snapshot). A simple Cosmic script using Galaxy would look like:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc identifier id'>irc</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_connect identifier id'>connect</span> <span class='rubyid_channel identifier id'>channel</span><span class='colon op'>:</span> <span class='string val'>'#status'</span><span class='comma token'>,</span> <span class='rubyid_to identifier id'>to</span><span class='colon op'>:</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='rbrack token'>]</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_galaxy identifier id'>galaxy</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_snapshot identifier id'>snapshot</span> <span class='assign token'>=</span> <span class='rubyid_take_snapshot identifier id'>take_snapshot</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_select identifier id'>select</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='regexp val'>/^echo$?/</span>
+  <span class='rubyid_begin begin kw'>begin</span>
+    <span class='rubyid_update identifier id'>update</span> <span class='symbol val'>:services</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_services identifier id'>services</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_new_version identifier id'>new_version</span>
+  <span class='rubyid_rescue rescue kw'>rescue</span>
+    <span class='rubyid_revert identifier id'>revert</span> <span class='symbol val'>:services</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_services identifier id'>services</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_snapshot identifier id'>snapshot</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_start identifier id'>start</span> <span class='symbol val'>:services</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_services identifier id'>services</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>This script first connects an IRC channel to all messages created by the Galaxy plugin. Next it takes a snapshot of the current state of the Galaxy environment and then selects all services of type <code>echo</code>. It then tries to update these services and in case of failure, attempts to revert them to the previous snapshot. Finally it starts the services.</p>
+
+<h2>JMX</h2>
+
+<p>The JMX plugin allows Cosmic scripts to interact with exposes <a href="http://docs.oracle.com/javase/tutorial/jmx/index.html">JMX resources</a> exposed by services running on the JVM.</p>
+
+<p>This plugin requires JRuby and the <a href="https://github.com/jmesnil/jmx4r">jmx4r</a> gem:</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_jmx4r identifier id'>jmx4r</span>
+</pre>
+
+<p>The only configuration for the plugin is for authentication in cases where the JMX resources require it:</p>
+
+<pre class="code"><span class='rubyid_jmx identifier id'>jmx</span><span class='colon op'>:</span>
+  <span class='lt op'>&lt;</span><span class='rubyid_authentication identifier id'>authentication</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='rubyid_as identifier id'>as</span> <span class='rubyid_explained identifier id'>explained</span> <span class='rubyid_above identifier id'>above</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>The plugin supports reading and setting attributes as well as invoking operations. For instance</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/galaxy'</span>
+<span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/jmx'</span>
+
+<span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_galaxy identifier id'>galaxy</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_select identifier id'>select</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='regexp val'>/^echo$?/</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_jmx identifier id'>jmx</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_mbeans identifier id'>mbeans</span> <span class='assign token'>=</span> <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_collect identifier id'>collect</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_service identifier id'>service</span><span class='bitor op'>|</span> <span class='rubyid_get_mbean identifier id'>get_mbean</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_host identifier id'>host</span><span class='comma token'>,</span> <span class='symbol val'>:port</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>12345</span><span class='comma token'>,</span> <span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'some.company:name=MyMBean'</span><span class='rbrace token'>}</span>
+  <span class='rubyid_mbeans identifier id'>mbeans</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_mbean identifier id'>mbean</span><span class='bitor op'>|</span>
+    <span class='rubyid_old_value identifier id'>old_value</span> <span class='assign token'>=</span> <span class='rubyid_get_attribute identifier id'>get_attribute</span> <span class='symbol val'>:mbean</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_mbean identifier id'>mbean</span><span class='comma token'>,</span> <span class='symbol val'>:attribute</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'SomeAttribute'</span>
+    <span class='rubyid_set_attribute identifier id'>set_attribute</span> <span class='symbol val'>:mbean</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_mbean identifier id'>mbean</span><span class='comma token'>,</span> <span class='symbol val'>:attribute</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'SomeAttribute'</span><span class='comma token'>,</span> <span class='symbol val'>:value</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_old_value identifier id'>old_value</span> <span class='plus op'>+</span> <span class='integer val'>1</span>
+
+    <span class='rubyid_invoke identifier id'>invoke</span> <span class='symbol val'>:mbean</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_mbean identifier id'>mbean</span><span class='comma token'>,</span> <span class='symbol val'>:operation</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'DoSomething'</span><span class='comma token'>,</span> <span class='symbol val'>:args</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span> <span class='string val'>'test'</span> <span class='rbrack token'>]</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>This collects <code>some.company:name=MyMBean</code> mbeans from all <code>echo</code> servers on galaxy, then increments the <code>SomeAttribute</code> attribute and finally invokes the <code>DoSomething</code> operation with a single string argument.</p>
+
+<h2>F5</h2>
+
+<p>The F5 plugin allows Cosmic scripts to manipulate certain aspects of <a href="https://www.f5.com/products/big-ip/">F5 BIG-IP load balancers</a> such as registration of hosts, pool membership, monitoring configuration etc.</p>
+
+<p>It uses the <a href="https://devcentral.f5.com/Tutorials/TechTips/tabid/63/articleType/ArticleView/articleId/1086421/Getting-Started-With-Ruby-and-iControl.aspx">iControl library</a> version 11.0.0.1 or newer which can be downloaded from F5&#39;s developer website.</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_f5 identifier id'>f5</span><span class='minus op'>-</span><span class='rubyid_icontrol identifier id'>icontrol</span>
+</pre>
+
+<p>The configuration for the plugin consists of the load balancer host and the authentication credentials for it:</p>
+
+<pre class="code"><span class='rubyid_primary_lb identifier id'>primary_lb</span><span class='colon op'>:</span>
+  <span class='rubyid_plugin_class identifier id'>plugin_class</span><span class='colon op'>:</span> <span class='rubyid_Cosmic constant id'>Cosmic</span><span class='colon2 op'>::</span><span class='rubyid_F5 constant id'>F5</span>
+  <span class='rubyid_host identifier id'>host</span><span class='colon op'>:</span>         <span class='lt op'>&lt;</span><span class='rubyid_load identifier id'>load</span> <span class='rubyid_balancer identifier id'>balancer</span> <span class='rubyid_host identifier id'>host</span><span class='gt op'>&gt;</span>
+  <span class='lt op'>&lt;</span><span class='rubyid_authentication identifier id'>authentication</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='rubyid_as identifier id'>as</span> <span class='rubyid_explained identifier id'>explained</span> <span class='rubyid_above identifier id'>above</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>Typically, you would want to have one plugin entry for each primary load balancer that the Cosmic scripts need access to, and use the sync method provided by the plugin, to sync configuration changes to any secondary load balancers.</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/galaxy'</span>
+<span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/f5'</span>
+
+<span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_galaxy identifier id'>galaxy</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_select identifier id'>select</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='regexp val'>/^echo$?/</span>
+<span class='rubyid_end end kw'>end</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_primary_lb identifier id'>primary_lb</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_service identifier id'>service</span><span class='bitor op'>|</span>
+    <span class='rubyid_node identifier id'>node</span> <span class='assign token'>=</span> <span class='rubyid_disable identifier id'>disable</span> <span class='symbol val'>:ip</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_ip identifier id'>ip</span>
+    <span class='rubyid_remove_from_pool identifier id'>remove_from_pool</span> <span class='rubyid_node identifier id'>node</span><span class='dot token'>.</span><span class='rubyid_merge identifier id'>merge</span> <span class='lbrace token'>{</span> <span class='symbol val'>:pool</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'echo-12345'</span> <span class='rbrace token'>}</span>
+    <span class='rubyid_add_to_pool identifier id'>add_to_pool</span> <span class='rubyid_node identifier id'>node</span><span class='dot token'>.</span><span class='rubyid_merge identifier id'>merge</span> <span class='lbrace token'>{</span> <span class='colon op'>:</span> <span class='rubyid_pool identifier id'>pool</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'echo-23456'</span> <span class='rbrace token'>}</span>
+    <span class='rubyid_enable identifier id'>enable</span> <span class='rubyid_node identifier id'>node</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_sync identifier id'>sync</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>This sample script determines all <code>echo</code> servies from galaxy, then disables them on the primary load balancer, removes them from one pool and adds them to another pool, reenables the services and finally syncs the configuration with any secondary load balancers.</p>
+
+<h2>SSH</h2>
+
+<p>With the SSH plugin Cosmic scripts can execute commands on remote hosts and upload files to/download files from them.</p>
+
+<p>It uses the <a href="http://net-ssh.github.com/">Net::SSH and Net::SCP</a> libraries:</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_net identifier id'>net</span><span class='minus op'>-</span><span class='rubyid_ssh identifier id'>ssh</span> <span class='rubyid_net identifier id'>net</span><span class='minus op'>-</span><span class='rubyid_scp identifier id'>scp</span>
+</pre>
+
+<p>The plugin only requires configuration if ssh authentication with the remote host requires username/password instead of ssh keys:</p>
+
+<pre class="code"><span class='rubyid_ssh identifier id'>ssh</span><span class='colon op'>:</span>
+  <span class='lt op'>&lt;</span><span class='rubyid_authentication identifier id'>authentication</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='rubyid_as identifier id'>as</span> <span class='rubyid_explained identifier id'>explained</span> <span class='rubyid_above identifier id'>above</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>Using it is fairly straightforward:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/galaxy'</span>
+<span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/ssh'</span>
+
+<span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_galaxy identifier id'>galaxy</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_select identifier id'>select</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='regexp val'>/^echo$?/</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_ssh identifier id'>ssh</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_service identifier id'>service</span><span class='bitor op'>|</span>
+    <span class='rubyid_puts identifier id'>puts</span> <span class='rubyid_exec identifier id'>exec</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_host identifier id'>host</span><span class='comma token'>,</span> <span class='symbol val'>:user</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'eng'</span><span class='comma token'>,</span> <span class='symbol val'>:cmd</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'uname -a'</span>
+
+    <span class='rubyid_first identifier id'>first</span> <span class='assign token'>=</span> <span class='rubyid_true true kw'>true</span>
+    <span class='rubyid_upload identifier id'>upload</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_host identifier id'>host</span><span class='comma token'>,</span> <span class='symbol val'>:user</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'eng'</span><span class='comma token'>,</span> <span class='symbol val'>:local</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ARGV constant id'>ARGV</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_ch identifier id'>ch</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span><span class='comma token'>,</span> <span class='rubyid_sent identifier id'>sent</span><span class='comma token'>,</span> <span class='rubyid_total identifier id'>total</span><span class='bitor op'>|</span>
+      <span class='rubyid_print identifier id'>print</span> <span class='string val'>&quot;\r&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_first identifier id'>first</span>
+      <span class='rubyid_print identifier id'>print</span> <span class='dstring node'>&quot;#{name}: #{sent}/#{total}&quot;</span>
+      <span class='rubyid_first identifier id'>first</span> <span class='assign token'>=</span> <span class='rubyid_false false kw'>false</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_print identifier id'>print</span> <span class='string val'>&quot;\n&quot;</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>In this sample script, we first find all <code>echo</code> services on galaxy and then run <code>uname -a</code> on them. Then we upload a local file (passed in as a commandline argument) to the same path on the remote service. The script also prints out the progress of the upload while it is uploading the file.</p>
+
+<h2>Chef</h2>
+
+<p>This plugin allows Cosmic scripts to interact with <a href="http://www.opscode.com/chef/">Chef</a> in scripts. Currently this interaction is limited to retrieving information about nodes that Chef knows about, but support for applying roles to hosts and for <a href="http://wiki.opscode.com/display/chef/Chef+Solo">Chef Solo</a> is planned.</p>
+
+<p>The plugin uses the <a href="https://rubygems.org/gems/chef">Chef gem</a>:</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_chef identifier id'>chef</span>
+</pre>
+
+<p>Please note that chef currently does not support JRuby.</p>
+
+<p>Currently the only available functionality is to retrieve information about a node that Chef knows about:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/galaxy'</span>
+<span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/chef'</span>
+<span class='rubyid_require identifier id'>require</span> <span class='string val'>'pp'</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_chef identifier id'>chef</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_pp identifier id'>pp</span> <span class='rubyid_get_info identifier id'>get_info</span><span class='lparen token'>(</span><span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'foo'</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>This will print a hash with all data that Chef has about that particular host.</p>
+
+<h2>E-mail</h2>
+
+<p>This plugin allows Cosmic scripts to send email. It uses the <a href="https://github.com/mikel/mail">Mail gem</a>:</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_mail identifier id'>mail</span>
+</pre>
+
+<p>The plugin can either use a running Postfix or Sendmail daemon in which case no further configuration is necessary. Or you configure the mail delivery method in the configuration file:</p>
+
+<pre class="code"><span class='rubyid_mail identifier id'>mail</span><span class='colon op'>:</span>
+  <span class='rubyid_delivery_method identifier id'>delivery_method</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_smtp identifier id'>smtp</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_sendmail identifier id'>sendmail</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_smtp identifier id'>smtp</span><span class='colon op'>:</span>
+    <span class='rubyid_address identifier id'>address</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_mail identifier id'>mail</span> <span class='rubyid_server identifier id'>server</span><span class='semicolon token'>;</span> <span class='rubyid_defaults identifier id'>defaults</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_localhost identifier id'>localhost</span><span class='gt op'>&gt;</span>
+    <span class='rubyid_port identifier id'>port</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_mail identifier id'>mail</span> <span class='rubyid_send identifier id'>send</span> <span class='rubyid_port identifier id'>port</span><span class='semicolon token'>;</span> <span class='rubyid_defaults identifier id'>defaults</span> <span class='rubyid_to identifier id'>to</span> <span class='integer val'>25</span><span class='gt op'>&gt;</span>
+    <span class='rubyid_domain identifier id'>domain</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_the identifier id'>the</span> <span class='rubyid_mail identifier id'>mail</span> <span class='rubyid_domain identifier id'>domain</span><span class='semicolon token'>;</span> <span class='rubyid_defaults identifier id'>defaults</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_localhost identifier id'>localhost</span><span class='dot token'>.</span><span class='rubyid_localdomain identifier id'>localdomain</span><span class='gt op'>&gt;</span>
+    <span class='rubyid_authentication identifier id'>authentication</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_plain identifier id'>plain</span><span class='comma token'>,</span> <span class='rubyid_login identifier id'>login</span><span class='comma token'>,</span> <span class='rubyid_cram_md5 identifier id'>cram_md5</span><span class='semicolon token'>;</span> <span class='rubyid_off identifier id'>off</span> <span class='rubyid_by identifier id'>by</span> <span class='rubyid_default identifier id'>default</span><span class='gt op'>&gt;</span>
+    <span class='rubyid_enable_starttls_auto identifier id'>enable_starttls_auto</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_true true kw'>true</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_false false kw'>false</span><span class='semicolon token'>;</span> <span class='rubyid_true true kw'>true</span> <span class='rubyid_is identifier id'>is</span> <span class='rubyid_default identifier id'>default</span><span class='gt op'>&gt;</span>
+  <span class='rubyid_sendmail identifier id'>sendmail</span><span class='colon op'>:</span>
+    <span class='rubyid_location identifier id'>location</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_absolute identifier id'>absolute</span> <span class='rubyid_path identifier id'>path</span> <span class='rubyid_to identifier id'>to</span> <span class='rubyid_sendmail identifier id'>sendmail</span><span class='comma token'>,</span> <span class='rubyid_defaults identifier id'>defaults</span> <span class='rubyid_to identifier id'>to</span> <span class='div op'>/</span><span class='rubyid_usr identifier id'>usr</span><span class='div op'>/</span><span class='rubyid_sbin identifier id'>sbin</span><span class='div op'>/</span><span class='rubyid_sendmail identifier id'>sendmail</span><span class='gt op'>&gt;</span>
+  <span class='lt op'>&lt;</span><span class='rubyid_authentication identifier id'>authentication</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='rubyid_as identifier id'>as</span> <span class='rubyid_explained identifier id'>explained</span> <span class='rubyid_above identifier id'>above</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>Usage is straightforward:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/mail'</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_mail identifier id'>mail</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_send identifier id'>send</span> <span class='symbol val'>:from</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'me@example.com'</span><span class='comma token'>,</span>
+       <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'you@example.com'</span><span class='comma token'>,</span>
+       <span class='symbol val'>:subject</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Test 1'</span><span class='comma token'>,</span>
+       <span class='symbol val'>:body</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Test 1'</span>
+
+  <span class='rubyid_send identifier id'>send</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_from identifier id'>from</span>    <span class='string val'>'me@example.com'</span>
+    <span class='rubyid_to identifier id'>to</span>      <span class='string val'>'you@example.com'</span>
+    <span class='rubyid_subject identifier id'>subject</span> <span class='string val'>'Test 2'</span>
+
+    <span class='rubyid_text_part identifier id'>text_part</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_body identifier id'>body</span> <span class='string val'>'This is plain text'</span>
+    <span class='rubyid_end end kw'>end</span>
+
+    <span class='rubyid_html_part identifier id'>html_part</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_content_type identifier id'>content_type</span> <span class='string val'>'text/html; charset=UTF-8'</span>
+      <span class='rubyid_body identifier id'>body</span> <span class='string val'>'&lt;h1&gt;This is HTML&lt;/h1&gt;'</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>The first send call uses the simple API which only suppors subject &amp; plain text body sending. The second send call uses the mail creation support via blocks provided by the <a href="https://github.com/mikel/mail">Mail gem</a> to send a multipart email with both text and html bodies.</p>
+
+<h2>Execute</h2>
+
+<p>This plugin allows Cosmic scripts to run simple commands on the current machine. For non-JRuby platforms, it uses the <a href="https://github.com/ahoward/open4">Open4 gem</a>:</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_open4 identifier id'>open4</span>
+</pre>
+
+<p>When using JRuby, it will instead use <code>IO:open4</code>.</p>
+
+<p>The plugin does not require any configuration.</p>
+
+<p>Usage is straightforward:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/execute'</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_execute identifier id'>execute</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_status identifier id'>status</span><span class='comma token'>,</span> <span class='rubyid_output identifier id'>output</span> <span class='assign token'>=</span> <span class='rubyid_exec identifier id'>exec</span> <span class='symbol val'>:cmd</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'ls -la'</span>
+  <span class='rubyid_puts identifier id'>puts</span> <span class='dstring node'>&quot;Completed with status #{status}:&quot;</span>
+  <span class='rubyid_puts identifier id'>puts</span> <span class='rubyid_output identifier id'>output</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>This simply runs <code>ls -la</code> and then prints the status code of the command and its output (<code>stdout</code> and <code>stderr</code> combined) to <code>stdout</code>.</p>
+
+<h2>Nagios</h2>
+
+<p>Nagios currently doesn&#39;t provide a simple way to interact with it remotely. To help with this, Ning has a project called <a href="https://github.com/ning/nagix">Nagix</a> that provides a REST server and CLI for Nagios. Tools can then interact with the REST server remotely to access status information or issue commands against a Nagios instance.</p>
+
+<p>The Nagios plugin interacts with a Nagix instance and provides a simplified interface to retrieve status information about hosts and enable/disable notifications for hosts and their services. In order to use it, you&#39;ll first have to install the json gem:</p>
+
+<pre class="code"><span class='rubyid_gem identifier id'>gem</span> <span class='rubyid_install identifier id'>install</span> <span class='rubyid_json identifier id'>json</span>
+</pre>
+
+<p>Currently the only piece of configuration necessary is the host url for the Nagix server:</p>
+
+<pre class="code"><span class='rubyid_nagios identifier id'>nagios</span><span class='colon op'>:</span>
+  <span class='rubyid_nagix_host identifier id'>nagix_host</span><span class='colon op'>:</span> <span class='lt op'>&lt;</span><span class='rubyid_full identifier id'>full</span> <span class='rubyid_host identifier id'>host</span> <span class='rubyid_url identifier id'>url</span> <span class='rubyid_for for kw'>for</span> <span class='rubyid_the identifier id'>the</span> <span class='rubyid_Nagix constant id'>Nagix</span> <span class='rubyid_server identifier id'>server</span><span class='comma token'>,</span> <span class='rubyid_e identifier id'>e</span><span class='dot token'>.</span><span class='rubyid_g identifier id'>g</span><span class='dot token'>.</span> <span class='rubyid_http identifier id'>http</span><span class='symbol val'>:/</span><span class='regexp val'>/nagix.example.com:8080&gt;
+</span></pre>
+
+<p>Scripts can then interact with the Nagios server:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/nagios'</span>
+
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_nagios identifier id'>nagios</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_was_enabled identifier id'>was_enabled</span> <span class='assign token'>=</span> <span class='rubyid_enabled? fid id'>enabled?</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ARGV constant id'>ARGV</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span>
+  <span class='rubyid_disable identifier id'>disable</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ARGV constant id'>ARGV</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='symbol val'>:service</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ARGV constant id'>ARGV</span><span class='lbrack token'>[</span><span class='integer val'>1</span><span class='rbrack token'>]</span>
+  <span class='dot3 op'>...</span>
+  <span class='rubyid_enable identifier id'>enable</span>  <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ARGV constant id'>ARGV</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='symbol val'>:service</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ARGV constant id'>ARGV</span><span class='lbrack token'>[</span><span class='integer val'>1</span><span class='rbrack token'>]</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_was_enabled identifier id'>was_enabled</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<h1>Planned work</h1>
+
+<ul>
+<li>Support in the Chef plugin for applying roles to hosts, plus support for Chef Solo</li>
+</ul>
+
+<h1>Recipes</h1>
+
+<h2>Passing arguments to scripts</h2>
+
+<p>Cosmic follows standard conventions for separating its own arguments from arguments to the script:</p>
+
+<pre class="code"><span class='rubyid_cosmic identifier id'>cosmic</span> <span class='lt op'>&lt;</span><span class='rubyid_cosmic identifier id'>cosmic</span> <span class='rubyid_args identifier id'>args</span><span class='gt op'>&gt;</span> <span class='lt op'>&lt;</span><span class='rubyid_script identifier id'>script</span> <span class='rubyid_name identifier id'>name</span><span class='gt op'>&gt;</span> <span class='minus op'>-</span><span class='minus op'>-</span> <span class='lt op'>&lt;</span><span class='rubyid_script identifier id'>script</span> <span class='rubyid_args identifier id'>args</span><span class='gt op'>&gt;</span>
+</pre>
+
+<p>E.g.</p>
+
+<pre class="code"><span class='rubyid_cosmic identifier id'>cosmic</span> <span class='minus op'>-</span><span class='rubyid_c identifier id'>c</span> <span class='bitnot op'>~</span><span class='regexp val'>/.cosmicrc my-script.rb -- -v -t 'foo'
+</span></pre>
+
+<h2>Configuration for scripts</h2>
+
+<p>Scripts can have their own configuration in the cosmic configuration file. Simply add a section to it, e.g.</p>
+
+<pre class="code"><span class='lt op'>&lt;</span> <span class='rubyid_cosmic identifier id'>cosmic</span> <span class='rubyid_configuration identifier id'>configuration</span> <span class='gt op'>&gt;</span>
+<span class='rubyid_scripts identifier id'>scripts</span><span class='colon op'>:</span>
+  <span class='rubyid_myscript identifier id'>myscript</span><span class='colon op'>:</span>
+    <span class='rubyid_arg identifier id'>arg</span><span class='colon op'>:</span> <span class='rubyid_foo identifier id'>foo</span>
+</pre>
+
+<p>and then read it out in the script via the <code>cosmic</code> instance (which is in scope automatically for scripts
+run via the <code>cosmic</code> executable):</p>
+
+<pre class="code"><span class='rubyid_arg identifier id'>arg</span> <span class='assign token'>=</span> <span class='rubyid_cosmic identifier id'>cosmic</span><span class='dot token'>.</span><span class='rubyid_config identifier id'>config</span><span class='lbrack token'>[</span><span class='symbol val'>:scripts</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:myscript</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:arg</span><span class='rbrack token'>]</span>
+</pre>
+
+<h2>Using the same script in different environments (e.g. staging vs. production)</h2>
+
+<p>Suppose you have two environments, staging and production, and you want to run the same script in both. The simplest way to achieve that is to use two different configuration files, e.g. <code>.cosmic-staging</code> and <code>.cosmic-production</code> and pass the configuration to use via the <code>-c</code> commandline option.
+In the configuration file you would then configure the plugins appropriately. For services that are not present in an environment (or that you don&#39;t want to use), you&#39;d simply not include a configuration section in the corresponding configuration file, and use the <code>?</code> operator in the script.</p>
+
+<p>E.g. let&#39;s say we want to interact with IRC only in the production environment. Then in your script you&#39;d use the <code>irc</code> plugin like so:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_irc? fid id'>irc?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='dot3 op'>...</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>and only have configuration for the <code>irc</code> plugin in the production environment. This will still execute the block, however it will be executed against a so-called <code>HoneyPot</code> instance that stands in for the <code>irc</code> instance in this case. This instance will accept all calls to it, then simply not do anything other than return itself.</p>
+
+<p>This will work in a lot of cases, but sometimes it might cause odd errors. In those cases you can either check if the object you are working with is a honey pot:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_jira? fid id'>jira?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_create identifier id'>create</span> <span class='dot3 op'>...</span>
+  <span class='rubyid_unless unless kw'>unless</span> <span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_is_honey_pot identifier id'>is_honey_pot</span>
+    <span class='dot3 op'>...</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>or use <code>with_available</code> which will only run the code if the plugin is actually available</p>
+
+<pre class="code"><span class='rubyid_with_available identifier id'>with_available</span> <span class='rubyid_jira? fid id'>jira?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_create identifier id'>create</span> <span class='dot3 op'>...</span>
+  <span class='dot3 op'>...</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<h2>Dealing with dry-run mode</h2>
+
+<p>Sometimes it is unavoidable to make the script aware of whether dry-run mode is enabled or not. Typically this is the case when the script relies on the data returned by some action that is not performed during dry-run mode. For instance:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/jira'</span>
+
+<span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_jira? fid id'>jira?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_create_issue identifier id'>create_issue</span> <span class='symbol val'>:project</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'COS'</span><span class='comma token'>,</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'New Feature'</span><span class='comma token'>,</span> <span class='symbol val'>:summary</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;foo&quot;</span><span class='comma token'>,</span> <span class='symbol val'>:description</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;bar&quot;</span>
+<span class='rubyid_end end kw'>end</span>
+
+<span class='rubyid_puts identifier id'>puts</span> <span class='dstring node'>&quot;Issue is: #{issue.key}&quot;</span>
+</pre>
+
+<p>In dry-run mode, <code>issue</code> will be <code>nil</code> which leads to an error on the <code>puts</code> line:</p>
+
+<pre class="code"><span class='rubyid_NoMethodError constant id'>NoMethodError</span><span class='colon op'>:</span> <span class='rubyid_undefined identifier id'>undefined</span> <span class='rubyid_method identifier id'>method</span> <span class='xstring val'>`key' for nil:NilClass
+</span></pre>
+
+<p>There are two basic strategies to deal with this: check values for <code>nil</code> and react appropriately, or execute code blocks only if dry-run mode is not enabled.</p>
+
+<p>The former could look like this:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/jira'</span>
+
+<span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_jira? fid id'>jira?</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_create_issue identifier id'>create_issue</span> <span class='symbol val'>:project</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'COS'</span><span class='comma token'>,</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'New Feature'</span><span class='comma token'>,</span> <span class='symbol val'>:summary</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;foo&quot;</span><span class='comma token'>,</span> <span class='symbol val'>:description</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;bar&quot;</span>
+<span class='rubyid_end end kw'>end</span>
+
+<span class='rubyid_puts identifier id'>puts</span> <span class='dstring node'>&quot;Issue is: #{issue.key}&quot;</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_issue identifier id'>issue</span>
+</pre>
+
+<p>The latter makes use of the implicitly available <code>cosmic</code> environment instance:</p>
+
+<pre class="code"><span class='rubyid_require identifier id'>require</span> <span class='string val'>'cosmic/jira'</span>
+
+<span class='rubyid_unless unless kw'>unless</span> <span class='rubyid_cosmic identifier id'>cosmic</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+  <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_jira? fid id'>jira?</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_create_issue identifier id'>create_issue</span> <span class='symbol val'>:project</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'COS'</span><span class='comma token'>,</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'New Feature'</span><span class='comma token'>,</span> <span class='symbol val'>:summary</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;foo&quot;</span><span class='comma token'>,</span> <span class='symbol val'>:description</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;bar&quot;</span>
+  <span class='rubyid_end end kw'>end</span>
+
+  <span class='rubyid_puts identifier id'>puts</span> <span class='dstring node'>&quot;Issue is: #{issue.key}&quot;</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_issue identifier id'>issue</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<h1>Writing new plugins</h1>
+
+<p>Writing Cosmic plugins is fairly straightforward, but in order to keep the API consistent, there are a few rules and suggestions</p>
+
+<h2>Ruby 1.8.x vs. 1.9, Ruby vs. JRuby</h2>
+
+<p>In general, plugins should work with both Ruby &amp; JRuby, 1.8.7 and 1.9.x versions, unless 1.9 or JRuby are absolutely needed. In particular, Ruby 1.9-specific syntax should be avoided unless the plugin requires Ruby 1.9.</p>
+
+<h2>Cosmic environment integration</h2>
+
+<p>Plugins should use the environment&#39;s authentication system (if they need authentication) as much as possible. Likewise, plugins should not log directly to a file or stdout/stderr, but instead generate messages tagged with standard tags such as :debug, :info and :error, plus the plugin&#39;s name so that scripts and other plugins can operate on all messages from a given plugin.</p>
+
+<p>In addition, if the plugin consumes messages, then the plugin should implement methods called <code>connect</code> and <code>disconnect</code> to provide a user with a consistent API. See the IRC and JIRA plugins for examples.</p>
+
+<p>Cosmic also supports running multiple plugin instances under different names, potentially pointed to the same remote service. It is desirable if plugins support this mode and still be independent of each other.</p>
+
+<h2>Dry-run mode</h2>
+
+<p>Plugins should always support dry-run mode, even if they only consume messages. E.g the IRC plugin will not actually connect to the IRC server and write messages to channels. Instead, plugins should generate messages tagged as <code>:dryrun</code> that state what the plugin would do. The exception to this rule is if the plugin needs to for instance query a remote service for the current state of the world. E.g. the Galaxy plugin will issue <code>show</code> commands to Galaxy even in dry-run mode, so that it can return the services to the script.</p>
+
+<h2>Threading</h2>
+
+<p>Cosmic is deliberately single-threaded unless it can&#39;t be avoided. This means that for instance the message bus will only return from the notify method once all listeners have been notified. Therefore, self referential code such as listening for its own messages should be avoided.</p>
+
+<h2>Plugin API</h2>
+
+<p>Plugins should extend the plugin base class which gives them the optional sections capability.
+Public methods in the plugin are considered its API and thus should be documented (with <a href="http://yardoc.org/">Yard</a> using <a href="http://daringfireball.net/projects/markdown/">Markdown</a> syntax).
+All API methods that have arguments, should only take parameter hashes with symbols as keys. This keeps the API consistent and expressive (named parameters).
+API method names should be actions and so the names should be or at least use verbs (e.g. <code>take_snapshot</code> instead of <code>snapshot</code>).
+API methods should objects that are useful to the script. For instance, a lot of the JIRA plugin methods deal with JIRA issues. All of these methods return an object representing the JIRA issue which can be passed in again to other methods on the plugin.</p>
+
+<h2>Error handling</h2>
+
+<p>For now, error handling is up to the plugin. All built-in plugins simply pass the error from the underlying library up to the calling script (unless they can handle the error). No error wrapping is performed, primarily because Ruby has unchecked errors anyways.</p>
+</div></div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:06 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

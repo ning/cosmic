@@ -1,0 +1,176 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>E-mail &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="../index.html" />
+    <link rel="up" title="Plugins" href="../plugins.html" />
+    <link rel="next" title="Execute" href="execute.html" />
+    <link rel="prev" title="Chef" href="chef.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="execute.html" title="Execute"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="chef.html" title="Chef"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" accesskey="U">Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="e-mail">
+<h1>E-mail<a class="headerlink" href="#e-mail" title="Permalink to this headline">¶</a></h1>
+<p>This plugin allows Cosmic scripts to send email. It uses the <a class="reference external" href="https://github.com/mikel/mail">Mail gem</a>:</p>
+<div class="highlight-python"><pre>gem install mail</pre>
+</div>
+<p>The plugin can either use a running Postfix or Sendmail daemon in which case no further configuration is necessary. Or you configure the mail delivery method in the configuration file:</p>
+<div class="highlight-python"><pre>mail:
+  delivery_method: &lt;smtp or sendmail&gt;
+  smtp:
+    address: &lt;mail server; defaults to localhost&gt;
+    port: &lt;mail send port; defaults to 25&gt;
+    domain: &lt;the mail domain; defaults to localhost.localdomain&gt;
+    authentication: &lt;plain, login, cram_md5; off by default&gt;
+    enable_starttls_auto: &lt;true or false; true is default&gt;
+  sendmail:
+    location: &lt;absolute path to sendmail, defaults to /usr/sbin/sendmail&gt;
+  &lt;authentication configuration as explained above&gt;</pre>
+</div>
+<p>Usage is straightforward:</p>
+<div class="highlight-python"><pre>require 'cosmic/mail'
+
+with mail do
+  send :from =&gt; 'me@example.com',
+       :to =&gt; 'you@example.com',
+       :subject =&gt; 'Test 1',
+       :body =&gt; 'Test 1'
+
+  send do
+    from    'me@example.com'
+    to      'you@example.com'
+    subject 'Test 2'
+
+    text_part do
+      body 'This is plain text'
+    end
+
+    html_part do
+      content_type 'text/html; charset=UTF-8'
+      body '&lt;h1&gt;This is HTML&lt;/h1&gt;'
+    end
+  end
+end</pre>
+</div>
+<p>The first send call uses the simple API which only suppors subject &amp; plain text body sending. The second send call uses the mail creation support via blocks provided by the <a class="reference external" href="https://github.com/mikel/mail">Mail gem</a> to send a multipart email with both text and html bodies.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../plugins.html">Plugins</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chef.html">Chef</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">E-mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute.html">Execute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f5.html">F5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="galaxy.html">Galaxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="irc.html">IRC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jira.html">JIRA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jmx.html">JMX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nagios.html">Nagios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ssh.html">SSH</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="chef.html"
+                        title="previous chapter">Chef</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="execute.html"
+                        title="next chapter">Execute</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="execute.html" title="Execute"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="chef.html" title="Chef"
+             >previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" >Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

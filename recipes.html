@@ -1,0 +1,208 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Recipes &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="index.html" />
+    <link rel="next" title="Contributing" href="contributing.html" />
+    <link rel="prev" title="SSH" href="plugins/ssh.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="contributing.html" title="Contributing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="plugins/ssh.html" title="SSH"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="recipes">
+<h1>Recipes<a class="headerlink" href="#recipes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="passing-arguments-to-scripts">
+<h2>Passing arguments to scripts<a class="headerlink" href="#passing-arguments-to-scripts" title="Permalink to this headline">¶</a></h2>
+<p>Cosmic follows standard conventions for separating its own arguments from arguments to the script:</p>
+<div class="highlight-python"><pre>cosmic &lt;cosmic args&gt; &lt;script name&gt; -- &lt;script args&gt;</pre>
+</div>
+<p>E.g.:</p>
+<div class="highlight-python"><pre>cosmic -c ~/.cosmicrc my-script.rb -- -v -t 'foo'</pre>
+</div>
+</div>
+<div class="section" id="configuration-for-scripts">
+<h2>Configuration for scripts<a class="headerlink" href="#configuration-for-scripts" title="Permalink to this headline">¶</a></h2>
+<p>Scripts can have their own configuration in the cosmic configuration file. Simply add a section to it, e.g.:</p>
+<div class="highlight-python"><pre>&lt; cosmic configuration &gt;
+scripts:
+  myscript:
+    arg: foo</pre>
+</div>
+<p>and then read it out in the script via the <tt class="docutils literal"><span class="pre">cosmic</span></tt> instance (which is in scope automatically for scripts run via the <tt class="docutils literal"><span class="pre">cosmic</span></tt> executable):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">arg</span> <span class="o">=</span> <span class="n">cosmic</span><span class="o">.</span><span class="n">config</span><span class="p">[:</span><span class="n">scripts</span><span class="p">][:</span><span class="n">myscript</span><span class="p">][:</span><span class="n">arg</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-the-same-script-in-different-environments">
+<h2>Using the same script in different environments<a class="headerlink" href="#using-the-same-script-in-different-environments" title="Permalink to this headline">¶</a></h2>
+<p>Suppose you have two environments, staging and production, and you want to run the same script in both. The simplest way to achieve that is to use two different configuration files, e.g. <tt class="docutils literal"><span class="pre">.cosmic-staging</span></tt> and <tt class="docutils literal"><span class="pre">.cosmic-production</span></tt> and pass the configuration to use via the <tt class="docutils literal"><span class="pre">-c</span></tt> commandline option.</p>
+<p>In the configuration file you would then configure the plugins appropriately. For services that are not present in an environment (or that you don&#8217;t want to use), you&#8217;d simply not include a configuration section in the corresponding configuration file, and use the <tt class="docutils literal"><span class="pre">?</span></tt> operator in the script.</p>
+<p>E.g. let&#8217;s say we want to interact with IRC only in the production environment. Then in your script you&#8217;d use the <tt class="docutils literal"><span class="pre">irc</span></tt> plugin like so:</p>
+<div class="highlight-python"><pre>with irc? do
+  ...
+end</pre>
+</div>
+<p>and only have configuration for the <tt class="docutils literal"><span class="pre">irc</span></tt> plugin in the production environment. This will still execute the block, however it will be executed against a so-called <tt class="docutils literal"><span class="pre">HoneyPot</span></tt> instance that stands in for the <tt class="docutils literal"><span class="pre">irc</span></tt> instance in this case. This instance will accept all calls to it, then simply not do anything other than return itself.</p>
+<p>This will work in a lot of cases, but sometimes it might cause odd errors. In those cases you can either check if the object you are working with is a honey pot:</p>
+<div class="highlight-python"><pre>with jira? do
+  issue = create ...
+  unless issue.is_honey_pot
+    ...
+  end
+end</pre>
+</div>
+<p>or use <tt class="docutils literal"><span class="pre">with_available</span></tt> which will only run the code if the plugin is actually available:</p>
+<div class="highlight-python"><pre>with_available jira? do
+  issue = create ...
+  ...
+end</pre>
+</div>
+</div>
+<div class="section" id="dealing-with-dry-run-mode">
+<h2>Dealing with dry-run mode<a class="headerlink" href="#dealing-with-dry-run-mode" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes it is unavoidable to make the script aware of whether dry-run mode is enabled or not. Typically this is the case when the script relies on the data returned by some action that is not performed during dry-run mode. For instance:</p>
+<div class="highlight-python"><pre>require 'cosmic/jira'
+
+issue = with jira? do
+  create_issue :project =&gt; 'COS', :type =&gt; 'New Feature', :summary =&gt; "foo", :description =&gt; "bar"
+end
+
+puts "Issue is: #{issue.key}"</pre>
+</div>
+<p>In dry-run mode, <tt class="docutils literal"><span class="pre">issue</span></tt> will be <tt class="docutils literal"><span class="pre">nil</span></tt> which leads to an error on the <tt class="docutils literal"><span class="pre">puts</span></tt> line:</p>
+<div class="highlight-python"><pre>NoMethodError: undefined method `key' for nil:NilClass</pre>
+</div>
+<p>There are two basic strategies to deal with this: check values for <tt class="docutils literal"><span class="pre">nil</span></tt> and react appropriately, or execute code blocks only if dry-run mode is not enabled.</p>
+<p>The former could look like this:</p>
+<div class="highlight-python"><pre>require 'cosmic/jira'
+
+issue = with jira? do
+  create_issue :project =&gt; 'COS', :type =&gt; 'New Feature', :summary =&gt; "foo", :description =&gt; "bar"
+end
+
+puts "Issue is: #{issue.key}" if issue</pre>
+</div>
+<p>The latter makes use of the implicitly available <tt class="docutils literal"><span class="pre">cosmic</span></tt> environment instance:</p>
+<div class="highlight-python"><pre>require 'cosmic/jira'
+
+unless cosmic.in_dry_run_mode
+  issue = with jira? do
+    create_issue :project =&gt; 'COS', :type =&gt; 'New Feature', :summary =&gt; "foo", :description =&gt; "bar"
+  end
+
+  puts "Issue is: #{issue.key}" if issue
+end</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#passing-arguments-to-scripts">Passing arguments to scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-for-scripts">Configuration for scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-the-same-script-in-different-environments">Using the same script in different environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dealing-with-dry-run-mode">Dealing with dry-run mode</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="plugins/ssh.html"
+                        title="previous chapter">SSH</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="contributing.html"
+                        title="next chapter">Contributing</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="contributing.html" title="Contributing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="plugins/ssh.html" title="SSH"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

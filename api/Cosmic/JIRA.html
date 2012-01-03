@@ -1,0 +1,1778 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Cosmic::JIRA
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (J)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../Cosmic.html" title="Cosmic (module)">Cosmic</a></span></span>
+     &raquo; 
+    <span class="title">JIRA</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Cosmic::JIRA
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></li>
+          
+            <li class="next">Cosmic::JIRA</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/cosmic/jira.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A plugin to interact with JIRA. One common use is to create JIRA issues that
+track deployments, with comments for the individual steps:</p>
+
+<pre class="code"><span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_jira identifier id'>jira</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_create_issue! fid id'>create_issue!</span> <span class='symbol val'>:project</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'COS'</span><span class='comma token'>,</span>
+                        <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'New Feature'</span><span class='comma token'>,</span>
+                        <span class='symbol val'>:summary</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Deployment'</span><span class='comma token'>,</span>
+                        <span class='symbol val'>:description</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Deploying something'</span>
+  <span class='rubyid_connect identifier id'>connect</span> <span class='symbol val'>:issue</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_issue identifier id'>issue</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:info</span><span class='comma token'>,</span> <span class='symbol val'>:galaxy</span><span class='rbrack token'>]</span>
+  <span class='rubyid_issue identifier id'>issue</span>
+<span class='rubyid_end end kw'>end</span>
+<span class='dot3 op'>...</span>
+<span class='rubyid_jira identifier id'>jira</span><span class='dot token'>.</span><span class='rubyid_resolve! fid id'>resolve!</span> <span class='symbol val'>:issue</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_issue identifier id'>issue</span><span class='comma token'>,</span> <span class='symbol val'>:comment</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Deployment finished'</span><span class='comma token'>,</span> <span class='symbol val'>:resolution</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'Fixed'</span>
+</pre>
+
+<p>The jira plugin currently does not emit any messages unless in dryrun mode, in which case
+it will not actually connect to the JIRA server in dry-run mode. Instead it will only send
+messages tagged as <code>:jira</code> and <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+  
+  
+  
+  
+  <h2>Instance Attribute Summary <small>(<a href="#" class="summary_toggle">collapse</a>)</small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#config-instance_method" title="#config (instance method)">- (Object) <strong>config</strong> </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title readonly">readonly</span>
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The plugin&#39;s configuration.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_on-instance_method" title="#comment_on (instance method)">- (Jira4R::V2::RemoteIssue<sup>?</sup>) <strong>comment_on</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Adds a comment to a JIRA issue.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connect-instance_method" title="#connect (instance method)">- (Cinch::Channel, ...) <strong>connect</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Connects an existing JIRA issue to the message bus.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#create_issue-instance_method" title="#create_issue (instance method)">- (Jira4R::V2::RemoteIssue<sup>?</sup>) <strong>create_issue</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new JIRA issue.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnect-instance_method" title="#disconnect (instance method)">- (Jira4R::V2::RemoteIssue<sup>?</sup>) <strong>disconnect</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Disconnects an existing JIRA issue from the message bus.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_issue-instance_method" title="#get_issue (instance method)">- (Jira4R::V2::RemoteIssue<sup>?</sup>) <strong>get_issue</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Retrieves a JIRA issue.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (JIRA) <strong>initialize</strong>(environment, name = :jira) </a>
+    
+
+    
+  </span>
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new jira plugin instance and connect it to the configrued JIRA server.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#link-instance_method" title="#link (instance method)">- (Jira4R::V2::RemoteIssue<sup>?</sup>) <strong>link</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Links an issue to another one.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#perform_workflow_action-instance_method" title="#perform_workflow_action (instance method)">- (Jira4R::V2::RemoteIssue<sup>?</sup>) <strong>perform_workflow_action</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Performs an arbitrary workflow action.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#resolve-instance_method" title="#resolve (instance method)">- (Jira4R::V2::RemoteIssue<sup>?</sup>) <strong>resolve</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Resolves an issue after disconnecting it from the message bus if necessary.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">#method_missing</a></span>, <span class='object_link'><a href="Plugin.html#notify-instance_method" title="Cosmic::Plugin#notify (method)">#notify</a></span>, <span class='object_link'><a href="Plugin.html#respond_to%3F-instance_method" title="Cosmic::Plugin#respond_to? (method)">#respond_to?</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <p class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Cosmic::JIRA (class)">JIRA</a></span></tt>) <strong>initialize</strong>(environment, name = :jira) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new jira plugin instance and connect it to the configrued JIRA server. In
+dryrun mode it will not actually connect but instead create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>environment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Environment.html" title="Cosmic::Environment (class)">Environment</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The cosmic environment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:jira</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The name for this plugin instance e.g. in the config</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+83
+84
+85
+86
+87
+88
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 83</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:jira</span><span class='rparen token'>)</span>
+  <span class='comment val'># Using Monitor instead of Mutex as the former is reentrant</span>
+  <span class='rubyid_@monitor ivar id'>@monitor</span> <span class='assign token'>=</span> <span class='rubyid_Monitor constant id'>Monitor</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span>
+  <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
+  <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
+  <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No jira address specified in the configuration&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:address</span><span class='rbrack token'>]</span>
+  <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_resolve_service_auth identifier id'>resolve_service_auth</span><span class='lparen token'>(</span><span class='symbol val'>:service_name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='comma token'>,</span> <span class='symbol val'>:config</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_@config ivar id'>@config</span><span class='rparen token'>)</span>
+  <span class='rubyid_authenticate identifier id'>authenticate</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+<div id="method_missing_details" class="method_details_list">
+  <h2>Dynamic Method Handling</h2>
+  <p class="notice super">
+    This class handles dynamic methods through the <tt>method_missing</tt> method
+    
+      in the class <span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">Cosmic::Plugin</a></span>
+    
+  </p>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <span id="config-instance_method"></span>
+      <div class="method_details first">
+  <p class="signature first" id="config-instance_method">
+  
+    - (<tt>Object</tt>) <strong>config</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>The plugin&#39;s configuration</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+75
+76
+77</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 75</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_config identifier id'>config</span>
+  <span class='rubyid_@config ivar id'>@config</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="comment_on-instance_method">
+  
+    - (<tt>Jira4R::V2::RemoteIssue</tt><sup>?</sup>) <strong>comment_on</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Adds a comment to a JIRA issue. This method will do nothing in dryrun mode except create
+a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:issue</span>
+          <span class="type">(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue or its key</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:author</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The author of the comment. If not specified, then the
+user used to authenticate with JIRA will be used</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:comment</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The comment</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 160</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_comment_on identifier id'>comment_on</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would comment on issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jira</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_key identifier id'>key</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:issue</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :issue argument given&quot;</span>
+    <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_issueify identifier id'>issueify</span><span class='lparen token'>(</span><span class='rubyid_key identifier id'>key</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_issue identifier id'>issue</span>
+      <span class='rubyid_comment identifier id'>comment</span> <span class='assign token'>=</span> <span class='rubyid_Jira4R constant id'>Jira4R</span><span class='colon2 op'>::</span><span class='rubyid_V2 constant id'>V2</span><span class='colon2 op'>::</span><span class='rubyid_RemoteComment constant id'>RemoteComment</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rparen token'>)</span>
+      <span class='rubyid_comment identifier id'>comment</span><span class='dot token'>.</span><span class='rubyid_author identifier id'>author</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:author</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span>
+      <span class='rubyid_comment identifier id'>comment</span><span class='dot token'>.</span><span class='rubyid_body identifier id'>body</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:comment</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>''</span>
+      <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+        <span class='rubyid_@jira ivar id'>@jira</span><span class='dot token'>.</span><span class='rubyid_addComment identifier id'>addComment</span><span class='lparen token'>(</span><span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_key identifier id'>key</span><span class='dot token'>.</span><span class='rubyid_upcase identifier id'>upcase</span><span class='comma token'>,</span> <span class='rubyid_comment identifier id'>comment</span><span class='rparen token'>)</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not find JIRA issue #{params[:issue]}&quot;</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_issue identifier id'>issue</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="connect-instance_method">
+  
+    - (<tt>Cinch::Channel</tt>, ...) <strong>connect</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Connects an existing JIRA issue to the message bus. All messages with the given tags
+will then be added as comments to the JIRA issue. This method will do nothing in dryrun mode
+except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:issue</span>
+          <span class="type">(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue or its key</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:to</span>
+          <span class="type">(<tt>Array&lt;String&gt;</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags for the messages that the plugin should write to the channel</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Cinch::Channel</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The channel if the plugin was able to connect it</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 306</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_connect identifier id'>connect</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would connect issue #{params[:issue]} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} to the message bus&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jira</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_key identifier id'>key</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:issue</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :issue argument given&quot;</span>
+    <span class='rubyid_tags identifier id'>tags</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
+    <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_issueify identifier id'>issueify</span><span class='lparen token'>(</span><span class='rubyid_key identifier id'>key</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_issue identifier id'>issue</span>
+      <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_connect_message_listener identifier id'>connect_message_listener</span><span class='lparen token'>(</span><span class='symbol val'>:listener</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_IssueMessageListener constant id'>IssueMessageListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_self self kw'>self</span><span class='comma token'>,</span> <span class='rubyid_issue identifier id'>issue</span><span class='rparen token'>)</span><span class='comma token'>,</span> <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_tags identifier id'>tags</span><span class='rparen token'>)</span>
+    <span class='rubyid_elsif elsif kw'>elsif</span> <span class='notop op'>!</span><span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not find JIRA issue #{key}&quot;</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_issue identifier id'>issue</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="create_issue-instance_method">
+  
+    - (<tt>Jira4R::V2::RemoteIssue</tt><sup>?</sup>) <strong>create_issue</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new JIRA issue. This method will do nothing in dryrun mode except create
+a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:project</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The key of the project (short name)</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:type</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The type of the issue</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:summary</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue summary</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:description</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue description</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:assignee</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The assignee. If not specified, then the user
+used to authenticate with JIRA will be used</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The new issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 115</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_create_issue identifier id'>create_issue</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_project_name identifier id'>project_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:project</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :project argument given&quot;</span>
+  <span class='rubyid_type identifier id'>type</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :type argument given&quot;</span>
+  <span class='rubyid_summary identifier id'>summary</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:summary</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :summary argument given&quot;</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would create a new issue in project #{project_name} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jira</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_project identifier id'>project</span> <span class='assign token'>=</span> <span class='rubyid_get_project identifier id'>get_project</span><span class='lparen token'>(</span><span class='rubyid_project_name identifier id'>project_name</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_project identifier id'>project</span>
+      <span class='rubyid_type_id identifier id'>type_id</span> <span class='assign token'>=</span> <span class='rubyid_nil nil kw'>nil</span>
+      <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+        <span class='rubyid_@jira ivar id'>@jira</span><span class='dot token'>.</span><span class='rubyid_getIssueTypesForProject identifier id'>getIssueTypesForProject</span><span class='lparen token'>(</span><span class='rubyid_project identifier id'>project</span><span class='dot token'>.</span><span class='rubyid_id identifier id'>id</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_issue_type identifier id'>issue_type</span><span class='bitor op'>|</span>
+          <span class='rubyid_if if kw'>if</span> <span class='rubyid_issue_type identifier id'>issue_type</span><span class='dot token'>.</span><span class='rubyid_name identifier id'>name</span> <span class='eq op'>==</span> <span class='rubyid_type identifier id'>type</span>
+            <span class='rubyid_type_id identifier id'>type_id</span> <span class='assign token'>=</span> <span class='rubyid_issue_type identifier id'>issue_type</span><span class='dot token'>.</span><span class='rubyid_id identifier id'>id</span>
+          <span class='rubyid_end end kw'>end</span>
+        <span class='rubyid_end end kw'>end</span>
+      <span class='rubyid_end end kw'>end</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;The type '#{type}' does not seem to be defined for project '#{project.name}'&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_type_id identifier id'>type_id</span>
+
+      <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_Jira4R constant id'>Jira4R</span><span class='colon2 op'>::</span><span class='rubyid_V2 constant id'>V2</span><span class='colon2 op'>::</span><span class='rubyid_RemoteIssue constant id'>RemoteIssue</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span>
+      <span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_project identifier id'>project</span> <span class='assign token'>=</span> <span class='rubyid_project identifier id'>project</span><span class='dot token'>.</span><span class='rubyid_key identifier id'>key</span>
+      <span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_summary identifier id'>summary</span> <span class='assign token'>=</span> <span class='rubyid_summary identifier id'>summary</span>
+      <span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_description identifier id'>description</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:description</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>''</span>
+      <span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_type identifier id'>type</span> <span class='assign token'>=</span> <span class='rubyid_type_id identifier id'>type_id</span>
+      <span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_assignee identifier id'>assignee</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:assignee</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span>
+      <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+        <span class='rubyid_@jira ivar id'>@jira</span><span class='dot token'>.</span><span class='rubyid_createIssue identifier id'>createIssue</span><span class='lparen token'>(</span><span class='rubyid_issue identifier id'>issue</span><span class='rparen token'>)</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not find JIRA project #{project_nam}&quot;</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="disconnect-instance_method">
+  
+    - (<tt>Jira4R::V2::RemoteIssue</tt><sup>?</sup>) <strong>disconnect</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Disconnects an existing JIRA issue from the message bus. This does not change anything in the JIRA issue itself,
+e.g. no comment will be added by this method or the issue resolved. This method will do nothing in dryrun mode
+except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:issue</span>
+          <span class="type">(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue or its key</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 331</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_disconnect identifier id'>disconnect</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would disconnect issue #{params[:issue]} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} from the message bus&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jira</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_key identifier id'>key</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:issue</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :issue argument given&quot;</span>
+    <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_issueify identifier id'>issueify</span><span class='lparen token'>(</span><span class='rubyid_key identifier id'>key</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_issue identifier id'>issue</span>
+      <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_disconnect_message_listener identifier id'>disconnect_message_listener</span><span class='lparen token'>(</span><span class='symbol val'>:listener</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_IssueMessageListener constant id'>IssueMessageListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_self self kw'>self</span><span class='comma token'>,</span> <span class='rubyid_issue identifier id'>issue</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_issue identifier id'>issue</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_issue-instance_method">
+  
+    - (<tt>Jira4R::V2::RemoteIssue</tt><sup>?</sup>) <strong>get_issue</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Retrieves a JIRA issue. This method will do nothing in dryrun mode except create
+a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:key</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The key of the issue</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 99</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_issue identifier id'>get_issue</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_key identifier id'>key</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:key</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :key argument given&quot;</span>
+  <span class='rubyid_issueify identifier id'>issueify</span><span class='lparen token'>(</span><span class='rubyid_key identifier id'>key</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="link-instance_method">
+  
+    - (<tt>Jira4R::V2::RemoteIssue</tt><sup>?</sup>) <strong>link</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Links an issue to another one. This method will do nothing in dryrun mode except create
+a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:issue</span>
+          <span class="type">(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue or its key</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:to</span>
+          <span class="type">(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue to link to, or its key</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:kind</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The kind of the link (e.g. <code>depends on</code>)</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:comment</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The link comment</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 191</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_link identifier id'>link</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_kind identifier id'>kind</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:kind</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :kind argument given&quot;</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would create a link of type #{kind} from issue #{params[:issue]} to #{params[:to]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jira</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_from_key identifier id'>from_key</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:issue</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :issue argument given&quot;</span>
+    <span class='rubyid_to_key identifier id'>to_key</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
+    <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_issueify identifier id'>issueify</span><span class='lparen token'>(</span><span class='rubyid_from_key identifier id'>from_key</span><span class='rparen token'>)</span>
+    <span class='rubyid_to identifier id'>to</span> <span class='assign token'>=</span> <span class='rubyid_issueify identifier id'>issueify</span><span class='lparen token'>(</span><span class='rubyid_to_key identifier id'>to_key</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_issue identifier id'>issue</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_to identifier id'>to</span>
+      <span class='comment val'># The SOAP and RPC apis don't support linking so we have go via the web form instead</span>
+      <span class='rubyid_uri identifier id'>uri</span> <span class='assign token'>=</span> <span class='rubyid_URI constant id'>URI</span><span class='dot token'>.</span><span class='rubyid_parse identifier id'>parse</span><span class='lparen token'>(</span><span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:address</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_http identifier id'>http</span> <span class='assign token'>=</span> <span class='rubyid_Net constant id'>Net</span><span class='colon2 op'>::</span><span class='rubyid_HTTP constant id'>HTTP</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_uri identifier id'>uri</span><span class='dot token'>.</span><span class='rubyid_host identifier id'>host</span><span class='comma token'>,</span> <span class='rubyid_uri identifier id'>uri</span><span class='dot token'>.</span><span class='rubyid_port identifier id'>port</span><span class='rparen token'>)</span>
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_uri identifier id'>uri</span><span class='dot token'>.</span><span class='rubyid_scheme identifier id'>scheme</span> <span class='eq op'>==</span> <span class='string val'>'https'</span>
+        <span class='rubyid_http identifier id'>http</span><span class='dot token'>.</span><span class='rubyid_use_ssl identifier id'>use_ssl</span> <span class='assign token'>=</span> <span class='rubyid_true true kw'>true</span>
+        <span class='rubyid_http identifier id'>http</span><span class='dot token'>.</span><span class='rubyid_verify_mode identifier id'>verify_mode</span> <span class='assign token'>=</span> <span class='rubyid_OpenSSL constant id'>OpenSSL</span><span class='colon2 op'>::</span><span class='rubyid_SSL constant id'>SSL</span><span class='colon2 op'>::</span><span class='rubyid_VERIFY_NONE constant id'>VERIFY_NONE</span>
+      <span class='rubyid_end end kw'>end</span>
+      <span class='comment val'># Login first to get the cookie and token</span>
+      <span class='rubyid_req identifier id'>req</span> <span class='assign token'>=</span> <span class='rubyid_Net constant id'>Net</span><span class='colon2 op'>::</span><span class='rubyid_HTTP constant id'>HTTP</span><span class='colon2 op'>::</span><span class='rubyid_Post constant id'>Post</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='string val'>'/login.jsp'</span><span class='rparen token'>)</span>
+      <span class='rubyid_req identifier id'>req</span><span class='dot token'>.</span><span class='rubyid_set_form_data identifier id'>set_form_data</span><span class='lparen token'>(</span><span class='string val'>'os_authType'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'basic'</span><span class='comma token'>,</span> <span class='string val'>'os_cookie'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_true true kw'>true</span><span class='rparen token'>)</span>
+      <span class='rubyid_req identifier id'>req</span><span class='dot token'>.</span><span class='rubyid_basic_auth identifier id'>basic_auth</span><span class='lparen token'>(</span><span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:password</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+
+      <span class='rubyid_response identifier id'>response</span> <span class='assign token'>=</span> <span class='rubyid_http identifier id'>http</span><span class='dot token'>.</span><span class='rubyid_request identifier id'>request</span><span class='lparen token'>(</span><span class='rubyid_req identifier id'>req</span><span class='rparen token'>)</span>
+
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_response identifier id'>response</span><span class='dot token'>.</span><span class='rubyid_code identifier id'>code</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span> <span class='eq op'>==</span> <span class='integer val'>200</span>
+        <span class='rubyid_cookies identifier id'>cookies</span> <span class='assign token'>=</span> <span class='rubyid_response identifier id'>response</span><span class='dot token'>.</span><span class='rubyid_get_fields identifier id'>get_fields</span><span class='lparen token'>(</span><span class='string val'>'set-cookie'</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_collect identifier id'>collect</span> <span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='rubyid_cookie identifier id'>cookie</span><span class='bitor op'>|</span> <span class='rubyid_cookie identifier id'>cookie</span><span class='dot token'>.</span><span class='rubyid_split identifier id'>split</span><span class='lparen token'>(</span><span class='string val'>';'</span><span class='rparen token'>)</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span> <span class='rbrace token'>}</span>
+        <span class='rubyid_doc identifier id'>doc</span> <span class='assign token'>=</span> <span class='rubyid_Nokogiri constant id'>Nokogiri</span><span class='colon2 op'>::</span><span class='rubyid_HTML constant id'>HTML</span><span class='lparen token'>(</span><span class='rubyid_response identifier id'>response</span><span class='dot token'>.</span><span class='rubyid_body identifier id'>body</span><span class='rparen token'>)</span>
+        <span class='rubyid_token identifier id'>token</span> <span class='assign token'>=</span> <span class='string val'>''</span>
+        <span class='rubyid_doc identifier id'>doc</span><span class='dot token'>.</span><span class='rubyid_xpath identifier id'>xpath</span><span class='lparen token'>(</span><span class='string val'>&quot;//meta[@id='atlassian-token']&quot;</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_meta_tag identifier id'>meta_tag</span><span class='bitor op'>|</span>
+          <span class='rubyid_token identifier id'>token</span> <span class='assign token'>=</span> <span class='rubyid_meta_tag identifier id'>meta_tag</span><span class='lbrack token'>[</span><span class='string val'>'content'</span><span class='rbrack token'>]</span>
+        <span class='rubyid_end end kw'>end</span>
+
+        <span class='rubyid_req identifier id'>req</span> <span class='assign token'>=</span> <span class='rubyid_Net constant id'>Net</span><span class='colon2 op'>::</span><span class='rubyid_HTTP constant id'>HTTP</span><span class='colon2 op'>::</span><span class='rubyid_Post constant id'>Post</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='string val'>'/secure/LinkExistingIssue.jspa'</span><span class='rparen token'>)</span>
+        <span class='rubyid_req identifier id'>req</span><span class='dot token'>.</span><span class='rubyid_set_form_data identifier id'>set_form_data</span><span class='lparen token'>(</span><span class='string val'>'id'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_issue identifier id'>issue</span><span class='dot token'>.</span><span class='rubyid_id identifier id'>id</span><span class='comma token'>,</span>
+                          <span class='string val'>'linkKey'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_to identifier id'>to</span><span class='dot token'>.</span><span class='rubyid_key identifier id'>key</span><span class='comma token'>,</span>
+                          <span class='string val'>'linkDesc'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_kind identifier id'>kind</span><span class='comma token'>,</span>
+                          <span class='string val'>'comment'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:comment</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>''</span><span class='comma token'>,</span>
+                          <span class='string val'>'atl_token'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_token identifier id'>token</span><span class='rparen token'>)</span>
+        <span class='rubyid_req identifier id'>req</span><span class='lbrack token'>[</span><span class='string val'>'Cookie'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_cookies identifier id'>cookies</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
+
+        <span class='rubyid_response identifier id'>response</span> <span class='assign token'>=</span> <span class='rubyid_http identifier id'>http</span><span class='dot token'>.</span><span class='rubyid_request identifier id'>request</span><span class='lparen token'>(</span><span class='rubyid_req identifier id'>req</span><span class='rparen token'>)</span>
+        <span class='rubyid_if if kw'>if</span> <span class='rubyid_response identifier id'>response</span><span class='dot token'>.</span><span class='rubyid_code identifier id'>code</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span> <span class='geq op'>&gt;=</span> <span class='integer val'>400</span>
+          <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not link JIRA issue #{issue.key} to #{to.key}, response status was #{response.code.to_i}&quot;</span>
+        <span class='rubyid_end end kw'>end</span>
+      <span class='rubyid_else else kw'>else</span>
+        <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not login to JIRA via http/https, response status was #{response.code.to_i}&quot;</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not find the JIRA issue #{from_key}&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_issue identifier id'>issue</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not find the target JIRA issue #{to_key}&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_to identifier id'>to</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_issue identifier id'>issue</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="perform_workflow_action-instance_method">
+  
+    - (<tt>Jira4R::V2::RemoteIssue</tt><sup>?</sup>) <strong>perform_workflow_action</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Performs an arbitrary workflow action. This method will do nothing in dryrun mode except create a message
+tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:issue</span>
+          <span class="type">(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue or its key</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:action</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The action</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:params</span>
+          <span class="type">(<tt>Array</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>An array of parameters for the workflow action</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 256</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_perform_workflow_action identifier id'>perform_workflow_action</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_action_name identifier id'>action_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:action</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :action argument given&quot;</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would perform workflow action #{action_name} on issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jira</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_from_key identifier id'>from_key</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:issue</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :issue argument given&quot;</span>
+    <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_issueify identifier id'>issueify</span><span class='lparen token'>(</span><span class='rubyid_from_key identifier id'>from_key</span><span class='rparen token'>)</span>
+    <span class='rubyid_perform_workflow_action_internal identifier id'>perform_workflow_action_internal</span><span class='lparen token'>(</span><span class='rubyid_issue identifier id'>issue</span><span class='comma token'>,</span> <span class='rubyid_action_name identifier id'>action_name</span><span class='comma token'>,</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:params</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="resolve-instance_method">
+  
+    - (<tt>Jira4R::V2::RemoteIssue</tt><sup>?</sup>) <strong>resolve</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Resolves an issue after disconnecting it from the message bus if necessary. This method will do
+nothing in dryrun mode except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:issue</span>
+          <span class="type">(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The issue or its key</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:action</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The action. If not specified, then <code>Resolve Issue</code> will be used</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:resolution</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The resolution. If not specified, then <code>Fixed</code> will be used</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Jira4R::V2::RemoteIssue</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The issue</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jira.rb', line 277</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_resolve identifier id'>resolve</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would resolve issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jira</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_issue identifier id'>issue</span> <span class='assign token'>=</span> <span class='rubyid_disconnect identifier id'>disconnect</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_issue identifier id'>issue</span>
+      <span class='rubyid_action_name identifier id'>action_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:action</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>'Resolve Issue'</span>
+      <span class='rubyid_resolution_field identifier id'>resolution_field</span> <span class='assign token'>=</span> <span class='rubyid_Jira4R constant id'>Jira4R</span><span class='colon2 op'>::</span><span class='rubyid_V2 constant id'>V2</span><span class='colon2 op'>::</span><span class='rubyid_RemoteFieldValue constant id'>RemoteFieldValue</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span>
+      <span class='rubyid_resolution_field identifier id'>resolution_field</span><span class='dot token'>.</span><span class='rubyid_id identifier id'>id</span> <span class='assign token'>=</span> <span class='string val'>&quot;resolution&quot;</span>
+      <span class='rubyid_resolution_field identifier id'>resolution_field</span><span class='dot token'>.</span><span class='rubyid_values identifier id'>values</span> <span class='assign token'>=</span> <span class='rubyid_get_resolution_id identifier id'>get_resolution_id</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:resolution</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>'Fixed'</span><span class='rparen token'>)</span>
+      <span class='rubyid_perform_workflow_action_internal identifier id'>perform_workflow_action_internal</span><span class='lparen token'>(</span><span class='rubyid_issue identifier id'>issue</span><span class='comma token'>,</span> <span class='rubyid_action_name identifier id'>action_name</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='rubyid_resolution_field identifier id'>resolution_field</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;Could not find JIRA issue #{params[:issue]}&quot;</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_issue identifier id'>issue</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:11 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Cosmic::CosmicLogger
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (C)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../Cosmic.html" title="Cosmic (module)">Cosmic</a></span></span>
+     &raquo; 
+    <span class="title">CosmicLogger</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Cosmic::CosmicLogger
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Logger</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Logger</li>
+          
+            <li class="next">Cosmic::CosmicLogger</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/cosmic/cosmic.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Custom logger for plugins that puts log messages onto the message bus.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+  
+
+
+  
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#format_message-instance_method" title="#format_message (instance method)">- (Object) <strong>format_message</strong>(severity, timestamp, progname, msg) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Base logger method responsible for dealing with a specific message.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (CosmicLogger) <strong>initialize</strong>(params) </a>
+    
+
+    
+  </span>
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new logger instance.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <p class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Cosmic::CosmicLogger (class)">CosmicLogger</a></span></tt>) <strong>initialize</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new logger instance. The parameters are used to configure
+the environment to log to, plus the tags for each log level. For
+example:</p>
+
+<pre class="code"><span class='rubyid_CosmicLogger constant id'>CosmicLogger</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='symbol val'>:environment</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                 <span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_WARN constant id'>WARN</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='symbol val'>:warn</span><span class='comma token'>,</span>
+                <span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_ERROR constant id'>ERROR</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:error</span><span class='comma token'>,</span><span class='symbol val'>:fatal</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+</pre>
+
+<p>Only messages with log levels that are mapped to tags will be put onto
+the message bus, all others will be silently ignored.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:environment</span>
+          <span class="type">(<tt><span class='object_link'><a href="Environment.html" title="Cosmic::Environment (class)">Environment</a></span></tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The environment</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">Logger::DEBUG</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags that debug messages should be mapped to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">Logger::INFO</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags that info messages should be mapped to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">Logger::WARN</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags that warn messages should be mapped to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">Logger::ERROR</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags that error messages should be mapped to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">Logger::FATAL</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags that fatal messages should be mapped to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">Logger::UNKNOWN</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags that messages with unknown severity should be mapped to</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 223</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:environment</span><span class='rbrack token'>]</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='string val'>'DEBUG'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_DEBUG constant id'>DEBUG</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='string val'>'INFO'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_INFO constant id'>INFO</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='string val'>'WARN'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_WARN constant id'>WARN</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='string val'>'ERROR'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_ERROR constant id'>ERROR</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='string val'>'FATAL'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_FATAL constant id'>FATAL</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='string val'>'UNKNOWN'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_UNKNOWN constant id'>UNKNOWN</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='string val'>'ANY'</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='rubyid_Logger constant id'>Logger</span><span class='colon2 op'>::</span><span class='rubyid_UNKNOWN constant id'>UNKNOWN</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="format_message-instance_method">
+  
+    - (<tt>Object</tt>) <strong>format_message</strong>(severity, timestamp, progname, msg) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Base logger method responsible for dealing with a specific message.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>severity</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The severity of the message</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>timestamp</span>
+      
+      
+        <span class='type'>(<tt>Time</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The time of the message, ignored</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>progname</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The name of the logging program, ignored</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>msg</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The message</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+241
+242
+243
+244
+245
+246</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 241</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_format_message identifier id'>format_message</span><span class='lparen token'>(</span><span class='rubyid_severity identifier id'>severity</span><span class='comma token'>,</span> <span class='rubyid_timestamp identifier id'>timestamp</span><span class='comma token'>,</span> <span class='rubyid_progname identifier id'>progname</span><span class='comma token'>,</span> <span class='rubyid_msg identifier id'>msg</span><span class='rparen token'>)</span>
+  <span class='rubyid_tags identifier id'>tags</span> <span class='assign token'>=</span> <span class='rubyid_@level_map ivar id'>@level_map</span><span class='lbrack token'>[</span><span class='rubyid_severity identifier id'>severity</span><span class='rbrack token'>]</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_tags identifier id'>tags</span>
+    <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_msg identifier id'>msg</span><span class='comma token'>,</span> <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_tags identifier id'>tags</span><span class='rparen token'>)</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:12 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

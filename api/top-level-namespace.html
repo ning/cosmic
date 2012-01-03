@@ -1,0 +1,650 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Top Level Namespace
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    
+    
+    <span class="title">Top Level Namespace</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Top Level Namespace
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Defined Under Namespace</h2>
+<p class="children">
+   
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Cosmic.html" title="Cosmic (module)">Cosmic</a></span>
+    
+   
+    
+  
+</p>
+
+  <h2>Constant Summary</h2>
+  
+    <dl class="constants">
+      
+        <dt id="JRUBY-constant" class="">JRUBY =
+          
+        </dt>
+        <dd><pre class="code"><span class='rubyid_defined? defined kw'>defined?</span><span class='lparen token'>(</span><span class='rubyid_RUBY_ENGINE constant id'>RUBY_ENGINE</span><span class='rparen token'>)</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_RUBY_ENGINE constant id'>RUBY_ENGINE</span> <span class='eq op'>==</span> <span class='string val'>'jruby'</span>
+</pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#arrayify-instance_method" title="#arrayify (instance method)">- (Array) <strong>arrayify</strong>(obj) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Wraps the given object in an array unless it is already one.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#require_with_hint-instance_method" title="#require_with_hint (instance method)">- (true, false) <strong>require_with_hint</strong>(what, hint) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A version of the <code>require</code> method that prints out an optional text telling the user
+how to fix the load problem.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#with-instance_method" title="#with (instance method)">- (Object<sup>?</sup>) <strong>with</strong>(obj) { ... }</a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Runs a block in the context of an object.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#with_available-instance_method" title="#with_available (instance method)">- (Object<sup>?</sup>) <strong>with_available</strong>(obj) { ... }</a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>This is the same as <code>#with</code> except that it will only run the block in the context of the object
+if the object is not an instance of <code>Cosmic::HoneyPot</code>.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="arrayify-instance_method">
+  
+    - (<tt>Array</tt>) <strong>arrayify</strong>(obj) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Wraps the given object in an array unless it is already one. If passed <code>nil</code> then
+it will return an empty array.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>obj</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The object to arrayify</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The object if it is already an array, or an empty array if given <code>nil</code>.
+Otherwise an array with the object as the single element</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 65</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_obj identifier id'>obj</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_obj identifier id'>obj</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_obj identifier id'>obj</span><span class='dot token'>.</span><span class='rubyid_is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='rubyid_Array constant id'>Array</span><span class='rparen token'>)</span>
+      <span class='rubyid_obj identifier id'>obj</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='lbrack token'>[</span><span class='rubyid_obj identifier id'>obj</span><span class='rbrack token'>]</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="require_with_hint-instance_method">
+  
+    - (<tt>true</tt>, <tt>false</tt>) <strong>require_with_hint</strong>(what, hint) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>A version of the <code>require</code> method that prints out an optional text telling the user
+how to fix the load problem.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>what</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>What to load</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>hint</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>An optional hint to show if the thing could not be loaded</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>true</tt>, <tt>false</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether the module was loaded (<code>true</code>) or it was already loaded
+before (<code>false</code>)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86
+87
+88
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 84</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_require_with_hint identifier id'>require_with_hint</span><span class='lparen token'>(</span><span class='rubyid_what identifier id'>what</span><span class='comma token'>,</span> <span class='rubyid_hint identifier id'>hint</span><span class='rparen token'>)</span>
+  <span class='rubyid_begin begin kw'>begin</span>
+    <span class='rubyid_require identifier id'>require</span> <span class='rubyid_what identifier id'>what</span>
+  <span class='rubyid_rescue rescue kw'>rescue</span> <span class='rubyid_LoadError constant id'>LoadError</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_e identifier id'>e</span>
+    <span class='rubyid_puts identifier id'>puts</span> <span class='rubyid_hint identifier id'>hint</span>
+    <span class='rubyid_raise identifier id'>raise</span> <span class='rubyid_e identifier id'>e</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="with-instance_method">
+  
+    - (<tt>Object</tt><sup>?</sup>) <strong>with</strong>(obj) { ... }
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Runs a block in the context of an object. This is similar to the <code>with</code> keyword
+in Pascal or JavaScript. For example:</p>
+
+<pre class="code"><span class='rubyid_str identifier id'>str</span> <span class='assign token'>=</span> <span class='string val'>&quot;Hello World&quot;</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_str identifier id'>str</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_puts identifier id'>puts</span> <span class='rubyid_reverse identifier id'>reverse</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>It also supports blocks with arity of 1:</p>
+
+<pre class="code"><span class='rubyid_str identifier id'>str</span> <span class='assign token'>=</span> <span class='string val'>&quot;Hello World&quot;</span>
+<span class='rubyid_with identifier id'>with</span> <span class='rubyid_str identifier id'>str</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_my_str identifier id'>my_str</span><span class='bitor op'>|</span>
+  <span class='rubyid_puts identifier id'>puts</span> <span class='rubyid_my_str identifier id'>my_str</span><span class='dot token'>.</span><span class='rubyid_reverse identifier id'>reverse</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>obj</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The object that serves as the context for the block. If <code>nil</code> then
+the block won&#39;t be executed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<h3>Yields:</h3>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>A block of arity 0 or 1 that will be executed in the context of the given object</p>
+</div>
+      
+    </li>
+  
+</ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The return value of the block if any. If the block is not
+executed because the object is <code>nil</code>, then nothing will be
+returned</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 28</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_with identifier id'>with</span><span class='lparen token'>(</span><span class='rubyid_obj identifier id'>obj</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_obj identifier id'>obj</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_block_given? fid id'>block_given?</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_block identifier id'>block</span><span class='dot token'>.</span><span class='rubyid_arity identifier id'>arity</span> <span class='eq op'>==</span> <span class='integer val'>1</span>
+      <span class='rubyid_yield yield kw'>yield</span> <span class='rubyid_obj identifier id'>obj</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_obj identifier id'>obj</span><span class='dot token'>.</span><span class='rubyid_instance_eval identifier id'>instance_eval</span><span class='lparen token'>(</span><span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="with_available-instance_method">
+  
+    - (<tt>Object</tt><sup>?</sup>) <strong>with_available</strong>(obj) { ... }
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>This is the same as <code>#with</code> except that it will only run the block in the context of the object
+if the object is not an instance of <code>Cosmic::HoneyPot</code>. In effect this means that you&#39;d use
+this in cases where a plugin is not configured but used in a script and you don&#39;t want to
+run code using the plugin at all.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>obj</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The object that serves as the context for the block. If <code>nil</code> or an
+instance of <code>Cosmic::HoneyPot</code> then the block won&#39;t be executed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<h3>Yields:</h3>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>A block of arity 0 or 1 that will be executed in the context of the given object</p>
+</div>
+      
+    </li>
+  
+</ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The return value of the block if any. If the block is not
+executed because the object is <code>nil</code>, then nothing will be
+returned</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 49</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_with_available identifier id'>with_available</span><span class='lparen token'>(</span><span class='rubyid_obj identifier id'>obj</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_obj identifier id'>obj</span> <span class='andop op'>&amp;&amp;</span> <span class='notop op'>!</span><span class='rubyid_obj identifier id'>obj</span><span class='dot token'>.</span><span class='rubyid_is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='rubyid_Cosmic constant id'>Cosmic</span><span class='colon2 op'>::</span><span class='rubyid_HoneyPot constant id'>HoneyPot</span><span class='rparen token'>)</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_block_given? fid id'>block_given?</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_block identifier id'>block</span><span class='dot token'>.</span><span class='rubyid_arity identifier id'>arity</span> <span class='eq op'>==</span> <span class='integer val'>1</span>
+      <span class='rubyid_yield yield kw'>yield</span> <span class='rubyid_obj identifier id'>obj</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_obj identifier id'>obj</span><span class='dot token'>.</span><span class='rubyid_instance_eval identifier id'>instance_eval</span><span class='lparen token'>(</span><span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:13 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

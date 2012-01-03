@@ -1,0 +1,159 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="#" />
+    <link rel="next" title="Concepts" href="concepts.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>Cosmic is a Ruby library and commandline tool for service deployment automation. The core idea is that deployments of machines &amp; services should be scripted so that they are reproducable and easier to understand. Cosmic&#8217; aim is to help writing these scripts by providing a simplified interface to services commonly used during deployment plus a little bit of DSL sugar to keep the scripts concise and easy to understand. The DSL part is kept to a minimum however, Cosmic scripts are still normal Ruby scripts with all the benfits that that brings.</p>
+<p>Cosmic itself requires Ruby 1.8.7 or newer, however some plugins require Ruby 1.9 (e.g. the IRC plugin) or JRuby (e.g. the JMX plugin).</p>
+<p>Cosmic is licensed under the Apache Software License, version 2.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#plugins">Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#authentication-system">Authentication system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#messages">Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#dry-run">Dry-run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="concepts.html#dsl">DSL</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use Cosmic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#commandline-tool">Commandline tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#standalone-tool">Standalone tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#using-cosmic-in-your-own-scripts">Using Cosmic in your own scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#authentication-types">Authentication types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="configuration.html#plugin-configuration">Plugin configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="plugins/chef.html">Chef</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/email.html">E-mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/execute.html">Execute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/f5.html">F5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/galaxy.html">Galaxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/irc.html">IRC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/jira.html">JIRA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/jmx.html">JMX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/nagios.html">Nagios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plugins/ssh.html">SSH</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#passing-arguments-to-scripts">Passing arguments to scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#configuration-for-scripts">Configuration for scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#using-the-same-script-in-different-environments">Using the same script in different environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#dealing-with-dry-run-mode">Dealing with dry-run mode</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#writing-new-plugins">Writing new plugins</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="concepts.html"
+                        title="next chapter">Concepts</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             >next</a> |</li>
+        <li><a href="#">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

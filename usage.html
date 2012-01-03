@@ -1,0 +1,160 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to use Cosmic &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="index.html" />
+    <link rel="next" title="Configuration" href="configuration.html" />
+    <link rel="prev" title="Concepts" href="concepts.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="configuration.html" title="Configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="how-to-use-cosmic">
+<h1>How to use Cosmic<a class="headerlink" href="#how-to-use-cosmic" title="Permalink to this headline">¶</a></h1>
+<p>Cosmic can be used in three ways: via the commandline tool <tt class="docutils literal"><span class="pre">cosmic</span></tt> that gets installed as part of the gem, as a library from your own ruby scripts, or via a standalone executable.</p>
+<div class="section" id="commandline-tool">
+<h2>Commandline tool<a class="headerlink" href="#commandline-tool" title="Permalink to this headline">¶</a></h2>
+<p>The commandline tool <tt class="docutils literal"><span class="pre">cosmic</span></tt> is installed as part of the cosmic gem. It provides a simple ruby commandline script that automatically creates a Cosmic environment and then executes your script in it. This means that your script shouldn&#8217;t instantiate the Cosmic environment and instead should simply depend on it being available:</p>
+<div class="highlight-python"><pre>require 'cosmic/irc'
+
+with irc do
+  write :msg =&gt; ARGV[0], :channels =&gt; '#test'
+end
+...</pre>
+</div>
+<p>You will still have to require all plugins that you want to use - Cosmic will not require them automatically.</p>
+<p>The above script <tt class="docutils literal"><span class="pre">irc-test.rb</span></tt> could then be invoked as:</p>
+<div class="highlight-python"><pre>cosmic irc-test.rb 'Hello World'</pre>
+</div>
+</div>
+<div class="section" id="standalone-tool">
+<h2>Standalone tool<a class="headerlink" href="#standalone-tool" title="Permalink to this headline">¶</a></h2>
+<p>This is a separate project <a class="reference external" href="https://github.com/ning/cosmic-standalone">cosmic-standalone</a> that bundles the gem with all plugins that it is allowed to bundle (some are omitted due to license restrictions) with jruby into an executable jar file. You can simply download the executable and, provided you jave Java 6 or newer installed, run as is. See the documentation for that project for more details about which plugins are included and which have to be installed separately.</p>
+</div>
+<div class="section" id="using-cosmic-in-your-own-scripts">
+<h2>Using Cosmic in your own scripts<a class="headerlink" href="#using-cosmic-in-your-own-scripts" title="Permalink to this headline">¶</a></h2>
+<p>You can also require the cosmic gem in your scripts. You will then have to create the Cosmic environment yourself, e.g.:</p>
+<div class="highlight-python"><pre>require 'cosmic'
+require 'cosmic/irc'
+
+cosmic = Cosmic::Environment.from_config_file
+
+with cosmic do
+  with irc do
+    write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+  end
+  ...
+end</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">How to use Cosmic</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#commandline-tool">Commandline tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standalone-tool">Standalone tool</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-cosmic-in-your-own-scripts">Using Cosmic in your own scripts</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="concepts.html"
+                        title="previous chapter">Concepts</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="configuration.html"
+                        title="next chapter">Configuration</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="configuration.html" title="Configuration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="concepts.html" title="Concepts"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

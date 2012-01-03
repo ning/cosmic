@@ -1,0 +1,161 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Galaxy &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="../index.html" />
+    <link rel="up" title="Plugins" href="../plugins.html" />
+    <link rel="next" title="IRC" href="irc.html" />
+    <link rel="prev" title="F5" href="f5.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="irc.html" title="IRC"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="f5.html" title="F5"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" accesskey="U">Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="id1">
+<h1>Galaxy<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>This plugin makes the <a class="reference external" href="https://github.com/ning/galaxy">Galaxy</a> software deployment tool available to Cosmic scripts.</p>
+<p>Cosmic requires Galaxy version 2.5.1 or newer, or 2.5.1.1 for Ruby/JRuby 1.9 compatibility. You can install Galaxy via:</p>
+<div class="highlight-python"><pre>gem install galaxy</pre>
+</div>
+<p>The plugin is configured as follows:</p>
+<div class="highlight-python"><pre>galaxy:
+  host:               &lt;The gonsole host; default is localhost&gt;
+  port:               &lt;The galaxy port; default is 4440&gt;
+  relaxed_versioning: &lt;Whether to use relaxed versioning; default is false&gt;</pre>
+</div>
+<p>Galaxy itself does not support authentication, so no such configuration is necessary for it.</p>
+<p>The Galaxy plugin makes it straightforward to use Galaxy commands from within Cosmic scripts and it adds additional functionality not readily available in Galaxy (e.g. reverting to a previous snapshot). A simple Cosmic script using Galaxy would look like:</p>
+<div class="highlight-python"><pre>with irc do
+  connect channel: '#status', to: [:galaxy]
+end
+with galaxy do
+  snapshot = take_snapshot
+  services = select :type =&gt; /^echo$?/
+  begin
+    update :services =&gt; services, :to =&gt; new_version
+  rescue
+    revert :services =&gt; services, :to =&gt; snapshot
+  end
+  start :services =&gt; services
+end</pre>
+</div>
+<p>This script first connects an IRC channel to all messages created by the Galaxy plugin. Next it takes a snapshot of the current state of the Galaxy environment and then selects all services of type <tt class="docutils literal"><span class="pre">echo</span></tt>. It then tries to update these services and in case of failure, attempts to revert them to the previous snapshot. Finally it starts the services.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../plugins.html">Plugins</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chef.html">Chef</a></li>
+<li class="toctree-l2"><a class="reference internal" href="email.html">E-mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute.html">Execute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f5.html">F5</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Galaxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="irc.html">IRC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jira.html">JIRA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jmx.html">JMX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nagios.html">Nagios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ssh.html">SSH</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="f5.html"
+                        title="previous chapter">F5</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="irc.html"
+                        title="next chapter">IRC</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="irc.html" title="IRC"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="f5.html" title="F5"
+             >previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" >Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,222 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Concepts &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="index.html" />
+    <link rel="next" title="How to use Cosmic" href="usage.html" />
+    <link rel="prev" title="Introduction" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="How to use Cosmic"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="concepts">
+<h1>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="plugins">
+<h2>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h2>
+<p>The Cosmic core provides little in terms of actual deployment support, all that is contained in the plugins. Each Cosmic plugin is a wrapper around an existing ruby library or external API that simplifies interaction with the service specifically for deployments. This also means that you won&#8217;t have access to all capabilities of that service, only to those that make sense for deploying machines/services. However, plugins usually provide access to the underlying library/API so that you can interact with that directly if necessary.</p>
+</div>
+<div class="section" id="authentication-system">
+<h2>Authentication system<a class="headerlink" href="#authentication-system" title="Permalink to this headline">¶</a></h2>
+<p>Cosmic provides built-in support for authentication that can be used by all plugins. The goal there is to perform deployments as a specific person and not using some general account such as <tt class="docutils literal"><span class="pre">root</span></tt> or <tt class="docutils literal"><span class="pre">eng</span></tt> or something like that. This allows to track deployments more accurately and also to have more fine-grained control over who can perform which deployment steps.</p>
+<p>Cosmic itself can currently authenticate against an LDAP server, and then pull credentials from there to authenticate other services, or use the LDAP credentials themselves for LDAP-enabled services. Depending on the service setup, this would allow a single-sign-on style deployment where the person performing the deployment only has to authenticate once at the start of the deployment, and from then on all other steps would be automatically authenticated by Cosmic.</p>
+</div>
+<div class="section" id="messages">
+<h2>Messages<a class="headerlink" href="#messages" title="Permalink to this headline">¶</a></h2>
+<p>The environment that Cosmic plugins run in, provides the ability to send and listen to messages. These messages are basically tagged strings. A plugin then can express interest in messages with specific tags. In addition, deployment scripts can wire some plugins to specific tags, e.g.:</p>
+<div class="highlight-python"><pre>irc.connect :channel =&gt; '#test', :to =&gt; [:info, :galaxy]
+notify :msg =&gt; 'A message, yay !', :tags =&gt; :info</pre>
+</div>
+<p>This example wires a specific IRC channel, <tt class="docutils literal"><span class="pre">#test</span></tt>, to all messages that are tagged <tt class="docutils literal"><span class="pre">:info</span></tt> or <tt class="docutils literal"><span class="pre">:galaxy</span></tt>, and then sends an explicit message tagged as <tt class="docutils literal"><span class="pre">:info</span></tt>, which because of the wiring will then be posted by the IRC plugin to that channel.</p>
+<p>Cosmic plugins usually either produce messages (these are typically the plugins that perform actual deployment steps) or consume message (e.g. for keeping record of the deployment progress).</p>
+</div>
+<div class="section" id="dry-run">
+<h2>Dry-run<a class="headerlink" href="#dry-run" title="Permalink to this headline">¶</a></h2>
+<p>One of the core concepts of Cosmic is the dry-run mode. When it is turned on (via configuration or commandline switch), then all plugins will omit messages that by default are output to standard out, instead of performing the actions. In effect, the script will output the steps it would take, but not actually perform these steps.</p>
+</div>
+<div class="section" id="dsl">
+<h2>DSL<a class="headerlink" href="#dsl" title="Permalink to this headline">¶</a></h2>
+<p>Cosmic adds only a few pieces of syntactic sugar, all geared at eliminating syntactic noise and keeping the scripts short and to the point.</p>
+<div class="section" id="with-constructs">
+<h3><tt class="docutils literal"><span class="pre">with</span></tt> constructs<a class="headerlink" href="#with-constructs" title="Permalink to this headline">¶</a></h3>
+<p>Cosmic borrows the <tt class="docutils literal"><span class="pre">with</span></tt> construct from languages such as JavaScript or Pascal and provides it in two flavors:</p>
+<div class="highlight-python"><pre>with irc do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>or:</p>
+<div class="highlight-python"><pre>with_available irc do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>Both of these are equivalent to:</p>
+<div class="highlight-python"><pre>irc.write :msg =&gt; 'Hello world', :channels =&gt; '#cosmic'</pre>
+</div>
+<p>They differ in how they handle the case that the object, in the example above the <tt class="docutils literal"><span class="pre">irc</span></tt> plugin, is not available. This is explained in more detail below in the description of optional sections.</p>
+<p>The benefit of the <tt class="docutils literal"><span class="pre">with</span></tt> constructs is that multiple calls to methods on the same object can be grouped into one <tt class="docutils literal"><span class="pre">with</span></tt> statement which reduces the noise and makes the code more readable. It also makes it more obvious that the methods are called on the same object.</p>
+<p>The other benefit is that this makes optional sections possible as explained below.</p>
+</div>
+<div class="section" id="simplified-plugin-interaction">
+<h3>Simplified plugin interaction<a class="headerlink" href="#simplified-plugin-interaction" title="Permalink to this headline">¶</a></h3>
+<p>Within the context of a Cosmic environment instance, plugins can simply be instantiated and used by their name:</p>
+<div class="highlight-python"><pre>cosmic = Cosmic::Environment.from_config_file
+
+with cosmic do
+  with irc do
+    write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+  end
+  ...
+  with irc do
+    write :msg =&gt; 'Goodbye world', :channels =&gt; '#test'
+  end
+end</pre>
+</div>
+<p>This will automatically create an IRC instance in the first <tt class="docutils literal"><span class="pre">with</span> <span class="pre">irc</span></tt> block using the environment&#8217;s configuration (as explained below) and use it. The plugin then gets cached under that name <tt class="docutils literal"><span class="pre">irc</span></tt>, so that the second block will simply use the same instance.</p>
+</div>
+<div class="section" id="optional-sections">
+<h3>Optional sections<a class="headerlink" href="#optional-sections" title="Permalink to this headline">¶</a></h3>
+<p>Optional sections are groups of statements that get executed if a certain plugin is defined, otherwise they are ignored. Usually you would use <tt class="docutils literal"><span class="pre">if</span></tt> or <tt class="docutils literal"><span class="pre">unless</span></tt> statements in Ruby. Cosmic provides a shortcut syntax that makes this more concise:</p>
+<div class="highlight-python"><pre>with irc? do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>or:</p>
+<div class="highlight-python"><pre>irc?.write :msg =&gt; 'Hello world', :channels =&gt; '#test'</pre>
+</div>
+<p>vs.:</p>
+<div class="highlight-python"><pre>with_available irc? do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>The question mark after the plugin&#8217;s short name directs Cosmic to not fail if the plugin is not configured. Note that this does not matter to all plugins. Some plugins such as the <tt class="docutils literal"><span class="pre">ssh</span></tt> plugin don&#8217;t require any configuration (though they might have optional configuration) and thus would always be available. If however a name is used that does not map to a plugin (e.g. <tt class="docutils literal"><span class="pre">my-ssh</span></tt>), then a configuration section for that name is required and optional sections apply.</p>
+<p>The first two forms above (<tt class="docutils literal"><span class="pre">with</span></tt> section and direct invocation) will actually execute the code, but they will do so against a so-called honey pot. This has the benefit that any code in the <tt class="docutils literal"><span class="pre">with</span></tt> block that does not use the plugin itself, will still get executed.</p>
+<p>The third form will only execute the code in the block if the plugin is actually available.</p>
+<p>One common use case for these forms is using the same deployment script in production and QA or development environments. Some services would only be configured in the production environment, so in the script they would be referenced with a <tt class="docutils literal"><span class="pre">?</span></tt>.</p>
+</div>
+<div class="section" id="optional-error-handling">
+<h3>Optional error handling<a class="headerlink" href="#optional-error-handling" title="Permalink to this headline">¶</a></h3>
+<p>In a similar way to optional sections, Cosmic allows to make potential errors raised by a method call optional. The typical use case for this would be to differenciate required functionality from optional functionality that should not affect the deployment. For example in:</p>
+<div class="highlight-python"><pre>with irc do
+  write msg: 'Hello world', channels: '#test'
+end</pre>
+</div>
+<p>if the call to <tt class="docutils literal"><span class="pre">write</span></tt> causes an error, for instance because the connection to the IRC server was dropped, then this would cause the deployment script to fail even if it is actually not critical to the deployment itself. If instead you write this as:</p>
+<div class="highlight-python"><pre>with irc do
+  write? :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>then an error raised by the <tt class="docutils literal"><span class="pre">write</span></tt> method will be emitted as an error message (see below) but otherwise ignored and the deployment can continue.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Concepts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#plugins">Plugins</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication-system">Authentication system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#messages">Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dry-run">Dry-run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dsl">DSL</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="usage.html"
+                        title="next chapter">How to use Cosmic</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="usage.html" title="How to use Cosmic"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

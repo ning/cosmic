@@ -1,0 +1,458 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Cosmic::Execute
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (E)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../Cosmic.html" title="Cosmic (module)">Cosmic</a></span></span>
+     &raquo; 
+    <span class="title">Execute</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Cosmic::Execute
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></li>
+          
+            <li class="next">Cosmic::Execute</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/cosmic/execute.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A plugin that provides scripts a simple way of executing commands and capturing their output.
+You&#39;d typically use it in a Cosmic context like so:</p>
+
+<pre class="code"><span class='rubyid_output identifier id'>output</span> <span class='assign token'>=</span> <span class='rubyid_with identifier id'>with</span> <span class='rubyid_execute identifier id'>execute</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_exec identifier id'>exec</span> <span class='symbol val'>:cmd</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;uname -a&quot;</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>This plugin does not need any configuration.</p>
+
+<p>Note that this plugin will not actually execute the command in dry-run mode.
+Instead it will only send messages tagged as <code>:execute</code> and <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+  
+  
+  
+  
+
+
+  
+  
+  
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#exec-instance_method" title="#exec (instance method)">- (Array&lt;Integer, String&gt;) <strong>exec</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Executes a command and returns the output (stdin &amp; stderr combined) of the command.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Exec) <strong>initialize</strong>(environment, name = :execute) </a>
+    
+
+    
+  </span>
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new exec plugin instance.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">#method_missing</a></span>, <span class='object_link'><a href="Plugin.html#notify-instance_method" title="Cosmic::Plugin#notify (method)">#notify</a></span>, <span class='object_link'><a href="Plugin.html#respond_to%3F-instance_method" title="Cosmic::Plugin#respond_to? (method)">#respond_to?</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <p class="signature first" id="initialize-instance_method">
+  
+    - (<tt>Exec</tt>) <strong>initialize</strong>(environment, name = :execute) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new exec plugin instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>environment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Environment.html" title="Cosmic::Environment (class)">Environment</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The Cosmic environment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:execute</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The name for this plugin instance e.g. in the config</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/execute.rb', line 26</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:execute</span><span class='rparen token'>)</span>
+  <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+<div id="method_missing_details" class="method_details_list">
+  <h2>Dynamic Method Handling</h2>
+  <p class="notice super">
+    This class handles dynamic methods through the <tt>method_missing</tt> method
+    
+      in the class <span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">Cosmic::Plugin</a></span>
+    
+  </p>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="exec-instance_method">
+  
+    - (<tt>Array&lt;Integer, String&gt;</tt>) <strong>exec</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Executes a command and returns the output (stdin &amp; stderr combined) of the command.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:cmd</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The command to run</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Integer, String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The status and output of the command (stdout and stderr
+combined)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/execute.rb', line 36</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_exec identifier id'>exec</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would execute command '#{params[:cmd]}'&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:execute</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_cmd identifier id'>cmd</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:cmd</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :cmd argument given&quot;</span>
+    <span class='rubyid_output identifier id'>output</span> <span class='assign token'>=</span> <span class='string val'>&quot;&quot;</span>
+    <span class='rubyid_pid identifier id'>pid</span><span class='comma token'>,</span> <span class='rubyid_ignored identifier id'>ignored</span><span class='comma token'>,</span> <span class='rubyid_stdout identifier id'>stdout</span><span class='comma token'>,</span> <span class='rubyid_stderr identifier id'>stderr</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_JRUBY constant id'>JRUBY</span> <span class='integer val'>? </span><span class='rubyid_IO constant id'>IO</span> <span class='colon op'>:</span> <span class='rubyid_Open4 constant id'>Open4</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='symbol val'>:popen4</span><span class='comma token'>,</span> <span class='rubyid_cmd identifier id'>cmd</span><span class='rparen token'>)</span>
+    <span class='rubyid_threads identifier id'>threads</span> <span class='assign token'>=</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
+    <span class='rubyid_threads identifier id'>threads</span> <span class='lshft op'>&lt;&lt;</span> <span class='rubyid_Thread constant id'>Thread</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_stdout identifier id'>stdout</span><span class='rparen token'>)</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_out identifier id'>out</span><span class='bitor op'>|</span>
+      <span class='rubyid_out identifier id'>out</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_line identifier id'>line</span><span class='bitor op'>|</span>
+        <span class='rubyid_output identifier id'>output</span> <span class='lshft op'>&lt;&lt;</span> <span class='dstring node'>&quot;\n#{line.chomp.strip}&quot;</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_threads identifier id'>threads</span> <span class='lshft op'>&lt;&lt;</span> <span class='rubyid_Thread constant id'>Thread</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_stderr identifier id'>stderr</span><span class='rparen token'>)</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_err identifier id'>err</span><span class='bitor op'>|</span>
+      <span class='rubyid_err identifier id'>err</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_line identifier id'>line</span><span class='bitor op'>|</span>
+        <span class='rubyid_output identifier id'>output</span> <span class='lshft op'>&lt;&lt;</span> <span class='dstring node'>&quot;\n#{line.chomp.strip}&quot;</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_threads identifier id'>threads</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_thread identifier id'>thread</span><span class='bitor op'>|</span>
+      <span class='rubyid_thread identifier id'>thread</span><span class='dot token'>.</span><span class='rubyid_join identifier id'>join</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_begin begin kw'>begin</span>
+      <span class='rubyid_Process constant id'>Process</span><span class='dot token'>.</span><span class='rubyid_getpgid identifier id'>getpgid</span><span class='lparen token'>(</span><span class='rubyid_pid identifier id'>pid</span><span class='rparen token'>)</span>
+      <span class='rubyid_ignored identifier id'>ignored</span><span class='comma token'>,</span> <span class='rubyid_status identifier id'>status</span> <span class='assign token'>=</span> <span class='rubyid_Process constant id'>Process</span><span class='dot token'>.</span><span class='rubyid_waitpid2 identifier id'>waitpid2</span><span class='lparen token'>(</span><span class='rubyid_pid identifier id'>pid</span><span class='rparen token'>)</span>
+      <span class='rubyid_exitstatus identifier id'>exitstatus</span> <span class='assign token'>=</span> <span class='rubyid_status identifier id'>status</span><span class='dot token'>.</span><span class='rubyid_exitstatus identifier id'>exitstatus</span>
+    <span class='rubyid_rescue rescue kw'>rescue</span> <span class='rubyid_Errno constant id'>Errno</span><span class='colon2 op'>::</span><span class='rubyid_ESRCH constant id'>ESRCH</span>
+      <span class='rubyid_exitstatus identifier id'>exitstatus</span> <span class='assign token'>=</span> <span class='integer val'>0</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_return return kw'>return</span> <span class='lbrack token'>[</span><span class='rubyid_exitstatus identifier id'>exitstatus</span><span class='comma token'>,</span> <span class='rubyid_output identifier id'>output</span><span class='dot token'>.</span><span class='rubyid_strip identifier id'>strip</span><span class='rbrack token'>]</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:10 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,1652 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Cosmic::Environment
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (E)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../Cosmic.html" title="Cosmic (module)">Cosmic</a></span></span>
+     &raquo; 
+    <span class="title">Environment</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Cosmic::Environment
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Cosmic::Environment</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/cosmic/cosmic.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Represents the environment in which plugins are run.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+  <h2>Instance Attribute Summary <small>(<a href="#" class="summary_toggle">collapse</a>)</small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#config-instance_method" title="#config (instance method)">- (Object) <strong>config</strong> </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title readonly">readonly</span>
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The complete configuration.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#in_dry_run_mode-instance_method" title="#in_dry_run_mode (instance method)">- (Object) <strong>in_dry_run_mode</strong> </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title readonly">readonly</span>
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Whether dry run mode is turned on (off by default).</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#from_config_file-class_method" title="from_config_file (class method)">+ (Environment) <strong>from_config_file</strong>(params = {}) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new environment instance from the configuration in a file.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connect_message_listener-instance_method" title="#connect_message_listener (instance method)">- <strong>connect_message_listener</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Connects a listener with the message bus.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnect_message_listener-instance_method" title="#disconnect_message_listener (instance method)">- <strong>disconnect_message_listener</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Disconnects a listener from the message bus.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_from_ldap-instance_method" title="#get_from_ldap (instance method)">- (Net::LDAP::Entry<sup>?</sup>) <strong>get_from_ldap</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>If Cosmic is connected to an LDAP server, then this method
+will return the entry referenced by the given path.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_plugin_config-instance_method" title="#get_plugin_config (instance method)">- (Hash) <strong>get_plugin_config</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the configuration section for the indicated plugin.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Environment) <strong>initialize</strong>(config_hash = {}) </a>
+    
+
+    
+  </span>
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new environment instance from the given configuration settings.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#method_missing-instance_method" title="#method_missing (instance method)">- (Plugin<sup>?</sup>) <strong>method_missing</strong>(method_sym, *args) { ... }</a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Catches calls to undefined methods and tries to map them to plugins.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#notify-instance_method" title="#notify (instance method)">- <strong>notify</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Sends a message to the message bus.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#resolve_service_auth-instance_method" title="#resolve_service_auth (instance method)">- <strong>resolve_service_auth</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Helper method for plugins to resolve authentication tokens from the
+environment.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#respond_to%3F-instance_method" title="#respond_to? (instance method)">- (true, false) <strong>respond_to?</strong>(method_sym, include_private = false) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Checks if the environment instance could handle the call to <code>method_sym</code>.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <p class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Cosmic::Environment (class)">Environment</a></span></tt>) <strong>initialize</strong>(config_hash = {}) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new environment instance from the given configuration settings.
+See the configuration documentation for details.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>config_hash</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The configuration</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+278
+279
+280
+281
+282
+283
+284
+285
+286</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 278</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_config_hash identifier id'>config_hash</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span><span class='rparen token'>)</span>
+  <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_unify_keys identifier id'>unify_keys</span><span class='lparen token'>(</span><span class='rubyid_config_hash identifier id'>config_hash</span><span class='rparen token'>)</span>
+  <span class='rubyid_@in_dry_run_mode ivar id'>@in_dry_run_mode</span> <span class='assign token'>=</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:dry_run_mode</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_false false kw'>false</span> <span class='comment val'># we don't allow changing after the environment object is created</span>
+  <span class='rubyid_@cached_plugins ivar id'>@cached_plugins</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
+  <span class='rubyid_@message_bus ivar id'>@message_bus</span> <span class='assign token'>=</span> <span class='rubyid_MessageBus constant id'>MessageBus</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span>
+  <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_StdoutListener constant id'>StdoutListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:dryrun</span><span class='comma token'>,</span> <span class='symbol val'>:warn</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_StderrListener constant id'>StderrListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='comma token'>,</span> <span class='symbol val'>:error</span><span class='rparen token'>)</span>
+  <span class='rubyid_authenticate identifier id'>authenticate</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+<div id="method_missing_details" class="method_details_list">
+  <h2>Dynamic Method Handling</h2>
+  <p class="notice this">
+    This class handles dynamic methods through the <tt>method_missing</tt> method
+    
+  </p>
+  
+    <div class="method_details first">
+  <p class="signature first" id="method_missing-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></tt><sup>?</sup>) <strong>method_missing</strong>(method_sym, *args) { ... }
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Catches calls to undefined methods and tries to map them to plugins. It tries
+to look for a plugin configuration section under that name, and if it finds
+one, check if the section has a <code>plugin_class</code> attribute. If so, then it will
+try to instantiate the class and return the instance. Otherwise, it will
+check if there is a class of the following form:</p>
+
+<ul>
+<li><code>Cosmic::&lt;name&gt;</code></li>
+<li><code>Cosmic::&lt;name in all uppercase&gt;</code></li>
+<li><code>Cosmic::&lt;name in camel case&gt;</code></li>
+<li><code>::&lt;name&gt;</code></li>
+<li><code>::&lt;name in all uppercase&gt;</code></li>
+<li><code>::&lt;name in camel case&gt;</code></li>
+</ul>
+
+<p>E.g. for <code>irc</code>, it would look for <code>Cosmic::irc</code>, <code>Cosmic::IRC</code>, <code>Cosmic::Irc</code>,
+<code>::irc</code>, <code>::IRC</code>, <code>::Irc</code>. If it finds one, it will instantiate it and return
+it.
+The environment also caches the instantiated plugins so that the second call
+for the same case-insensitive name returns the same plugin instance. So for
+example calls like</p>
+
+<pre class="code"><span class='rubyid_environment identifier id'>environment</span><span class='dot token'>.</span><span class='rubyid_irc identifier id'>irc</span>
+<span class='rubyid_environment identifier id'>environment</span><span class='dot token'>.</span><span class='rubyid_Irc constant id'>Irc</span>
+</pre>
+
+<p>will first check if the environment knows about a plugin <code>irc</code> and if yes,
+then will return the instance right away. If not then it will instantiate the
+plugin as explained above.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>method_sym</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The method symbol to call</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>args</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The invocation arguments</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<h3>Yields:</h3>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'><p>An optional block which is ignored</p>
+</div>
+      
+    </li>
+  
+</ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The plugin instance if found, otherwise <code>nil</code></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 440</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_method_missing identifier id'>method_missing</span><span class='lparen token'>(</span><span class='rubyid_method_sym identifier id'>method_sym</span><span class='comma token'>,</span> <span class='mult op'>*</span><span class='rubyid_args identifier id'>args</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
+  <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='rubyid_method_sym identifier id'>method_sym</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
+  <span class='rubyid_required identifier id'>required</span> <span class='assign token'>=</span> <span class='rubyid_true true kw'>true</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_name identifier id'>name</span> <span class='match op'>=~</span> <span class='regexp val'>/^(.+)\?$/</span>
+    <span class='rubyid_required identifier id'>required</span> <span class='assign token'>=</span> <span class='rubyid_false false kw'>false</span>
+    <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='rubyid_$1 nth_ref id'>$1</span>
+  <span class='rubyid_end end kw'>end</span>
+
+  <span class='comment val'># First we check if we already know it</span>
+  <span class='rubyid_instance identifier id'>instance</span> <span class='assign token'>=</span> <span class='rubyid_@cached_plugins ivar id'>@cached_plugins</span><span class='lbrack token'>[</span><span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_downcase identifier id'>downcase</span><span class='rbrack token'>]</span>
+  <span class='rubyid_return return kw'>return</span> <span class='rubyid_instance identifier id'>instance</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_instance identifier id'>instance</span>
+
+  <span class='comment val'># Now let's check if there is a plugin configured for that name, or if</span>
+  <span class='comment val'># there is a class of that name in namespace Cosmic</span>
+  <span class='rubyid_clazz identifier id'>clazz</span> <span class='assign token'>=</span> <span class='rubyid_find_plugin_class identifier id'>find_plugin_class</span><span class='lparen token'>(</span><span class='rubyid_name identifier id'>name</span><span class='rparen token'>)</span>
+  <span class='rubyid_begin begin kw'>begin</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_clazz identifier id'>clazz</span>
+      <span class='rubyid_instance identifier id'>instance</span> <span class='assign token'>=</span> <span class='rubyid_clazz identifier id'>clazz</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_self self kw'>self</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
+      <span class='rubyid_@cached_plugins ivar id'>@cached_plugins</span><span class='lbrack token'>[</span><span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_downcase identifier id'>downcase</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_instance identifier id'>instance</span>
+      <span class='rubyid_instance identifier id'>instance</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_super super kw'>super</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_rescue rescue kw'>rescue</span> <span class='rubyid_Exception constant id'>Exception</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_e identifier id'>e</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_required identifier id'>required</span>
+      <span class='rubyid_raise identifier id'>raise</span> <span class='dstring node'>&quot;No such plugin instance configured or configuration is invalid for '#{name}': #{e}&quot;</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_HoneyPot constant id'>HoneyPot</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <span id="config-instance_method"></span>
+      <div class="method_details first">
+  <p class="signature first" id="config-instance_method">
+  
+    - (<tt>Object</tt>) <strong>config</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>The complete configuration</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+252
+253
+254</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 252</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_config identifier id'>config</span>
+  <span class='rubyid_@config ivar id'>@config</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <span id="in_dry_run_mode-instance_method"></span>
+      <div class="method_details ">
+  <p class="signature " id="in_dry_run_mode-instance_method">
+  
+    - (<tt>Object</tt>) <strong>in_dry_run_mode</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Whether dry run mode is turned on (off by default)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+254
+255
+256</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 254</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+  <span class='rubyid_@in_dry_run_mode ivar id'>@in_dry_run_mode</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="from_config_file-class_method">
+  
+    + (<tt><span class='object_link'><a href="" title="Cosmic::Environment (class)">Environment</a></span></tt>) <strong>from_config_file</strong>(params = {}) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new environment instance from the configuration in a file. The 
+passed-in parameters hash is merged on top of the file configuration
+thus allowing to modify configuration settings before the environment is
+created. If no file was specified, then it will try to load <code>.cosmicrc</code> in
+the current folder first, and if that fails, then <code>.cosmicrc</code> in the home
+folder of the current user. If these don&#39;t exist either, then it will return
+an environment which is configured using only the passed in parameters.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters, may contain config overrides</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:config_file</span>
+          <span class="type">(<tt>String</tt>, <tt>nil</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The path to the configuration file</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Cosmic::Environment (class)">Environment</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The new environment instance</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+267
+268
+269
+270
+271</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 267</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_self self kw'>self</span><span class='dot token'>.</span><span class='rubyid_from_config_file identifier id'>from_config_file</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span><span class='rparen token'>)</span>
+  <span class='rubyid_config identifier id'>config</span> <span class='assign token'>=</span> <span class='rubyid_read_rc identifier id'>read_rc</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:config_file</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_config identifier id'>config</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_config identifier id'>config</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_config identifier id'>config</span><span class='dot token'>.</span><span class='rubyid_is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='rubyid_Hash constant id'>Hash</span><span class='rparen token'>)</span>
+  <span class='rubyid_Environment constant id'>Environment</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_config identifier id'>config</span><span class='dot token'>.</span><span class='rubyid_merge identifier id'>merge</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="connect_message_listener-instance_method">
+  
+    - <strong>connect_message_listener</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Connects a listener with the message bus. Doesn&#39;t do anything if
+no listener or tags are given.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:listener</span>
+          <span class="type">(<tt>Object</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The listener</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:tags</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags that the listener is interested in</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+384
+385
+386</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 384</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_connect_message_listener identifier id'>connect_message_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:listener</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:tags</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="disconnect_message_listener-instance_method">
+  
+    - <strong>disconnect_message_listener</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Disconnects a listener from the message bus. Doesn&#39;t do anything if
+no listener was given.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:listener</span>
+          <span class="type">(<tt>Object</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The listener</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+394
+395
+396</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 394</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_disconnect_message_listener identifier id'>disconnect_message_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_remove_listener identifier id'>remove_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:listener</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_from_ldap-instance_method">
+  
+    - (<tt>Net::LDAP::Entry</tt><sup>?</sup>) <strong>get_from_ldap</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>If Cosmic is connected to an LDAP server, then this method
+will return the entry referenced by the given path.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:path</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The LDAP path to the desired entry</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Net::LDAP::Entry</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The entry or nil if the path doesn&#39;t exist</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+369
+370
+371
+372
+373
+374
+375</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 369</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_from_ldap identifier id'>get_from_ldap</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_case case kw'>case</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth_type</span><span class='rbrack token'>]</span>
+    <span class='rubyid_when when kw'>when</span> <span class='regexp val'>/^ldap$/</span>
+      <span class='rubyid_return return kw'>return</span> <span class='rubyid_@ldap ivar id'>@ldap</span><span class='dot token'>.</span><span class='rubyid_search identifier id'>search</span><span class='lparen token'>(</span><span class='symbol val'>:base</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:path</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>''</span><span class='comma token'>,</span> <span class='symbol val'>:return_result</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_true true kw'>true</span><span class='rparen token'>)</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_nil nil kw'>nil</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_plugin_config-instance_method">
+  
+    - (<tt>Hash</tt>) <strong>get_plugin_config</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Returns the configuration section for the indicated plugin.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:name</span>
+          <span class="type">(<tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The plugin&#39;s name</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The plugin&#39;s config or an empty hash if not found or no name given</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+293
+294
+295
+296
+297
+298
+299</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 293</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:plugins</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:name</span><span class='rbrack token'>]</span>
+    <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:plugins</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:name</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="notify-instance_method">
+  
+    - <strong>notify</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Sends a message to the message bus. Doesn&#39;t do anything if no message or tags
+are given.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:msg</span>
+          <span class="type">(<tt>Object</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The message</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:tags</span>
+          <span class="type">(<tt>Array&lt;Symbol&gt;</tt>, <tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The tags of the message</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+405
+406
+407</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 405</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:msg</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:tags</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="resolve_service_auth-instance_method">
+  
+    - <strong>resolve_service_auth</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Helper method for plugins to resolve authentication tokens from the
+environment. The environment understands several different authentication
+schemes which are explained in detail in the configuration documentation.
+When successful, then it will update <code>params[:config][:auth][:username]</code>
+and <code>params[:config][:auth][:password]</code> with the resolved credentials,
+or <code>params[:config][:auth][:key_data]</code> with the key data read from the
+environment (e.g. for ssh private keys).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:service_name</span>
+          <span class="type">(<tt>Symbol</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service name, e.g. <code>:irc</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:config</span>
+          <span class="type">(<tt>Hash</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service&#39;s configuration</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 313</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_resolve_service_auth identifier id'>resolve_service_auth</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_return return kw'>return</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:service_name</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:config</span><span class='rbrack token'>]</span>
+  <span class='rubyid_service_name identifier id'>service_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:service_name</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span>
+  <span class='rubyid_service_config identifier id'>service_config</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:config</span><span class='rbrack token'>]</span>
+  <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span> <span class='opasgn op'>||=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
+  <span class='rubyid_auth_config identifier id'>auth_config</span> <span class='assign token'>=</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span>
+
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:credentials</span><span class='rbrack token'>]</span>
+    <span class='rubyid_username identifier id'>username</span> <span class='assign token'>=</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:credentials</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span>
+    <span class='rubyid_password identifier id'>password</span> <span class='assign token'>=</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:credentials</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:password</span><span class='rbrack token'>]</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_case case kw'>case</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth_type</span><span class='rbrack token'>]</span>
+    <span class='rubyid_when when kw'>when</span> <span class='regexp val'>/^credentials_from_env$/</span>
+      <span class='rubyid_username identifier id'>username</span><span class='comma token'>,</span> <span class='rubyid_password identifier id'>password</span> <span class='assign token'>=</span> <span class='rubyid_get_service_credentials_from_env identifier id'>get_service_credentials_from_env</span><span class='lparen token'>(</span><span class='rubyid_service_name identifier id'>service_name</span><span class='comma token'>,</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='rparen token'>)</span>
+    <span class='rubyid_when when kw'>when</span> <span class='regexp val'>/^ldap_credentials$/</span>
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span>
+        <span class='rubyid_username identifier id'>username</span> <span class='assign token'>=</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span>
+        <span class='rubyid_password identifier id'>password</span> <span class='assign token'>=</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:password</span><span class='rbrack token'>]</span>
+      <span class='rubyid_elsif elsif kw'>elsif</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span>
+        <span class='rubyid_username identifier id'>username</span> <span class='assign token'>=</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span>
+        <span class='rubyid_password identifier id'>password</span> <span class='assign token'>=</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:password</span><span class='rbrack token'>]</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_when when kw'>when</span> <span class='regexp val'>/^credentials$/</span>
+      <span class='rubyid_if if kw'>if</span> <span class='notop op'>!</span><span class='rubyid_username identifier id'>username</span> <span class='andop op'>&amp;&amp;</span> <span class='notop op'>!</span><span class='rubyid_password identifier id'>password</span>
+        <span class='rubyid_username identifier id'>username</span> <span class='assign token'>=</span> <span class='rubyid_ask identifier id'>ask</span><span class='lparen token'>(</span><span class='dstring node'>&quot;Username for #{service_name.to_s}?\n&quot;</span><span class='rparen token'>)</span>
+        <span class='rubyid_password identifier id'>password</span> <span class='assign token'>=</span> <span class='rubyid_ask identifier id'>ask</span><span class='lparen token'>(</span><span class='dstring node'>&quot;Password for #{service_name.to_s}?\n&quot;</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='rubyid_q identifier id'>q</span><span class='bitor op'>|</span> <span class='rubyid_q identifier id'>q</span><span class='dot token'>.</span><span class='rubyid_echo identifier id'>echo</span> <span class='assign token'>=</span> <span class='rubyid_false false kw'>false</span> <span class='rbrace token'>}</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_when when kw'>when</span> <span class='regexp val'>/^keys$/</span>
+      <span class='rubyid_auth_config identifier id'>auth_config</span><span class='lbrack token'>[</span><span class='symbol val'>:keys</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:keys</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_when when kw'>when</span> <span class='regexp val'>/^keys_from_env$/</span>
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span>
+        <span class='rubyid_path identifier id'>path</span> <span class='assign token'>=</span> <span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:key_path</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_ldapify_username identifier id'>ldapify_username</span><span class='lparen token'>(</span><span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+        <span class='rubyid_attrs identifier id'>attrs</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_service_config identifier id'>service_config</span><span class='lbrack token'>[</span><span class='symbol val'>:ldap</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:key_attrs</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+        <span class='rubyid_if if kw'>if</span> <span class='rubyid_path identifier id'>path</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_attrs identifier id'>attrs</span><span class='dot token'>.</span><span class='rubyid_length identifier id'>length</span> <span class='gt op'>&gt;</span> <span class='integer val'>0</span>
+          <span class='rubyid_key_entry identifier id'>key_entry</span> <span class='assign token'>=</span> <span class='rubyid_first_or_nil identifier id'>first_or_nil</span><span class='lparen token'>(</span><span class='rubyid_get_from_ldap identifier id'>get_from_ldap</span><span class='lparen token'>(</span><span class='symbol val'>:path</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_path identifier id'>path</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+          <span class='rubyid_if if kw'>if</span> <span class='rubyid_key_entry identifier id'>key_entry</span>
+            <span class='rubyid_key_data identifier id'>key_data</span> <span class='assign token'>=</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
+            <span class='rubyid_attrs identifier id'>attrs</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_attr_name identifier id'>attr_name</span><span class='bitor op'>|</span>
+              <span class='rubyid_attr_value identifier id'>attr_value</span> <span class='assign token'>=</span> <span class='rubyid_first_or_nil identifier id'>first_or_nil</span><span class='lparen token'>(</span><span class='rubyid_key_entry identifier id'>key_entry</span><span class='lbrack token'>[</span><span class='rubyid_attr_name identifier id'>attr_name</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+              <span class='rubyid_key_data identifier id'>key_data</span> <span class='lshft op'>&lt;&lt;</span> <span class='rubyid_attr_value identifier id'>attr_value</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_attr_value identifier id'>attr_value</span>
+            <span class='rubyid_end end kw'>end</span>
+            <span class='rubyid_auth_config identifier id'>auth_config</span><span class='lbrack token'>[</span><span class='symbol val'>:key_data</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_key_data identifier id'>key_data</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_key_data identifier id'>key_data</span><span class='dot token'>.</span><span class='rubyid_length identifier id'>length</span> <span class='gt op'>&gt;</span> <span class='integer val'>0</span>
+          <span class='rubyid_end end kw'>end</span>
+        <span class='rubyid_end end kw'>end</span>
+      <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_auth_config identifier id'>auth_config</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_username identifier id'>username</span>
+  <span class='rubyid_auth_config identifier id'>auth_config</span><span class='lbrack token'>[</span><span class='symbol val'>:password</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_password identifier id'>password</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="respond_to?-instance_method">
+  
+    - (<tt>true</tt>, <tt>false</tt>) <strong>respond_to?</strong>(method_sym, include_private = false) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Checks if the environment instance could handle the call to <code>method_sym</code>.
+In effect, this checks if the environment knows about a plugin of that name
+or could instantiate one of that name. See #method_missing for details on
+the rules.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>method_sym</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The method symbol to check</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>include_private</span>
+      
+      
+        <span class='type'>(<tt>true</tt>, <tt>false</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to include private methods. Is ignored</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>true</tt>, <tt>false</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p><code>true</code> if the environment could handle the call</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+480
+481
+482
+483
+484
+485
+486
+487</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 480</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_respond_to? fid id'>respond_to?</span><span class='lparen token'>(</span><span class='rubyid_method_sym identifier id'>method_sym</span><span class='comma token'>,</span> <span class='rubyid_include_private identifier id'>include_private</span> <span class='assign token'>=</span> <span class='rubyid_false false kw'>false</span><span class='rparen token'>)</span>
+  <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='rubyid_method_sym identifier id'>method_sym</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_name identifier id'>name</span> <span class='match op'>=~</span> <span class='regexp val'>/^(.+)\?$/</span>
+    <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='rubyid_$1 nth_ref id'>$1</span>
+  <span class='rubyid_end end kw'>end</span>
+
+  <span class='rubyid_return return kw'>return</span> <span class='rubyid_@cached_plugins ivar id'>@cached_plugins</span><span class='lbrack token'>[</span><span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_downcase identifier id'>downcase</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_find_plugin_class identifier id'>find_plugin_class</span><span class='lparen token'>(</span><span class='rubyid_name identifier id'>name</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:08 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

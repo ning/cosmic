@@ -1,0 +1,2354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Cosmic::F5
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (F)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../Cosmic.html" title="Cosmic (module)">Cosmic</a></span></span>
+     &raquo; 
+    <span class="title">F5</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Cosmic::F5
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></li>
+          
+            <li class="next">Cosmic::F5</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/cosmic/f5.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A plugin to interact with an F5 load balancer:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_f5 identifier id'>f5</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_disable identifier id'>disable</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'foo'</span>
+  <span class='rubyid_add_to_pool identifier id'>add_to_pool</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'foo'</span><span class='comma token'>,</span> <span class='symbol val'>:port</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='integer val'>12345</span><span class='comma token'>,</span> <span class='symbol val'>:pool</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'prod-foo'</span>
+              <span class='symbol val'>:monitor_rule</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrace token'>{</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'MONITOR_RULE_TYPE_SINGLE'</span><span class='comma token'>,</span> <span class='symbol val'>:templates</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'foo'</span> <span class='rbrace token'>}</span>
+  <span class='rubyid_enable identifier id'>enable</span> <span class='symbol val'>:host</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'foo'</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>The F5 plugin emits messages tagged as <code>:f5</code> and <code>:info</code> for most of its actions.
+Note that in dry-run mode this plugin will still connect to the load balancer and perform non-destructive
+operations (e.g. <span class='object_link'><a href="#get_members-instance_method" title="Cosmic::F5#get_members (method)">#get_members</a></span>) but not destructive ones (such as <span class='object_link'><a href="#enable-instance_method" title="Cosmic::F5#enable (method)">#enable</a></span>). Instead, it will send
+messages tagged as <code>:f5</code> and <code>:dryrun</code> in those cases.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+  
+  
+  
+  
+  <h2>Instance Attribute Summary <small>(<a href="#" class="summary_toggle">collapse</a>)</small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#config-instance_method" title="#config (instance method)">- (Object) <strong>config</strong> </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title readonly">readonly</span>
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The plugin&#39;s configuration.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_to_pool-instance_method" title="#add_to_pool (instance method)">- (Array&lt;Hash&gt;) <strong>add_to_pool</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Adds a node to a pool.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disable-instance_method" title="#disable (instance method)">- (Hash<sup>?</sup>) <strong>disable</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Disables a node in one or all pools if not already enabled.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enable-instance_method" title="#enable (instance method)">- (Hash<sup>?</sup>) <strong>enable</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Enables a node in one or all pools if not already enabled.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_member-instance_method" title="#get_member (instance method)">- (Array&lt;Hash&gt;) <strong>get_member</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Retrieves a member of a pool.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_members-instance_method" title="#get_members (instance method)">- (Array&lt;Hash&gt;) <strong>get_members</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Retrieves the members of a pool.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_node-instance_method" title="#get_node (instance method)">- (Hash<sup>?</sup>) <strong>get_node</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Retrieves a node.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_num_connections-instance_method" title="#get_num_connections (instance method)">- (Integer<sup>?</sup>) <strong>get_num_connections</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Retrieves the number of active connections for a node or pool member.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_stats-instance_method" title="#get_stats (instance method)">- (Hash<sup>?</sup>) <strong>get_stats</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Retrieves statistics for a node or pool member.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Galaxy) <strong>initialize</strong>(environment, name = :f5) </a>
+    
+
+    
+  </span>
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new F5 plugin instance.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_from_pool-instance_method" title="#remove_from_pool (instance method)">- <strong>remove_from_pool</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Removes a node from a pool.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_monitor_rule-instance_method" title="#set_monitor_rule (instance method)">- (Array&lt;Hash&gt;) <strong>set_monitor_rule</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Sets the monitor rule for a pool member which defines how the load balancer monitors the member.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#sync-instance_method" title="#sync (instance method)">- <strong>sync</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Synchronizes the configuration to a specified group or all groups that the load balancer is a member of.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">#method_missing</a></span>, <span class='object_link'><a href="Plugin.html#notify-instance_method" title="Cosmic::Plugin#notify (method)">#notify</a></span>, <span class='object_link'><a href="Plugin.html#respond_to%3F-instance_method" title="Cosmic::Plugin#respond_to? (method)">#respond_to?</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <p class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="Galaxy.html" title="Cosmic::Galaxy (class)">Galaxy</a></span></tt>) <strong>initialize</strong>(environment, name = :f5) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new F5 plugin instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>environment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Environment.html" title="Cosmic::Environment (class)">Environment</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The cosmic environment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:f5</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The name for this plugin instance e.g. in the config</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+30
+31
+32
+33
+34
+35
+36
+37
+38</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 30</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:f5</span><span class='rparen token'>)</span>
+  <span class='comment val'># Using Monitor instead of Mutex as the former is reentrant</span>
+  <span class='rubyid_@monitor ivar id'>@monitor</span> <span class='assign token'>=</span> <span class='rubyid_Monitor constant id'>Monitor</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span>
+  <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
+  <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
+  <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_resolve_service_auth identifier id'>resolve_service_auth</span><span class='lparen token'>(</span><span class='symbol val'>:service_name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='comma token'>,</span> <span class='symbol val'>:config</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_@config ivar id'>@config</span><span class='rparen token'>)</span>
+  <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No F5 host specified in the configuration&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span>
+  <span class='rubyid_authenticate identifier id'>authenticate</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+<div id="method_missing_details" class="method_details_list">
+  <h2>Dynamic Method Handling</h2>
+  <p class="notice super">
+    This class handles dynamic methods through the <tt>method_missing</tt> method
+    
+      in the class <span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">Cosmic::Plugin</a></span>
+    
+  </p>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <span id="config-instance_method"></span>
+      <div class="method_details first">
+  <p class="signature first" id="config-instance_method">
+  
+    - (<tt>Object</tt>) <strong>config</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>The plugin&#39;s configuration</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 23</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_config identifier id'>config</span>
+  <span class='rubyid_@config ivar id'>@config</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="add_to_pool-instance_method">
+  
+    - (<tt>Array&lt;Hash&gt;</tt>) <strong>add_to_pool</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Adds a node to a pool. If a monitor rule is specified, then it will also set it on the
+member using the #set&lt;em&gt;monitor&lt;/em&gt;rule method.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port, 80 by default</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:monitor_rule</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The monitoring rule</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The member as a hash with <code>:pool_name</code>,, <code>:ip</code>, <code>:port</code>,
+<code>:availability</code>, <code>:enabled</code> and <code>:monitor_rule</code> entries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 51</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_add_to_pool identifier id'>add_to_pool</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :pool argument given&quot;</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_node_port identifier id'>node_port</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>80</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would add node node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Adding node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.Pool'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_add_member identifier id'>add_member</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='lbrack token'>[</span><span class='lbrace token'>{</span> <span class='string val'>'address'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span> <span class='string val'>'port'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_port identifier id'>node_port</span> <span class='rbrace token'>}</span><span class='rbrack token'>]</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:monitor_rule</span><span class='rbrack token'>]</span>
+      <span class='rubyid_set_monitor_rule identifier id'>set_monitor_rule</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="disable-instance_method">
+  
+    - (<tt>Hash</tt><sup>?</sup>) <strong>disable</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Disables a node in one or all pools if not already enabled. This method will do nothing in dryrun mode
+except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port, only need if a pool is specified</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name; if not specified then the node will be disabled
+in all pools that it is a member of</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The hash of the node/member <code>:ip</code>, <code>:availability</code>, <code>:enabled</code> and possibly
+<code>:pool_name</code>, <code>:port</code>, and <code>:monitor_rule</code> entries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 361</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_disable identifier id'>disable</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_pool_name identifier id'>pool_name</span>
+    <span class='rubyid_node_port identifier id'>node_port</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>80</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Disabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_set_pool_member_status identifier id'>set_pool_member_status</span><span class='lparen token'>(</span><span class='rubyid_pool_name identifier id'>pool_name</span><span class='comma token'>,</span>
+                             <span class='string val'>'member'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrace token'>{</span> <span class='string val'>'address'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span> <span class='string val'>'port'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_port identifier id'>node_port</span> <span class='rbrace token'>}</span><span class='comma token'>,</span>
+                             <span class='string val'>'session_state'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'STATE_DISABLED'</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Disabling node #{node_ip} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_set_node_status identifier id'>set_node_status</span><span class='lparen token'>(</span><span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span> <span class='string val'>'STATE_DISABLED'</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="enable-instance_method">
+  
+    - (<tt>Hash</tt><sup>?</sup>) <strong>enable</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Enables a node in one or all pools if not already enabled. This method will do nothing in dryrun mode
+except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port, only need if a pool is specified</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name; if not specified then the node will be enabled
+in all pools that it is a member of</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The hash of the node/member <code>:ip</code>, <code>:availability</code>, <code>:enabled</code> and possibly
+<code>:pool_name</code>, <code>:port</code>, and <code>:monitor_rule</code> entries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 321</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_enable identifier id'>enable</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_pool_name identifier id'>pool_name</span>
+    <span class='rubyid_node_port identifier id'>node_port</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>80</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would enable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Enabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_set_pool_member_status identifier id'>set_pool_member_status</span><span class='lparen token'>(</span><span class='rubyid_pool_name identifier id'>pool_name</span><span class='comma token'>,</span>
+                             <span class='string val'>'member'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrace token'>{</span> <span class='string val'>'address'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span> <span class='string val'>'port'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_port identifier id'>node_port</span> <span class='rbrace token'>}</span><span class='comma token'>,</span>
+                             <span class='string val'>'monitor_state'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'STATE_ENABLED'</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would enable node #{node_ip} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Enabling node #{node_ip} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_set_node_status identifier id'>set_node_status</span><span class='lparen token'>(</span><span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span> <span class='string val'>'STATE_ENABLED'</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_member-instance_method">
+  
+    - (<tt>Array&lt;Hash&gt;</tt>) <strong>get_member</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Retrieves a member of a pool.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port, 80 by default</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The member as a hash with <code>:pool_name</code>,, <code>:ip</code>, <code>:port</code>,
+<code>:availability</code>, <code>:enabled</code> and <code>:monitor_rule</code> entries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 198</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :pool argument given&quot;</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_node_port identifier id'>node_port</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>80</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span>
+  <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+         <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_member identifier id'>member</span> <span class='assign token'>=</span> <span class='rubyid_nil nil kw'>nil</span>
+  <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.PoolMember'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_get_object_status identifier id'>get_object_status</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_pool_member identifier id'>pool_member</span><span class='bitor op'>|</span>
+      <span class='rubyid_member_info identifier id'>member_info</span> <span class='assign token'>=</span> <span class='rubyid_pool_member identifier id'>pool_member</span><span class='lbrack token'>[</span><span class='string val'>'member'</span><span class='rbrack token'>]</span>
+      <span class='rubyid_status identifier id'>status</span> <span class='assign token'>=</span> <span class='rubyid_pool_member identifier id'>pool_member</span><span class='lbrack token'>[</span><span class='string val'>'object_status'</span><span class='rbrack token'>]</span>
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_member_info identifier id'>member_info</span><span class='lbrack token'>[</span><span class='string val'>'address'</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_member_info identifier id'>member_info</span><span class='lbrack token'>[</span><span class='string val'>'port'</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='rubyid_node_port identifier id'>node_port</span>
+        <span class='rubyid_member identifier id'>member</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='symbol val'>:ip</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_member_info identifier id'>member_info</span><span class='lbrack token'>[</span><span class='string val'>'address'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+                   <span class='symbol val'>:port</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_member_info identifier id'>member_info</span><span class='lbrack token'>[</span><span class='string val'>'port'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+                   <span class='symbol val'>:availability</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_status identifier id'>status</span><span class='lbrack token'>[</span><span class='string val'>'availability_status'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+                   <span class='symbol val'>:enabled</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lparen token'>(</span><span class='rubyid_status identifier id'>status</span><span class='lbrack token'>[</span><span class='string val'>'enabled_status'</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='string val'>'ENABLED_STATUS_ENABLED'</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                   <span class='symbol val'>:pool</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrace token'>}</span>
+        <span class='rubyid_break break kw'>break</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_member identifier id'>member</span>
+    <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.PoolMember'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_get_monitor_association identifier id'>get_monitor_association</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_monitor_associations identifier id'>monitor_associations</span><span class='bitor op'>|</span>
+        <span class='rubyid_address identifier id'>address</span> <span class='assign token'>=</span> <span class='rubyid_monitor_associations identifier id'>monitor_associations</span><span class='lbrack token'>[</span><span class='string val'>'member'</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='string val'>'ipport'</span><span class='rbrack token'>]</span>
+        <span class='rubyid_if if kw'>if</span> <span class='rubyid_address identifier id'>address</span><span class='lbrack token'>[</span><span class='string val'>'address'</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_address identifier id'>address</span><span class='lbrack token'>[</span><span class='string val'>'port'</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='rubyid_node_port identifier id'>node_port</span>
+          <span class='rubyid_monitor_rule identifier id'>monitor_rule</span> <span class='assign token'>=</span> <span class='rubyid_monitor_associations identifier id'>monitor_associations</span><span class='lbrack token'>[</span><span class='string val'>'monitor_rule'</span><span class='rbrack token'>]</span>
+          <span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='symbol val'>:monitor_rule</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_rule identifier id'>monitor_rule</span><span class='lbrack token'>[</span><span class='string val'>'type'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+                                    <span class='symbol val'>:quorum</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_rule identifier id'>monitor_rule</span><span class='lbrack token'>[</span><span class='string val'>'quorum'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+                                    <span class='symbol val'>:templates</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_rule identifier id'>monitor_rule</span><span class='lbrack token'>[</span><span class='string val'>'monitor_templates'</span><span class='rbrack token'>]</span> <span class='rbrace token'>}</span>
+          <span class='rubyid_break break kw'>break</span>
+        <span class='rubyid_end end kw'>end</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_member identifier id'>member</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_members-instance_method">
+  
+    - (<tt>Array&lt;Hash&gt;</tt>) <strong>get_members</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Retrieves the members of a pool.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The members as hashes with <code>:pool_name</code>,, <code>:ip</code>, <code>:port</code>,
+<code>:availability</code>, <code>:enabled</code> and <code>:monitor_rule</code> entries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 156</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_members identifier id'>get_members</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :pool argument given&quot;</span>
+  <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+         <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_members identifier id'>members</span> <span class='assign token'>=</span> <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.PoolMember'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_get_object_status identifier id'>get_object_status</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_collect identifier id'>collect</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_pool_member identifier id'>pool_member</span><span class='bitor op'>|</span>
+      <span class='rubyid_member identifier id'>member</span> <span class='assign token'>=</span> <span class='rubyid_pool_member identifier id'>pool_member</span><span class='lbrack token'>[</span><span class='string val'>'member'</span><span class='rbrack token'>]</span>
+      <span class='rubyid_status identifier id'>status</span> <span class='assign token'>=</span> <span class='rubyid_pool_member identifier id'>pool_member</span><span class='lbrack token'>[</span><span class='string val'>'object_status'</span><span class='rbrack token'>]</span>
+      <span class='lbrace token'>{</span> <span class='symbol val'>:ip</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='string val'>'address'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+        <span class='symbol val'>:port</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='string val'>'port'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+        <span class='symbol val'>:availability</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_status identifier id'>status</span><span class='lbrack token'>[</span><span class='string val'>'availability_status'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+        <span class='symbol val'>:enabled</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lparen token'>(</span><span class='rubyid_status identifier id'>status</span><span class='lbrack token'>[</span><span class='string val'>'enabled_status'</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='string val'>'ENABLED_STATUS_ENABLED'</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+        <span class='symbol val'>:pool</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrace token'>}</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_members_hash identifier id'>members_hash</span> <span class='assign token'>=</span> <span class='rubyid_members identifier id'>members</span><span class='dot token'>.</span><span class='rubyid_inject identifier id'>inject</span><span class='lparen token'>(</span><span class='lbrace token'>{</span><span class='rbrace token'>}</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='rubyid_h identifier id'>h</span><span class='comma token'>,</span> <span class='rubyid_member identifier id'>member</span><span class='bitor op'>|</span> <span class='rubyid_h identifier id'>h</span><span class='lbrack token'>[</span><span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='symbol val'>:ip</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span> <span class='plus op'>+</span> <span class='string val'>':'</span> <span class='plus op'>+</span> <span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='rubyid_member identifier id'>member</span><span class='semicolon token'>;</span> <span class='rubyid_h identifier id'>h</span> <span class='rbrace token'>}</span>
+  <span class='rubyid_pool_members identifier id'>pool_members</span> <span class='assign token'>=</span> <span class='rubyid_members identifier id'>members</span><span class='dot token'>.</span><span class='rubyid_map identifier id'>map</span> <span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='rubyid_member identifier id'>member</span><span class='bitor op'>|</span> <span class='lbrace token'>{</span> <span class='string val'>'address'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='symbol val'>:ip</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='string val'>'port'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='rbrace token'>}</span> <span class='rbrace token'>}</span>
+  <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.PoolMember'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_get_monitor_association identifier id'>get_monitor_association</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_monitor_associations identifier id'>monitor_associations</span><span class='bitor op'>|</span>
+      <span class='rubyid_address identifier id'>address</span> <span class='assign token'>=</span> <span class='rubyid_monitor_associations identifier id'>monitor_associations</span><span class='lbrack token'>[</span><span class='string val'>'member'</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='string val'>'ipport'</span><span class='rbrack token'>]</span>
+      <span class='rubyid_member identifier id'>member</span> <span class='assign token'>=</span> <span class='rubyid_members_hash identifier id'>members_hash</span><span class='lbrack token'>[</span><span class='rubyid_address identifier id'>address</span><span class='lbrack token'>[</span><span class='string val'>'address'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span> <span class='plus op'>+</span> <span class='string val'>':'</span> <span class='plus op'>+</span> <span class='rubyid_address identifier id'>address</span><span class='lbrack token'>[</span><span class='string val'>'port'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span><span class='rbrack token'>]</span>
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_member identifier id'>member</span>
+        <span class='rubyid_monitor_rule identifier id'>monitor_rule</span> <span class='assign token'>=</span> <span class='rubyid_monitor_associations identifier id'>monitor_associations</span><span class='lbrack token'>[</span><span class='string val'>'monitor_rule'</span><span class='rbrack token'>]</span>
+        <span class='rubyid_member identifier id'>member</span><span class='lbrack token'>[</span><span class='symbol val'>:monitor_rule</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_rule identifier id'>monitor_rule</span><span class='lbrack token'>[</span><span class='string val'>'type'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+                                  <span class='symbol val'>:quorum</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_rule identifier id'>monitor_rule</span><span class='lbrack token'>[</span><span class='string val'>'quorum'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+                                  <span class='symbol val'>:templates</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_rule identifier id'>monitor_rule</span><span class='lbrack token'>[</span><span class='string val'>'monitor_templates'</span><span class='rbrack token'>]</span> <span class='rbrace token'>}</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+
+  <span class='rubyid_members identifier id'>members</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_node-instance_method">
+  
+    - (<tt>Hash</tt><sup>?</sup>) <strong>get_node</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Retrieves a node.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The member as a hash with <code>:ip</code>, <code>:availability</code>, and <code>:enabled</code> entries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 242</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_node identifier id'>get_node</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Retrieving node #{node_ip} from load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+         <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+    <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.NodeAddress'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_get_object_status identifier id'>get_object_status</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_status identifier id'>status</span><span class='bitor op'>|</span>
+      <span class='rubyid_return return kw'>return</span> <span class='lbrace token'>{</span> <span class='symbol val'>:ip</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span>
+               <span class='symbol val'>:availability</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_status identifier id'>status</span><span class='lbrack token'>[</span><span class='string val'>'availability_status'</span><span class='rbrack token'>]</span><span class='comma token'>,</span>
+               <span class='symbol val'>:enabled</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lparen token'>(</span><span class='rubyid_status identifier id'>status</span><span class='lbrack token'>[</span><span class='string val'>'enabled_status'</span><span class='rbrack token'>]</span> <span class='eq op'>==</span> <span class='string val'>'ENABLED_STATUS_ENABLED'</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_num_connections-instance_method">
+  
+    - (<tt>Integer</tt><sup>?</sup>) <strong>get_num_connections</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Retrieves the number of active connections for a node or pool member. If <code>pool_name</code> is specified,
+then only the stats for that pool are returned.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port; only required if a pool name is given</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name; optional</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The number of active connections</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+306
+307
+308</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 306</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_num_connections identifier id'>get_num_connections</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_get_stats identifier id'>get_stats</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='lbrack token'>[</span><span class='string val'>'STATISTIC_SERVER_SIDE_CURRENT_CONNECTIONS'</span><span class='rbrack token'>]</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="get_stats-instance_method">
+  
+    - (<tt>Hash</tt><sup>?</sup>) <strong>get_stats</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Retrieves statistics for a node or pool member. If <code>pool_name</code> is specified, then
+only the stats for that pool are returned.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port; only required if a pool name is given</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name, 80 by default if a pool name is given</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The statistics as a hash of statistics name to current value</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 264</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_get_stats identifier id'>get_stats</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_result identifier id'>result</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_pool_name identifier id'>pool_name</span>
+    <span class='rubyid_node_port identifier id'>node_port</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>80</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_stats identifier id'>stats</span> <span class='assign token'>=</span> <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.PoolMember'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_get_statistics identifier id'>get_statistics</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='lbrack token'>[</span><span class='lbrace token'>{</span> <span class='string val'>'address'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span> <span class='string val'>'port'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_port identifier id'>node_port</span> <span class='rbrace token'>}</span><span class='rbrack token'>]</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_stats identifier id'>stats</span> <span class='assign token'>=</span> <span class='rubyid_stats identifier id'>stats</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span> <span class='rubyid_if if_mod kw'>if</span> <span class='rubyid_stats identifier id'>stats</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Retrieving stats for node #{node_ip} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_stats identifier id'>stats</span> <span class='assign token'>=</span> <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.NodeAddress'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_get_statistics identifier id'>get_statistics</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_stats identifier id'>stats</span><span class='lbrack token'>[</span><span class='string val'>'statistics'</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_stats identifier id'>stats</span><span class='lbrack token'>[</span><span class='string val'>'statistics'</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_stats identifier id'>stats</span><span class='lbrack token'>[</span><span class='string val'>'statistics'</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='string val'>'statistics'</span><span class='rbrack token'>]</span>
+    <span class='rubyid_stats identifier id'>stats</span><span class='lbrack token'>[</span><span class='string val'>'statistics'</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='integer val'>0</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='string val'>'statistics'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_stat identifier id'>stat</span><span class='bitor op'>|</span>
+      <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='rubyid_extract_type identifier id'>extract_type</span><span class='lparen token'>(</span><span class='rubyid_stat identifier id'>stat</span><span class='rparen token'>)</span>
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_name identifier id'>name</span>
+        <span class='comment val'># TODO: switch on the type and support all possible values</span>
+        <span class='rubyid_if if kw'>if</span> <span class='rubyid_extract_type identifier id'>extract_type</span><span class='lparen token'>(</span><span class='rubyid_stat identifier id'>stat</span><span class='dot token'>.</span><span class='rubyid_value identifier id'>value</span><span class='rparen token'>)</span> <span class='eq op'>==</span> <span class='string val'>'iControl:Common.ULong64'</span>
+          <span class='rubyid_result identifier id'>result</span><span class='lbrack token'>[</span><span class='rubyid_name identifier id'>name</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_stat identifier id'>stat</span><span class='dot token'>.</span><span class='rubyid_value identifier id'>value</span><span class='dot token'>.</span><span class='rubyid_high identifier id'>high</span> <span class='lshft op'>&lt;&lt;</span> <span class='integer val'>32</span><span class='rparen token'>)</span> <span class='bitor op'>|</span> <span class='rubyid_stat identifier id'>stat</span><span class='dot token'>.</span><span class='rubyid_value identifier id'>value</span><span class='dot token'>.</span><span class='rubyid_low identifier id'>low</span>
+        <span class='rubyid_end end kw'>end</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_result identifier id'>result</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="remove_from_pool-instance_method">
+  
+    - <strong>remove_from_pool</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Removes a node from a pool.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port, 80 by default</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 133</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_remove_from_pool identifier id'>remove_from_pool</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :pool argument given&quot;</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_node_port identifier id'>node_port</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>80</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would remote node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Removing node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.Pool'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_remove_member identifier id'>remove_member</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='lbrack token'>[</span><span class='lbrace token'>{</span> <span class='string val'>'address'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span> <span class='string val'>'port'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_port identifier id'>node_port</span> <span class='rbrace token'>}</span><span class='rbrack token'>]</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_nil nil kw'>nil</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="set_monitor_rule-instance_method">
+  
+    - (<tt>Array&lt;Hash&gt;</tt>) <strong>set_monitor_rule</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Sets the monitor rule for a pool member which defines how the load balancer monitors the member.
+The <code>:monitor_rule</code> parameter is a hash consisting of</p>
+
+<ul>
+<li><code>:type</code> - The type of the monitoring rule, one of <code>MONITOR_RULE_TYPE_SINGLE</code> for a
+        single monitor, <code>MONITOR_RULE_TYPE_AND_LIST</code> for a list of monitors that
+        all have to succeed, or <code>MONITOR_RULE_TYPE_M_OF_N</code> if a quorum of monitors
+        have to succeed</li>
+<li><code>:quorum</code> - The optional number of monitors that have to succeed, only used if the
+          type is <code>MONITOR_RULE_TYPE_M_OF_N</code></li>
+<li><code>:templates</code> - An array of the names of the monitoring rule templates to use</li>
+</ul>
+
+<p>If <code>:monitor_rule</code> is not specified, then this method will remove any monitoring rules for
+the member.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s hostname; specify this or the node&#39;s <code>:ip</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:ip</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s ip address; specify this or the node&#39;s <code>:host</code></p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:port</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The node&#39;s port, 80 by default</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:pool</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The pool name</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:monitor_rule</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The monitoring rule</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The member as a hash with <code>:pool_name</code>,, <code>:ip</code>, <code>:port</code>,
+<code>:availability</code>, <code>:enabled</code> and <code>:monitor_rule</code> entries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 95</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_set_monitor_rule identifier id'>set_monitor_rule</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:pool</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :pool argument given&quot;</span>
+  <span class='rubyid_node_ip identifier id'>node_ip</span> <span class='assign token'>=</span> <span class='rubyid_get_ip identifier id'>get_ip</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_node_port identifier id'>node_port</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:port</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>80</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_to_i identifier id'>to_i</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would set monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[F5] Setting monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:monitor_rule</span><span class='rbrack token'>]</span>
+      <span class='rubyid_ip_port identifier id'>ip_port</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='string val'>'address'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_ip identifier id'>node_ip</span><span class='comma token'>,</span>
+                  <span class='string val'>'port'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_node_port identifier id'>node_port</span> <span class='rbrace token'>}</span>
+      <span class='rubyid_monitor_ip_port identifier id'>monitor_ip_port</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='string val'>'address_type'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'ATYPE_EXPLICIT_ADDRESS_EXPLICIT_PORT'</span><span class='comma token'>,</span>
+                          <span class='string val'>'ipport'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ip_port identifier id'>ip_port</span> <span class='rbrace token'>}</span>
+      <span class='rubyid_monitor_rule identifier id'>monitor_rule</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='string val'>'type'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:monitor_rule</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>'MONITOR_RULE_TYPE_SINGLE'</span><span class='comma token'>,</span>
+                       <span class='string val'>'quorum'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:monitor_rule</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:quorum</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='integer val'>0</span><span class='comma token'>,</span>
+                       <span class='string val'>'monitor_templates'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:monitor_rule</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:templates</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span> <span class='rbrace token'>}</span>
+      <span class='rubyid_monitor_associations identifier id'>monitor_associations</span> <span class='assign token'>=</span> <span class='lbrack token'>[</span><span class='lbrace token'>{</span> <span class='string val'>'member'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_ip_port identifier id'>monitor_ip_port</span><span class='comma token'>,</span>
+                                <span class='string val'>'monitor_rule'</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_monitor_rule identifier id'>monitor_rule</span> <span class='rbrace token'>}</span><span class='rbrack token'>]</span>
+    <span class='rubyid_else else kw'>else</span>
+      <span class='rubyid_monitor_associations identifier id'>monitor_associations</span> <span class='assign token'>=</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'LocalLB.PoolMember'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_set_monitor_association identifier id'>set_monitor_association</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_pool_name identifier id'>pool_name</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='lbrack token'>[</span> <span class='rubyid_monitor_associations identifier id'>monitor_associations</span> <span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_get_member identifier id'>get_member</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="sync-instance_method">
+  
+    - <strong>sync</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Synchronizes the configuration to a specified group or all groups that the load balancer is a member of. This
+method will do nothing in dryrun mode except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:group</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The specific group to sync to; if omitted then all groups will be synced to</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/f5.rb', line 396</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_sync identifier id'>sync</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would sync configurations for load balancer #{@config[:host]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:f5</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_group identifier id'>group</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:group</span><span class='rbrack token'>]</span>
+    <span class='rubyid_@monitor ivar id'>@monitor</span><span class='dot token'>.</span><span class='rubyid_synchronize identifier id'>synchronize</span> <span class='rubyid_do do kw'>do</span>
+      <span class='rubyid_if if kw'>if</span> <span class='rubyid_group identifier id'>group</span>
+        <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'System.ConfigSync'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_synchronize_to_group identifier id'>synchronize_to_group</span><span class='lparen token'>(</span><span class='rubyid_group identifier id'>group</span><span class='rparen token'>)</span>
+      <span class='rubyid_else else kw'>else</span>
+        <span class='rubyid_@f5 ivar id'>@f5</span><span class='lbrack token'>[</span><span class='string val'>'System.ConfigSync'</span><span class='rbrack token'>]</span><span class='dot token'>.</span><span class='rubyid_synchronize_configuration identifier id'>synchronize_configuration</span><span class='lparen token'>(</span><span class='string val'>'CONFIGSYNC_ALL'</span><span class='rparen token'>)</span>
+      <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_nil nil kw'>nil</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:09 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>

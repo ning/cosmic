@@ -1,0 +1,160 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>JMX &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="../_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="../index.html" />
+    <link rel="up" title="Plugins" href="../plugins.html" />
+    <link rel="next" title="Nagios" href="nagios.html" />
+    <link rel="prev" title="JIRA" href="jira.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="nagios.html" title="Nagios"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="jira.html" title="JIRA"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" accesskey="U">Plugins</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="jmx">
+<h1>JMX<a class="headerlink" href="#jmx" title="Permalink to this headline">¶</a></h1>
+<p>The JMX plugin allows Cosmic scripts to interact with exposes <a class="reference external" href="http://docs.oracle.com/javase/tutorial/jmx/index.html">JMX resources</a> exposed by services running on the JVM.</p>
+<p>This plugin requires JRuby and the <a class="reference external" href="https://github.com/jmesnil/jmx4r">jmx4r gem</a>:</p>
+<div class="highlight-python"><pre>gem install jmx4r</pre>
+</div>
+<p>The only configuration for the plugin is for authentication in cases where the JMX resources require it:</p>
+<div class="highlight-python"><pre>jmx:
+  &lt;authentication configuration as explained above&gt;</pre>
+</div>
+<p>The plugin supports reading and setting attributes as well as invoking operations. For instance:</p>
+<div class="highlight-python"><pre>require 'cosmic/galaxy'
+require 'cosmic/jmx'
+
+services = with galaxy do
+  select :type =&gt; /^echo$?/
+end
+with jmx do
+  mbeans = services.collect {|service| get_mbean :host =&gt; service.host, :port =&gt; 12345, :name =&gt; 'some.company:name=MyMBean'}
+  mbeans.each do |mbean|
+    old_value = get_attribute :mbean =&gt; mbean, :attribute =&gt; 'SomeAttribute'
+    set_attribute :mbean =&gt; mbean, :attribute =&gt; 'SomeAttribute', :value =&gt; old_value + 1
+
+    invoke :mbean =&gt; mbean, :operation =&gt; 'DoSomething', :args =&gt; [ 'test' ]
+  end
+end</pre>
+</div>
+<p>This collects <tt class="docutils literal"><span class="pre">some.company:name=MyMBean</span></tt> mbeans from all <tt class="docutils literal"><span class="pre">echo</span></tt> servers on galaxy, then increments the <tt class="docutils literal"><span class="pre">SomeAttribute</span></tt> attribute and finally invokes the <tt class="docutils literal"><span class="pre">DoSomething</span></tt> operation with a single string argument.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../plugins.html">Plugins</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="chef.html">Chef</a></li>
+<li class="toctree-l2"><a class="reference internal" href="email.html">E-mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="execute.html">Execute</a></li>
+<li class="toctree-l2"><a class="reference internal" href="f5.html">F5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="galaxy.html">Galaxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="irc.html">IRC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jira.html">JIRA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">JMX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nagios.html">Nagios</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ssh.html">SSH</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="jira.html"
+                        title="previous chapter">JIRA</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="nagios.html"
+                        title="next chapter">Nagios</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="nagios.html" title="Nagios"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="jira.html" title="JIRA"
+             >previous</a> |</li>
+        <li><a href="../index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li>
+          <li><a href="../plugins.html" >Plugins</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

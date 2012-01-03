@@ -1,0 +1,288 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Configuration &mdash; Cosmic 0.0.1-SNAPSHOT documentation</title>
+    
+    <link rel="stylesheet" href="_static/cosmic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.1-SNAPSHOT',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Cosmic 0.0.1-SNAPSHOT documentation" href="index.html" />
+    <link rel="next" title="Plugins" href="plugins.html" />
+    <link rel="prev" title="How to use Cosmic" href="usage.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="plugins.html" title="Plugins"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="How to use Cosmic"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>Cosmic and the plugins are configured via a single YAML file. The default location for the file is <tt class="docutils literal"><span class="pre">$HOME/.cosmicrc</span></tt>, but both the commandline tool and the <tt class="docutils literal"><span class="pre">Cosmic::Environment</span></tt> constructor support specifying a different file.</p>
+<p>The basic environment configuration looks like this:</p>
+<div class="highlight-python"><pre>auth_type: &lt;Authentication type&gt;
+&lt;Authentication type configuration section&gt;
+plugins:
+  &lt;Plugin configuration sections&gt;</pre>
+</div>
+<p>For example:</p>
+<div class="highlight-python"><pre>auth_type: ldap
+ldap:
+  host:       my-ldap-server.example.com
+  port:       1636
+  base:       dc=example,dc=com
+  encryption: simple_tls
+  auth:
+    method:   simple
+    username: cn=Directory Manager
+    password: my-password
+plugins:
+  irc:
+    host:      irc.example.com
+    port:      6667
+    nick:      cosmic
+    auth_type: credentials_from_env
+    ldap:
+      path:          o=irc.example.com,ou=apps,dc=example,dc=com
+      password_attr: password</pre>
+</div>
+<div class="section" id="authentication-types">
+<h2>Authentication types<a class="headerlink" href="#authentication-types" title="Permalink to this headline">¶</a></h2>
+<p>Cosmic currently supports these authentication types:</p>
+<div class="section" id="ldap">
+<h3>ldap<a class="headerlink" href="#ldap" title="Permalink to this headline">¶</a></h3>
+<p>Cosmic will authenticate with a configured LDAP server before proceeding, using <a class="reference external" href="http://net-ldap.rubyforge.org/">net-ldap</a>. The LDAP configuration has the following form:</p>
+<div class="highlight-python"><pre>ldap:
+  host:       &lt;LDAP host&gt;
+  port:       &lt;LDAP port&gt;
+  base:       &lt;Base distinguished name of the server, usually an organization or domain component entry&gt;
+  encryption: &lt;Encryption type, has to be simple_tls currently&gt;
+  auth:
+    method:   &lt;The autentication type, either simple or anonymous&gt;
+    username: &lt;The LDAP username to authenticate with if simple auth is chosen, e.g. cn=Directory Manager&gt;
+    password: &lt;The LDAP password&gt;</pre>
+</div>
+<p>If <tt class="docutils literal"><span class="pre">simple</span></tt> is chosen as the authentication method and username/password are not specified in the config, then Cosmic will prompt the user for username and password before proceeding.</p>
+<p>See e.g. this <a class="reference external" href="http://www.ldapman.org/articles/intro_to_ldap.html">introduction to LDAP</a> for more info about LDAP.</p>
+</div>
+<div class="section" id="credentials">
+<h3>credentials<a class="headerlink" href="#credentials" title="Permalink to this headline">¶</a></h3>
+<p>With this authentication form, Cosmic will not authenticate itself but provide the credentials to plugins if they use the <tt class="docutils literal"><span class="pre">credentials_from_env</span></tt> authentication type (see below). The configuration looks like this:</p>
+<div class="highlight-python"><pre>credentials:
+  username: &lt;The username&gt;
+  password: &lt;The password&gt;</pre>
+</div>
+<p>If username/password are not specified in the config, then Cosmic will prompt the user for username and password before proceeding.</p>
+</div>
+</div>
+<div class="section" id="plugin-configuration">
+<h2>Plugin configuration<a class="headerlink" href="#plugin-configuration" title="Permalink to this headline">¶</a></h2>
+<p>All plugins are configured under the <tt class="docutils literal"><span class="pre">plugins</span></tt> section in the configuration. The configuration generally has this format:</p>
+<div class="highlight-python"><pre>plugins:
+  &lt;Plugin name&gt;:
+    plugin_class: &lt;Optional plugin class name&gt;
+    &lt;Plugin-specific configuration&gt;</pre>
+</div>
+<p>Cosmic uses the plugin name and, if specified, the plugin class to instantiate the plugin and make it available to scripts. For instance, with this configuration section:</p>
+<div class="highlight-python"><pre>plugins:
+  irc:
+    &lt;IRC plugin configuration&gt;</pre>
+</div>
+<p>Cosmic will use this plugin section if used like this in a Cosmic environment:</p>
+<div class="highlight-python"><pre>with irc do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>or:</p>
+<div class="highlight-python"><pre>irc.write :msg =&gt; 'Hello world', :channels =&gt; '#test'</pre>
+</div>
+<p>Since no plugin class is specified, it will search for the plugin under the class names</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Cosmic::#{name}</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Cosmic::#{name.upcase}</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Cosmic::#{camel_case_name}</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">#{name}</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">#{name.upcase}</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">#{camel_case_name}</span></tt></li>
+</ul>
+<p>If it cannot find a plugin class, then it will raise an error unless a <tt class="docutils literal"><span class="pre">?</span></tt> was used. E.g.:</p>
+<div class="highlight-python"><pre>with irc? do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>would not fail if no irc configuration section exists or the class could not be found.</p>
+<p>The <tt class="docutils literal"><span class="pre">plugin_class</span></tt> configuration option allows you to specify the plugin class directly, and it also makes it possible to configure more than one plugin of the same type. E.g.:</p>
+<div class="highlight-python"><pre>plugins:
+  irc1:
+    plugin_class: Cosmic::IRC
+    &lt;First IRC plugin configuration&gt;
+  irc2:
+    plugin_class: Cosmic::IRC
+    &lt;Second IRC plugin configuration&gt;</pre>
+</div>
+<p>These two then can be used like so:</p>
+<div class="highlight-python"><pre>with irc1 do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end
+with irc2 do
+  write :msg =&gt; 'Hello world', :channels =&gt; '#test'
+end</pre>
+</div>
+<p>Plugins can perform authentication through the Cosmic environment, or they can handle it themselves. Authenticating through Cosmic has the benefit that it can reduce the number of times that the user is asked for credentials. For instance, assume a plugin for a service that authenticates via LDAP. That plugin can then use the same LDAP credentials that Cosmic asked the user for at the beginning of the deployment session. Likewise, it is possible to store authentication information (e.g. tokens, keys, etc.) in LDAP and have Cosmic fetch it from there on behalf of a plugin.</p>
+<p>For plugins, the Cosmic environment currently supports these authentication types:</p>
+<div class="section" id="credentials-from-env">
+<h3>credentials_from_env<a class="headerlink" href="#credentials-from-env" title="Permalink to this headline">¶</a></h3>
+<p>This type is used for cases where the environment stores the credentials and the plugin can simply ask the environment to retrieve them. It is currently only implemented for environments using LDAP authentication. In this case, the plugin&#8217;s configuration is required to have a <tt class="docutils literal"><span class="pre">ldap</span></tt> configuration section that specifies the path to the credentials plus the names of the attributes for the username and password:</p>
+<div class="highlight-python"><pre>plugins:
+  irc:
+    ...
+    auth_type: credentials_from_env
+    ldap:
+      path:          o=irc.example.com,ou=apps,dc=example,dc=com
+      password_attr: password</pre>
+</div>
+<p>In this example, the <tt class="docutils literal"><span class="pre">o=irc.example.com,ou=apps,dc=example,dc=com</span></tt> LDAP entry contains an attribute called <tt class="docutils literal"><span class="pre">password</span></tt> which contains the password for the LDAP server. No username is specified, so Cosmic will not retrieve it (the IRC plugin doesn&#8217;t require it if the IRC server doesn&#8217;t need one).</p>
+</div>
+<div class="section" id="ldap-credentials">
+<h3>ldap_credentials<a class="headerlink" href="#ldap-credentials" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">ldap_credentials</span></tt> type is used for services that authenticate themselves against LDAP. The Cosmic environment in this case is required to use <tt class="docutils literal"><span class="pre">ldap</span></tt> authentication, and the plugin will simply use the same credentials as the environment, to authenticate.</p>
+</div>
+<div class="section" id="id1">
+<h3>credentials<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>This type describes the case where the plugin has its own set of credentials independent from the environment. Cosmic supports the plugin by dealing with the credential configuration or asking the user as necessary. If you choose to configure the credentials in the config file, then put them in a <tt class="docutils literal"><span class="pre">credentials</span></tt> sub section in the plugin configuration:</p>
+<div class="highlight-python"><pre>plugins:
+  irc:
+    ...
+    auth_type: credentials
+    credentials:
+      username: testuser
+      password: my-password</pre>
+</div>
+<p>Cosmic will ask the user for credentials if the element is not present in the configuration.</p>
+</div>
+<div class="section" id="keys">
+<h3>keys<a class="headerlink" href="#keys" title="Permalink to this headline">¶</a></h3>
+<p>Some plugins can make use of keys directly (e.g. ssh). For these plugins, Cosmic supports two types of authentication: <tt class="docutils literal"><span class="pre">keys</span></tt> and <tt class="docutils literal"><span class="pre">keys_from_env</span></tt>. The <tt class="docutils literal"><span class="pre">keys</span></tt> type simply allows to specify an array of file paths of the keys to use:</p>
+<div class="highlight-python"><pre>plugins:
+  ssh:
+    ...
+    auth_type: keys
+    keys: [&lt;path to key 1&gt;, &lt;path to key 2&gt;, ...]</pre>
+</div>
+</div>
+<div class="section" id="keys-from-env">
+<h3>keys_from_env<a class="headerlink" href="#keys-from-env" title="Permalink to this headline">¶</a></h3>
+<p>With this authentication type, plugins ask the Cosmic environment to give them keys via whatever means the environment has configured. This is usually used in conjunction with <tt class="docutils literal"><span class="pre">ldap</span></tt> authentication for the environment itself, i.e. keys are retrieved from specific paths in the LDAP server. The plugin configuration would then define the paths and attributes to look for the key data:</p>
+<div class="highlight-python"><pre>plugins:
+  ssh:
+    ...
+    auth_type: keys_from_env
+    ldap:
+      key_path: &lt;LDAP path to the keys; if not specified, then the entry for the current user is used instead&gt;
+      key_attrs: [&lt;key attribute 1&gt;, &lt;key attribute 2&gt;, ...]</pre>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<h3>All Topics</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">How to use Cosmic</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#authentication-types">Authentication types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plugin-configuration">Plugin configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="plugins.html">Plugins</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="usage.html"
+                        title="previous chapter">How to use Cosmic</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plugins.html"
+                        title="next chapter">Plugins</a></p><h3>Other resources</h3>
+<ul>
+  <li><a href="api/_index.html">API</a></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="plugins.html" title="Plugins"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="How to use Cosmic"
+             >previous</a> |</li>
+        <li><a href="index.html">Cosmic 0.0.1-SNAPSHOT documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ning.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>

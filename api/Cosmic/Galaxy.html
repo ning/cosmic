@@ -1,0 +1,2172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+  Class: Cosmic::Galaxy
+  
+    &mdash; Documentation by YARD 0.7.4
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (G)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../Cosmic.html" title="Cosmic (module)">Cosmic</a></span></span>
+     &raquo; 
+    <span class="title">Galaxy</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  
+    <a id="class_list_link" href="#">Class List</a>
+  
+    <a id="method_list_link" href="#">Method List</a>
+  
+    <a id="file_list_link" href="#">File List</a>
+  
+</div>
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Cosmic::Galaxy
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></li>
+          
+            <li class="next">Cosmic::Galaxy</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">lib/cosmic/galaxy.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A plugin that makes galaxy available to cosmic scripts. You&#39;d typically create an <code>:galaxy</code> plugin section
+in the configuration and then use it in a cosmic context like so:</p>
+
+<pre class="code"><span class='rubyid_with identifier id'>with</span> <span class='rubyid_galaxy identifier id'>galaxy</span> <span class='rubyid_do do kw'>do</span>
+  <span class='rubyid_snapshot identifier id'>snapshot</span> <span class='assign token'>=</span> <span class='rubyid_take_snapshot identifier id'>take_snapshot</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_select identifier id'>select</span> <span class='symbol val'>:type</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='regexp val'>/^myservice$?/</span>
+  <span class='rubyid_update identifier id'>update</span> <span class='symbol val'>:services</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_services identifier id'>services</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>'new-version'</span>
+  <span class='rubyid_start identifier id'>start</span> <span class='symbol val'>:services</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_services identifier id'>services</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+
+<p>The galaxy plugin emits messages tagged as <code>:galaxy</code> and <code>:info</code> for most of its actions.
+Note that in dry-run mode this plugin will still connect to galaxy and perform non-destructive operations
+(e.g. <span class='object_link'><a href="#select-instance_method" title="Cosmic::Galaxy#select (method)">#select</a></span> and <span class='object_link'><a href="#take_snapshot-instance_method" title="Cosmic::Galaxy#take_snapshot (method)">#take_snapshot</a></span>) but not destructive ones (such as <span class='object_link'><a href="#update-instance_method" title="Cosmic::Galaxy#update (method)">#update</a></span>). Instead, it will send
+messages tagged as <code>:galaxy</code> and <code>:dryrun</code> in those cases.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+  
+  
+  
+  
+  <h2>Instance Attribute Summary <small>(<a href="#" class="summary_toggle">collapse</a>)</small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#config-instance_method" title="#config (instance method)">- (Object) <strong>config</strong> </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title readonly">readonly</span>
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The plugin&#39;s configuration.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#assign-instance_method" title="#assign (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>assign</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Assigns a service to a host.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#clear-instance_method" title="#clear (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>clear</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Clears one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">- (Galaxy) <strong>initialize</strong>(environment, name = :galaxy) </a>
+    
+
+    
+  </span>
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new galaxy plugin instance.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#restart-instance_method" title="#restart (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>restart</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Restarts one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#revert-instance_method" title="#revert (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>revert</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Reverts one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#rollback-instance_method" title="#rollback (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>rollback</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Rolls back one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#select-instance_method" title="#select (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>select</strong>(params = {}) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Selects services on galaxy via at most one of the following selectors:.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#start-instance_method" title="#start (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>start</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Starts one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#stop-instance_method" title="#stop (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>stop</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Stops one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#take_snapshot-instance_method" title="#take_snapshot (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>take_snapshot</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Takes a snapshot of the current galaxy state, which can be used for instance with #rollback.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update-instance_method" title="#update (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>update</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Updates one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_config-instance_method" title="#update_config (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>update_config</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Updates the confinguration of one or more services.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Plugin.html" title="Cosmic::Plugin (class)">Plugin</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">#method_missing</a></span>, <span class='object_link'><a href="Plugin.html#notify-instance_method" title="Cosmic::Plugin#notify (method)">#notify</a></span>, <span class='object_link'><a href="Plugin.html#respond_to%3F-instance_method" title="Cosmic::Plugin#respond_to? (method)">#respond_to?</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <p class="signature first" id="initialize-instance_method">
+  
+    - (<tt><span class='object_link'><a href="" title="Cosmic::Galaxy (class)">Galaxy</a></span></tt>) <strong>initialize</strong>(environment, name = :galaxy) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new galaxy plugin instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>environment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Environment.html" title="Cosmic::Environment (class)">Environment</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The cosmic environment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:galaxy</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The name for this plugin instance e.g. in the config</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 74</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:galaxy</span><span class='rparen token'>)</span>
+  <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
+  <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
+  <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No gonsole host specified in the configuration&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span>
+  <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span> <span class='symbol val'>:console</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Transport constant id'>Transport</span><span class='dot token'>.</span><span class='rubyid_locate identifier id'>locate</span><span class='lparen token'>(</span><span class='dstring node'>&quot;druby://#{@config[:host] || 'localhost'}:#{@config[:port] || 4440}&quot;</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='symbol val'>:versioning_policy</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:relaxed_versioning</span><span class='rbrack token'>]</span> <span class='question op'>?</span>
+                                               <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Versioning constant id'>Versioning</span><span class='colon2 op'>::</span><span class='rubyid_RelaxedVersioningPolicy constant id'>RelaxedVersioningPolicy</span> <span class='colon op'>:</span>
+                                               <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Versioning constant id'>Versioning</span><span class='colon2 op'>::</span><span class='rubyid_StrictVersioningPolicy constant id'>StrictVersioningPolicy</span> <span class='rbrace token'>}</span>
+
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+<div id="method_missing_details" class="method_details_list">
+  <h2>Dynamic Method Handling</h2>
+  <p class="notice super">
+    This class handles dynamic methods through the <tt>method_missing</tt> method
+    
+      in the class <span class='object_link'><a href="Plugin.html#method_missing-instance_method" title="Cosmic::Plugin#method_missing (method)">Cosmic::Plugin</a></span>
+    
+  </p>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <span id="config-instance_method"></span>
+      <div class="method_details first">
+  <p class="signature first" id="config-instance_method">
+  
+    - (<tt>Object</tt>) <strong>config</strong>  <span class="extras">(readonly)</span>
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>The plugin&#39;s configuration</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 67</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_config identifier id'>config</span>
+  <span class='rubyid_@config ivar id'>@config</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="assign-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>assign</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Assigns a service to a host. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code> to
+select which hosts to assign the service to. This method will do nothing in dryrun mode
+except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:env</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The environment</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:version</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The version</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:type</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service type</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host/service to assign</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts/services to assign</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to assign</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to assign</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The assigned services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 148</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_assign identifier id'>assign</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_env identifier id'>env</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:env</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :env argument given&quot;</span>
+  <span class='rubyid_version identifier id'>version</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:version</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :version argument given&quot;</span>
+  <span class='rubyid_type identifier id'>type</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :type argument given&quot;</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would assign #{agent.host} to /#{params[:env]}/#{params[:version]}/#{params[:type]}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_AssignCommand constant id'>AssignCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_env identifier id'>env</span><span class='comma token'>,</span> <span class='rubyid_version identifier id'>version</span><span class='comma token'>,</span> <span class='rubyid_type identifier id'>type</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="clear-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>clear</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Clears one or more services. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code>
+to select which hosts to clear. This method will do nothing in dryrun mode except create
+messages tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to clear</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to clear</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to clear</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to clear</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The cleared services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+322
+323
+324
+325
+326
+327
+328
+329</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 322</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_clear identifier id'>clear</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would clear #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_ClearCommand constant id'>ClearCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Cleared #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="restart-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>restart</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Restarts one or more services. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code>
+to select which hosts to restart. This method will do nothing in dryrun mode except create
+a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to restart</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to restart</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to restart</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to restart</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The restarted services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+189
+190
+191
+192
+193
+194
+195
+196</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 189</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_restart identifier id'>restart</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would restart #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_RestartCommand constant id'>RestartCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Restarted #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="revert-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>revert</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Reverts one or more services. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code>
+to select which hosts to revert. This method differs from <span class='object_link'><a href="#rollback-instance_method" title="Cosmic::Galaxy#rollback (method)">#rollback</a></span> in that you give it takes
+a previously taken snapshot which specifies the version of that the service should be reverted
+to. It then will update all passed-in services that are also present in the snapshot (as
+determined by the ip of the agent), to the version stated in the snapshot. The method also
+supports reverting multiple different service types to differing versions. This method will
+do nothing in dryrun mode except create messages tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:to</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>, <tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The snapshot to revert to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to revert</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to revert</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to revert</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to revert</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The reverted services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 295</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_revert identifier id'>revert</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_to identifier id'>to</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_ips identifier id'>ips</span> <span class='assign token'>=</span> <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_inject identifier id'>inject</span><span class='lparen token'>(</span><span class='rubyid_Set constant id'>Set</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='rubyid_ips identifier id'>ips</span><span class='comma token'>,</span> <span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span> <span class='rubyid_ips identifier id'>ips</span> <span class='lshft op'>&lt;&lt;</span> <span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_ip identifier id'>ip</span> <span class='rbrace token'>}</span>
+  <span class='rubyid_agents_by_version identifier id'>agents_by_version</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_to identifier id'>to</span><span class='rparen token'>)</span><span class='dot token'>.</span><span class='rubyid_inject identifier id'>inject</span><span class='lparen token'>(</span><span class='rubyid_Hash constant id'>Hash</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='rparen token'>)</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_by_version identifier id'>by_version</span><span class='comma token'>,</span> <span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_ips identifier id'>ips</span><span class='dot token'>.</span><span class='rubyid_include? fid id'>include?</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_ip identifier id'>ip</span><span class='rparen token'>)</span>
+      <span class='rubyid_version identifier id'>version</span> <span class='assign token'>=</span> <span class='rubyid_version_of? fid id'>version_of?</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='rparen token'>)</span>
+      <span class='rubyid_for_version identifier id'>for_version</span> <span class='assign token'>=</span> <span class='rubyid_by_version identifier id'>by_version</span><span class='lbrack token'>[</span><span class='rubyid_version identifier id'>version</span><span class='rbrack token'>]</span>
+      <span class='rubyid_by_version identifier id'>by_version</span><span class='lbrack token'>[</span><span class='rubyid_version identifier id'>version</span><span class='rbrack token'>]</span> <span class='assign token'>=</span> <span class='lparen token'>(</span><span class='rubyid_for_version identifier id'>for_version</span> <span class='assign token'>=</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='rparen token'>)</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_for_version identifier id'>for_version</span>
+      <span class='rubyid_for_version identifier id'>for_version</span> <span class='lshft op'>&lt;&lt;</span> <span class='rubyid_agent identifier id'>agent</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_by_version identifier id'>by_version</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_reverted identifier id'>reverted</span> <span class='assign token'>=</span> <span class='rubyid_agents_by_version identifier id'>agents_by_version</span><span class='dot token'>.</span><span class='rubyid_map identifier id'>map</span> <span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='rubyid_version identifier id'>version</span><span class='comma token'>,</span> <span class='rubyid_agents identifier id'>agents</span><span class='bitor op'>|</span> <span class='rubyid_update identifier id'>update</span><span class='lparen token'>(</span><span class='symbol val'>:services</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_agents identifier id'>agents</span><span class='comma token'>,</span> <span class='symbol val'>:to</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_version identifier id'>version</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
+  <span class='rubyid_reverted identifier id'>reverted</span><span class='dot token'>.</span><span class='rubyid_flatten identifier id'>flatten</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="rollback-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>rollback</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Rolls back one or more services. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code>
+to select which hosts to roll back. Note that this will simply undo the last deployment for
+each of the passed-in services. For rolling back an entire deployment but preserving the
+files of the deployment, it is better to use <span class='object_link'><a href="#revert-instance_method" title="Cosmic::Galaxy#revert (method)">#revert</a></span>. This method will do nothing in
+dryrun mode except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to roll back</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to roll back</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to roll back</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to roll back</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The rolled-back services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+271
+272
+273
+274
+275
+276
+277
+278</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 271</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_rollback identifier id'>rollback</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would rollback #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_RollbackCommand constant id'>RollbackCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Rolled back #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="select-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>select</strong>(params = {}) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Selects services on galaxy via at most one of the following selectors:</p>
+
+<ul>
+<li><code>:path</code> Regular expression for the full path in galaxy which is of the form
+      <code>/&lt;environment&gt;/&lt;version&gt;/&lt;type&gt;</code></li>
+<li><code>:type</code> Regular expression for only the type component of the path in galaxy</li>
+<li><code>:host</code>/<code>:hosts</code> The host(s) to select</li>
+</ul>
+
+<p>If no selector is specified then this will return all services.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:path</span>
+          <span class="type">(<tt>Regexp</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>Regular expression for the path selection</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:type</span>
+          <span class="type">(<tt>Regexp</tt>, <tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>Regular expression for the type selection</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>A single host to select</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to select</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The selected servies</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 107</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_select identifier id'>select</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:path</span><span class='rbrack token'>]</span>
+    <span class='rubyid_path_regex identifier id'>path_regex</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:path</span><span class='rbrack token'>]</span>
+    <span class='rubyid_path_regex identifier id'>path_regex</span> <span class='assign token'>=</span> <span class='rubyid_Regexp constant id'>Regexp</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_path_regex identifier id'>path_regex</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span><span class='rparen token'>)</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_path_regex identifier id'>path_regex</span><span class='dot token'>.</span><span class='rubyid_is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='rubyid_Regexp constant id'>Regexp</span><span class='rparen token'>)</span>
+    <span class='rubyid_selector identifier id'>selector</span> <span class='assign token'>=</span> <span class='rubyid_lambda identifier id'>lambda</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span> <span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_config_path identifier id'>config_path</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_path_regex identifier id'>path_regex</span><span class='dot token'>.</span><span class='rubyid_match identifier id'>match</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_config_path identifier id'>config_path</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[Galaxy] Selecting all services for path #{path_regex.inspect}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_elsif elsif kw'>elsif</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span>
+    <span class='rubyid_type_regex identifier id'>type_regex</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span>
+    <span class='rubyid_type_regex identifier id'>type_regex</span> <span class='assign token'>=</span> <span class='rubyid_Regexp constant id'>Regexp</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_type_regex identifier id'>type_regex</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span><span class='rparen token'>)</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_type_regex identifier id'>type_regex</span><span class='dot token'>.</span><span class='rubyid_is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='rubyid_Regexp constant id'>Regexp</span><span class='rparen token'>)</span>
+    <span class='rubyid_selector identifier id'>selector</span> <span class='assign token'>=</span> <span class='rubyid_lambda identifier id'>lambda</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span> <span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_config_path identifier id'>config_path</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_type_regex identifier id'>type_regex</span><span class='dot token'>.</span><span class='rubyid_match identifier id'>match</span><span class='lparen token'>(</span><span class='rubyid_type_of? fid id'>type_of?</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='rparen token'>)</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[Galaxy] Selecting all services of type #{type_regex.inspect}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_elsif elsif kw'>elsif</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:hosts</span><span class='rbrack token'>]</span>
+    <span class='rubyid_host_names identifier id'>host_names</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span><span class='rparen token'>)</span> <span class='bitand op'>&amp;</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:hosts</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_selector identifier id'>selector</span> <span class='assign token'>=</span> <span class='rubyid_lambda identifier id'>lambda</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span> <span class='rubyid_host_names identifier id'>host_names</span><span class='dot token'>.</span><span class='rubyid_include? fid id'>include?</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_host identifier id'>host</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[Galaxy] Selecting all services for hosts #{host_names.inspect}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;[Galaxy] Selecting all services&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_ShowCommand constant id'>ShowCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+  <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='rparen token'>)</span>
+  <span class='rubyid_execute_with_agents identifier id'>execute_with_agents</span><span class='lparen token'>(</span><span class='rubyid_command identifier id'>command</span><span class='comma token'>,</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span><span class='rparen token'>)</span>
+  <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span><span class='dot token'>.</span><span class='rubyid_select identifier id'>select</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_result identifier id'>result</span><span class='bitor op'>|</span> <span class='rubyid_selector identifier id'>selector</span><span class='dot token'>.</span><span class='rubyid_nil? fid id'>nil?</span> <span class='orop op'>||</span> <span class='rubyid_selector identifier id'>selector</span><span class='dot token'>.</span><span class='rubyid_call identifier id'>call</span><span class='lparen token'>(</span><span class='rubyid_result identifier id'>result</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="start-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>start</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Starts one or more services. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code> to
+select which hosts/services to start. This method will do nothing in dryrun mode except
+create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to start</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to start</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to start</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to start</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The started services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+170
+171
+172
+173
+174
+175
+176
+177</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 170</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_start identifier id'>start</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would start #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_StartCommand constant id'>StartCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Started #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="stop-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>stop</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Stops one or more services. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code> to
+select which hosts to stop. This method will do nothing in dryrun mode except create a
+message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to stop</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to stop</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to stop</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to stop</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The stopped services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+208
+209
+210
+211
+212
+213
+214
+215</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 208</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_stop identifier id'>stop</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would stop #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_StopCommand constant id'>StopCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Stopped #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="take_snapshot-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>take_snapshot</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Takes a snapshot of the current galaxy state, which can be used for instance with #rollback.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The current state as galaxy sees it, as an array of agents</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 88</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_take_snapshot identifier id'>take_snapshot</span>
+  <span class='rubyid_select identifier id'>select</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="update-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>update</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Updates one or more services. Use one of <code>:service</code>, <code>:services</code>, <code>:host</code>, or <code>:hosts</code> to
+select which hosts to update. This method will do nothing in dryrun mode except create a
+message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:to</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The version to update the services to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to update</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to update</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to update</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to update</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The updated services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+228
+229
+230
+231
+232
+233
+234
+235
+236</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 228</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_update identifier id'>update</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_to identifier id'>to</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would update #{agent.host} to version #{params[:to]}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_UpdateCommand constant id'>UpdateCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Updated #{agent.host} to #{to}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="update_config-instance_method">
+  
+    - (<tt>Array&lt;Galaxy::Agent&gt;</tt>) <strong>update_config</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Updates the confinguration of one or more services. Use one of <code>:service</code>, <code>:services</code>,
+<code>:host</code>, or <code>:hosts</code> to select which hosts to update. This method will do nothing in dryrun
+mode except create a message tagged as <code>:dryrun</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:to</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The version to update the confguration of the services to</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to update the confguration of</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to update the confguration of</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:host</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The host to update the confguration of</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:hosts</span>
+          <span class="type">(<tt>String</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The hosts to update the confguration of</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The updated services</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+249
+250
+251
+252
+253
+254
+255
+256
+257</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 249</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_update_config identifier id'>update_config</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_to identifier id'>to</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
+  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would update the config of #{agent.host} to version #{params[:to]}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_UpdateConfigCommand constant id'>UpdateConfigCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Updated the configuration of #{agent.host} to #{to}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
+  <span class='rbrace token'>}</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Tue Jan  3 12:20:12 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.7.4 (ruby-1.8.7).
+</div>
+
+  </body>
+</html>
