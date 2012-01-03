@@ -2,7 +2,6 @@
 --no-private
 --protected
 --hide-void-return
+--output-dir doc/build/api
 lib/**/*.rb
 LICENSE.txt
-README.md
-
