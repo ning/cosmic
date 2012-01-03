@@ -2,7 +2,7 @@
 
 import sys, os
 
-needs_sphinx = '1.1.2'
+needs_sphinx = '1.0'
 
 extensions = []
 

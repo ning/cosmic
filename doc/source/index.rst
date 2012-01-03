@@ -5,6 +5,8 @@ Cosmic is a Ruby library and commandline tool for service deployment automation.
 
 Cosmic itself requires Ruby 1.8.7 or newer, however some plugins require Ruby 1.9 (e.g. the IRC plugin) or JRuby (e.g. the JMX plugin).
 
+Cosmic is licensed under the Apache Software License, version 2.
+
 .. toctree::
    :maxdepth: 2
 
