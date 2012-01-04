@@ -11,8 +11,8 @@ if RUBY_VERSION < '1.9'
   end_message
 end
 
-require_with_hint 'cinch', "In order to use the cinch plugin please run 'gem install cinch'"
-require_with_hint 'atomic', "In order to use the cinch plugin please run 'gem install atomic'"
+require_with_hint 'cinch', "In order to use the irc plugin please run 'gem install cinch'"
+require_with_hint 'atomic', "In order to use the irc plugin please run 'gem install atomic'"
 
 module Cosmic
   # A listener for the message bus that outputs messages to an IRC channel.
