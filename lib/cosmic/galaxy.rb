@@ -146,15 +146,21 @@ module Cosmic
     # @option params [String] :hosts The hosts to assign
     # @return [Array<Galaxy::Agent>] The assigned services
     def assign(params)
+      services = services_from_params(params)
       env = params[:env] or raise "No :env argument given"
       version = params[:version] or raise "No :version argument given"
       type = params[:type] or raise "No :type argument given"
-      dry_run_or_not(params, 'Would assign #{agent.host} to /#{params[:env]}/#{params[:version]}/#{params[:type]}') {
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would assign #{agent.host} to /#{env}/#{version}/#{type}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
         command = ::Galaxy::Commands::AssignCommand.new([ env, version, type ], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment)
         command.execute(services_from_params(params))
         command.report.results
-      }
+      end
     end
 
     # Starts one or more services. Use one of `:service`, `:services`, `:host`, or `:hosts` to
@@ -168,12 +174,18 @@ module Cosmic
     # @option params [String] :hosts The hosts to start
     # @return [Array<Galaxy::Agent>] The started services
     def start(params)
-      dry_run_or_not(params, 'Would start #{agent.host}') {
+      services = services_from_params(params)
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would start #{agent.host}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
         command = ::Galaxy::Commands::StartCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Started #{agent.host}', [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
-      }
+      end
     end
 
     # Restarts one or more services. Use one of `:service`, `:services`, `:host`, or `:hosts`
@@ -187,12 +199,18 @@ module Cosmic
     # @option params [String] :hosts The hosts to restart
     # @return [Array<Galaxy::Agent>] The restarted services
     def restart(params)
-      dry_run_or_not(params, 'Would restart #{agent.host}') {
+      services = services_from_params(params)
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would restart #{agent.host}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
         command = ::Galaxy::Commands::RestartCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Restarted #{agent.host}', [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
-      }
+      end
     end
 
     # Stops one or more services. Use one of `:service`, `:services`, `:host`, or `:hosts` to
@@ -206,12 +224,18 @@ module Cosmic
     # @option params [String] :hosts The hosts to stop
     # @return [Array<Galaxy::Agent>] The stopped services
     def stop(params)
-      dry_run_or_not(params, 'Would stop #{agent.host}') {
+      services = services_from_params(params)
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would stop #{agent.host}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
         command = ::Galaxy::Commands::StopCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Stopped #{agent.host}', [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
-      }
+      end
     end
 
     # Updates one or more services. Use one of `:service`, `:services`, `:host`, or `:hosts` to
@@ -226,13 +250,19 @@ module Cosmic
     # @option params [String] :hosts The hosts to update
     # @return [Array<Galaxy::Agent>] The updated services
     def update(params)
+      services = services_from_params(params)
       to = params[:to] or raise "No :to argument given"
-      dry_run_or_not(params, 'Would update #{agent.host} to version #{params[:to]}') {
-        command = ::Galaxy::Commands::UpdateCommand.new([ params[:to] ], @galaxy_options)
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would update #{agent.host} to version #{to}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
+        command = ::Galaxy::Commands::UpdateCommand.new([ to ], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated #{agent.host} to ' + to, [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
-      }
+      end
     end
 
     # Updates the confinguration of one or more services. Use one of `:service`, `:services`,
@@ -247,14 +277,19 @@ module Cosmic
     # @option params [String] :hosts The hosts to update the confguration of
     # @return [Array<Galaxy::Agent>] The updated services
     def update_config(params)
+      services = services_from_params(params)
       to = params[:to] or raise "No :to argument given"
-      dry_run_or_not(params, 'Would update the configuration of #{agent.host} to version #{params[:to]}') {
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would update the configuration of #{agent.host} to version #{to}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
         command = ::Galaxy::Commands::UpdateConfigCommand.new([ to ], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated the configuration of #{agent.host} to ' + to, [:galaxy, :info])
         command.execute(services)
         command.report.results
-      }
-
+      end
     end
 
     # Rolls back one or more services. Use one of `:service`, `:services`, `:host`, or `:hosts`
@@ -270,12 +305,18 @@ module Cosmic
     # @option params [String] :hosts The hosts to roll back
     # @return [Array<Galaxy::Agent>] The rolled-back services
     def rollback(params)
-      dry_run_or_not(params, 'Would rollback #{agent.host}') {
+      services = services_from_params(params)
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would rollback #{agent.host}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
         command = ::Galaxy::Commands::RollbackCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Rolled back #{agent.host}', [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
-      }
+      end
     end
 
     # Reverts one or more services. Use one of `:service`, `:services`, `:host`, or `:hosts`
@@ -321,12 +362,18 @@ module Cosmic
     # @option params [String] :hosts The hosts to clear
     # @return [Array<Galaxy::Agent>] The cleared services
     def clear(params)
-      dry_run_or_not(params, 'Would clear #{agent.host}') {
+      services = services_from_params(params)
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "Would clear #{agent.host}", :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
         command = ::Galaxy::Commands::ClearCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Cleared #{agent.host}', [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
-      }
+      end
     end
 
     # Utility method that returns a textual representation of the given service(s).
@@ -355,19 +402,6 @@ module Cosmic
     end
 
     private
-
-    def dry_run_or_not(params, dry_run_msg)
-      if @environment.in_dry_run_mode
-        to = params[:to] or raise "No :to argument given"
-        services = params[:services] || arrayify(params[:service])
-        services.each do |agent|
-          notify(:msg => eval('"' + dry_run_msg + '"'), :tags => [:galaxy, :dryrun])
-        end
-        services
-      else
-        yield # implicit block binding
-      end
-    end
 
     def execute_with_agents(command, filters)
       agents = command.select_agents(filters)
