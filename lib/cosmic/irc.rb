@@ -169,6 +169,8 @@ module Cosmic
                  :tags => [:irc, :dryrun])
         else
           channels.each { |channel| write_to_channel(msg, channel) }
+          notify(:msg => "[#{@name}] Wrote message '#{msg}' to channels #{channels.join(',')}",
+                 :tags => [:irc, :trace])
         end
       end
     end
@@ -199,6 +201,10 @@ module Cosmic
       else
         channel = get_channel_internal(channel_name)
         if channel
+          # we do this before the actual action so that the message doesn't show up
+          # in the channel itself (if trace happens to be in the tags)
+          notify(:msg => "[#{@name}] Connected the message bus to channel #{channel_name} for tags #{params[:to]}",
+                 :tags => [:irc, :trace])
           @environment.connect_message_listener(:listener => ChannelMessageListener.new(channel), :tags => params[:to])
         end
       end
@@ -220,6 +226,8 @@ module Cosmic
         channel = get_channel_internal(channel_name)
         if channel
           @environment.disconnect_message_listener(:listener => ChannelMessageListener.new(channel))
+          notify(:msg => "[#{@name}] Disconnected the message bus from channel #{channel_name}",
+                 :tags => [:irc, :trace])
         end
       end
       channel
@@ -243,36 +251,40 @@ module Cosmic
     private
 
     def authenticate
+      host = @config[:host]
+      port = @config[:port]
+      nick = @config[:nick]
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would connect to IRC server #{@config[:host]}:#{@config[:port]} with nick #{@config[:nick]}",
+        notify(:msg => "[#{@name}] Would connect to IRC server #{host}:#{port} with nick #{nick}",
                :tags => [:irc, :dryrun])
       else
-        config = @config
+        password = @config[:auth][:password]
         environment = @environment
         @bot = Cinch::Bot.new do
           @logger = MessageBusLogger.new(:environment => environment,
-                                         :debug => [:irc, :trace],
                                          :generic => [:irc, :trace],
-                                         :error => [:irc, :error],
-                                         :incoming => [:irc, :trace],
-                                         :outgoing => [:irc, :trace])
+                                         :error => [:irc, :error])
           configure do |c|
-            c.nick     = config[:nick]
-            c.server   = config[:host]
-            c.port     = config[:port]
-            c.password = config[:auth][:password]
+            c.nick     = nick
+            c.server   = host
+            c.port     = port
+            c.password = password
             c.verbose  = false
           end
         end
+        me = self
+        my_name = @name
         connected = do_with_timeout(@config[:connection_timeout_sec]) { |done|
           @bot.on :connect do |m|
             done.value = true
+            me.notify(:msg => "[#{my_name}] Connected to IRC server #{host}:#{port} with nick #{nick}",
+                      :tags => [:irc, :trace])
           end
           @bot.start
         }
         if !connected
           @bot.quit
-          raise "Could not connect to the irc server #{@config[:host]}:#{@config[:port]}"
+          raise "Could not connect to the irc server #{host}:#{port}"
         end
       end
     end
@@ -281,24 +293,30 @@ module Cosmic
       if channel_or_name.is_a?(Cinch::Channel)
         channel = channel_or_name
       elsif @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would join channel #{channel_or_name.to_s} on IRC server #{@config[:host]}:#{@config[:port]}",
+        notify(:msg => "[#{@name}] Would join channel #{channel_or_name.to_s}",
                :tags => [:irc, :dryrun])
         nil
       else
         name = channel_or_name.to_s
         channel = @joined_channels[name]
         if !channel
+          me = self
+          my_name = @name
           channel = Cinch::Channel.new(name, @bot)
           joined = do_with_timeout(@config[:connection_timeout_sec]) { |done|
             @bot.on :join do |m|
-              done.value = true if m.channel == channel
+              if m.channel == channel
+                done.value = true
+                me.notify(:msg => "[#{my_name}] Joined channel #{name}",
+                          :tags => [:irc, :trace])
+              end
             end
             channel.join
           }
           if joined
             @joined_channels[name] = channel
           else
-            raise "Could not join the channel #{name} on the irc server #{@config[:host]}:#{@config[:port]}"
+            raise "Could not join the channel #{name}"
           end
         end
       end
