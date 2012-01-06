@@ -1,5 +1,6 @@
 require 'cosmic'
 require 'cosmic/plugin'
+require 'date'
 require 'uri'
 require 'net/http'
 require 'net/https'
@@ -111,6 +112,9 @@ module Cosmic
     # @option params [String,nil] :description The issue description
     # @option params [String,nil] :assignee The assignee. If not specified, then the user
     #                                       used to authenticate with JIRA will be used
+    # @option params [String,Array<String>,nil] :components The name of the component(s)
+    # @option params [DateTime,nil] :due_date The due date of the issue
+    # @option params [Hash,nil] :custom_fields Any custom fields as key value pairs
     # @return [Jira4R::V2::RemoteIssue,nil] The new issue
     def create_issue(params)
       project_name = params[:project] or raise "No :project argument given"
@@ -139,6 +143,20 @@ module Cosmic
           issue.description = params[:description] || ''
           issue.type = type_id
           issue.assignee = params[:assignee] || @config[:auth][:username]
+          issue.duedate = params[:due_date].iso8601 if params[:due_date]
+          if params[:components]
+            issue.components = arrayify(params[:components]).map {|component_name| find_component(project.key, component_name)}
+          end
+          if params[:custom_fields]
+            field_values = Jira4R::V2::ArrayOf_tns1_RemoteCustomFieldValue.new
+            params[:custom_fields].each do |name, value|
+              field = Jira4R::V2::RemoteCustomFieldValue.new
+              field.customfieldId = name
+              field.values = arrayify(value)
+              field_values.push(field)
+            end
+            issue.customFieldValues = field_values
+          end
           @monitor.synchronize do
             @jira.createIssue(issue)
           end
@@ -282,10 +300,14 @@ module Cosmic
       else
         issue = disconnect(params)
         if issue
+          resolution_name = params[:resolution] || 'Fixed'
+          resolution = find_resolution(resolution_name)
+          raise "The resolution #{resolution_name} does not seem to be supported" unless resolution
+
           action_name = params[:action] || 'Resolve Issue'
           resolution_field = Jira4R::V2::RemoteFieldValue.new
           resolution_field.id = "resolution"
-          resolution_field.values = get_resolution_id(params[:resolution] || 'Fixed')
+          resolution_field.values = resolution.id
           perform_workflow_action_internal(issue, action_name, [resolution_field])
         else
           raise "Could not find JIRA issue #{params[:issue]}"
@@ -376,30 +398,45 @@ module Cosmic
       end
     end
 
-    def get_resolution_id(resolution_name)
+    def find_resolution(resolution_name)
       @monitor.synchronize do
         @jira.getResolutions().each do |resolution|
           if resolution.name == resolution_name
-            return resolution.id
+            return resolution
           end
         end
       end
-      raise "The resolution #{resolution_name} does not seem to be supported"
+      nil
+    end
+
+    def find_component(project_key, component_name)
+      @monitor.synchronize do
+        @jira.getComponents(project_key).each do |component|
+          if component.name == component_name
+            return component
+          end
+        end
+      end
+      nil
+    end
+
+    def find_available_action(issue_key, action_name)
+      @monitor.synchronize do
+        @jira.getAvailableActions(issue_key.upcase).each do |action|
+          if action.name == action_name
+            return action
+          end
+        end
+      end
+      nil
     end
 
     def perform_workflow_action_internal(issue, action_name, args_array = [])
-      resolve_action_id = nil
+      action = find_available_action(issue.key, action_name)
+      raise "The workflow action #{action_name} does not seem to be supported" unless action
+
       @monitor.synchronize do
-        @jira.getAvailableActions(issue.key.upcase).each do |action|
-          if action.name == action_name
-            resolve_action_id = action.id
-            break
-          end
-        end
-      end
-      raise "The workflow action #{action_name} does not seem to be supported" unless resolve_action_id
-      @monitor.synchronize do
-        @jira.progressWorkflowAction(issue.key.upcase, resolve_action_id, args_array)
+        @jira.progressWorkflowAction(issue.key.upcase, action.id, args_array)
       end
     end
   end
