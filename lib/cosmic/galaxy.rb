@@ -4,9 +4,9 @@ begin
   require 'galaxy/command'
   require 'galaxy/console'
   require 'galaxy/versioning'
-rescue
+rescue LoadError => e
   puts "In order to use the galaxy plugin please install the galaxy gem version 2.5.1 or newer (2.5.1.1 if using (J)Ruby 1.9)"
-  exit
+  raise e
 end
 
 module Cosmic
@@ -328,6 +328,31 @@ module Cosmic
       }
     end
 
+    # Utility method that returns a textual representation of the given service(s).
+    # 
+    # @param [Hash] params The parameters
+    # @option params [Galaxy::Agent] :service The service to print
+    # @option params [Array<Galaxy::Agent>] :services The services to print
+    # @return [String] The textual representation
+    def print(params)
+      raise "No :service or :services argument given" unless params[:service] || params[:services]
+      services = arrayify(params[:services]) | arrayify(params[:service])
+
+      result = ""
+      services.each do |service|
+        result += sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", 
+                          format_field(service.host),
+                          format_field(service.config_path),
+                          format_field(service.status),
+                          format_field(service.build),
+                          format_field(service.core_type),
+                          format_field(service.machine),
+                          format_field(service.ip),
+                          format_field(service.agent_status))
+      end
+      result
+    end
+
     private
 
     def dry_run_or_not(params, dry_run_msg)
@@ -359,12 +384,16 @@ module Cosmic
 
     def services_from_params(params)
       raise "No :service or :services or :host or :hosts argument given" unless params[:service] || params[:services] || params[:host] || params[:hosts]
-      services = arrayify(params[:services]) & arrayify(params[:service])
+      services = arrayify(params[:services]) | arrayify(params[:service])
       if params[:host] || params[:hosts]
-        host_names = arrayify(params[:host]) & arrayify(params[:hosts])
+        host_names = arrayify(params[:hosts]) | arrayify(params[:host])
         services &= select(:hosts => host_names)
       end
       services
+    end
+
+    def format_field field
+      field ? field : '-'
     end
   end
 end

@@ -1,0 +1,39 @@
+.. _`F5 BIG-IP load balancers`: https://www.f5.com/products/big-ip/
+.. _`iControl library`: https://devcentral.f5.com/Tutorials/TechTips/tabid/63/articleType/ArticleView/articleId/1086421/Getting-Started-With-Ruby-and-iControl.aspx
+
+F5
+===
+
+The F5 plugin allows Cosmic scripts to manipulate certain aspects of `F5 BIG-IP load balancers`_ such as registration of hosts, pool membership, monitoring configuration etc.
+
+It uses the `iControl library`_ version 11.0.0.1 or newer, which can be downloaded from F5's developer website::
+
+    gem install f5-icontrol
+
+The configuration for the plugin consists of the load balancer host and the authentication credentials for it::
+
+    primary_lb:
+      plugin_class: Cosmic::F5
+      host:         <load balancer host>
+      <authentication configuration as explained above>
+
+Typically, you would want to have one plugin entry for each primary load balancer that the Cosmic scripts need access to, and use the sync method provided by the plugin, to sync configuration changes to any secondary load balancers::
+
+    require 'cosmic/galaxy'
+    require 'cosmic/f5'
+
+    services = with galaxy do
+      select :type => /^echo$?/
+    end
+
+    with primary_lb do
+      services.each do |service|
+        node = disable :ip => service.ip
+        remove_from_pool node.merge { :pool => 'echo-12345' }
+        add_to_pool node.merge { : pool => 'echo-23456' }
+        enable node
+      end
+      sync
+    end
+
+This sample script determines all ``echo`` servies from galaxy, then disables them on the primary load balancer, removes them from one pool and adds them to another pool, reenables the services and finally syncs the configuration with any secondary load balancers.

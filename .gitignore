@@ -15,9 +15,9 @@ tmtags
 
 ## PROJECT::GENERAL
 coverage
-doc
 pkg
 .yardoc
+doc/build
 
 ## PROJECT::SPECIFIC
 
