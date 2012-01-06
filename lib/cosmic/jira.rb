@@ -82,6 +82,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [JIRA] The new instance
     def initialize(environment, name = :jira)
+      @name = name.to_s
       # Using Monitor instead of Mutex as the former is reentrant
       @monitor = Monitor.new
       @environment = environment
@@ -121,7 +122,7 @@ module Cosmic
       type = params[:type] or raise "No :type argument given"
       summary = params[:summary] or raise "No :summary argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would create a new issue in project #{project_name} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Would create a new issue in project #{project_name}",
                :tags => [:jira, :dryrun])
         nil
       else
@@ -157,9 +158,12 @@ module Cosmic
             end
             issue.customFieldValues = field_values
           end
-          @monitor.synchronize do
+          new_issue = @monitor.synchronize do
             @jira.createIssue(issue)
           end
+          notify(:msg => "[#{@name}] Created new issue #{new_issue.key} in project #{project_name}",
+                 :tags => [:jira, :trace])
+          new_issue
         else
           raise "Could not find JIRA project #{project_nam}"
         end
@@ -177,7 +181,7 @@ module Cosmic
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def comment_on(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "Would comment on issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Would comment on issue #{params[:issue]}",
                :tags => [:jira, :dryrun])
         nil
       else
@@ -190,6 +194,8 @@ module Cosmic
           @monitor.synchronize do
             @jira.addComment(issue.key.upcase, comment)
           end
+          notify(:msg => "[#{@name}] Added a comment to issue #{issue.key}",
+                 :tags => [:jira, :trace])
         else
           raise "Could not find JIRA issue #{params[:issue]}"
         end
@@ -209,7 +215,7 @@ module Cosmic
     def link(params)
       kind = params[:kind] or raise "No :kind argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would create a link of type #{kind} from issue #{params[:issue]} to #{params[:to]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Would create a link of type #{kind} from issue #{params[:issue]} to #{params[:to]}",
                :tags => [:jira, :dryrun])
         nil
       else
@@ -252,6 +258,8 @@ module Cosmic
             if response.code.to_i >= 400
               raise "Could not link JIRA issue #{issue.key} to #{to.key}, response status was #{response.code.to_i}"
             end
+            notify(:msg => "[#{@name}] Created a link of type #{kind} from issue #{params[:issue]} to #{params[:to]}",
+                   :tags => [:jira, :trace])
           else
             raise "Could not login to JIRA via http/https, response status was #{response.code.to_i}"
           end
@@ -274,13 +282,16 @@ module Cosmic
     def perform_workflow_action(params)
       action_name = params[:action] or raise "No :action argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would perform workflow action #{action_name} on issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Would perform workflow action #{action_name} on issue #{params[:issue]}",
                :tags => [:jira, :dryrun])
         nil
       else
         from_key = params[:issue] or raise "No :issue argument given"
         issue = issueify(from_key)
         perform_workflow_action_internal(issue, action_name, params[:params] || [])
+        notify(:msg => "[#{@name}] Performed workflow action #{action_name} on issue #{params[:issue]}",
+               :tags => [:jira, :trace])
+        issue
       end
     end
 
@@ -294,7 +305,7 @@ module Cosmic
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def resolve(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "Would resolve issue #{params[:issue]} on JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Would resolve issue #{params[:issue]}",
                :tags => [:jira, :dryrun])
         nil
       else
@@ -309,6 +320,8 @@ module Cosmic
           resolution_field.id = "resolution"
           resolution_field.values = resolution.id
           perform_workflow_action_internal(issue, action_name, [resolution_field])
+          notify(:msg => "[#{@name}] Resolved issue #{params[:issue]}",
+                 :tags => [:jira, :trace])
         else
           raise "Could not find JIRA issue #{params[:issue]}"
         end
@@ -327,7 +340,7 @@ module Cosmic
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def connect(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "Would connect issue #{params[:issue]} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} to the message bus",
+        notify(:msg => "[#{@name}] Would connect issue #{params[:issue]} to the message bus for tags #{params[:to]}",
                :tags => [:jira, :dryrun])
         nil
       else
@@ -336,7 +349,9 @@ module Cosmic
         issue = issueify(key)
         if issue
           @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => tags)
-        elsif !@environment.in_dry_run_mode
+          notify(:msg => "[#{@name}] Connected issue #{params[:issue]} to the message bus for tags #{tags}",
+                 :tags => [:jira, :trace])
+        else
           raise "Could not find JIRA issue #{key}"
         end
         issue
@@ -352,7 +367,7 @@ module Cosmic
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def disconnect(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "Would disconnect issue #{params[:issue]} from JIRA server #{@config[:address]} as user #{@config[:auth][:username]} from the message bus",
+        notify(:msg => "[#{@name}] Would disconnect issue #{params[:issue]} from the message bus",
                :tags => [:jira, :dryrun])
         nil
       else
@@ -360,6 +375,8 @@ module Cosmic
         issue = issueify(key)
         if issue
           @environment.disconnect_message_listener(:listener => IssueMessageListener.new(self, issue))
+          notify(:msg => "[#{@name}] Disconnected issue #{params[:issue]} from the message bus",
+                 :tags => [:jira, :trace])
         end
         issue
       end
@@ -369,7 +386,7 @@ module Cosmic
 
     def authenticate
       if @environment.in_dry_run_mode
-        notify(:msg => "Would login to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Would login to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
       else
         @jira = Jira4R::JiraTool.new(2, @config[:address])
@@ -379,6 +396,8 @@ module Cosmic
                                Logger::FATAL => [:jira, :error])
         @jira.logger = log
         @jira.login(@config[:auth][:username], @config[:auth][:password])
+        notify(:msg => "[#{@name}] Login in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+               :tags => [:jira, :trace])
       end
     end
 

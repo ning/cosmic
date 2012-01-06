@@ -24,6 +24,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Exec] The new instance
     def initialize(environment, name = :execute)
+      @name = name.to_s
       @environment = environment
     end
 
@@ -35,7 +36,7 @@ module Cosmic
     #                                  combined)
     def exec(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "Would execute command '#{params[:cmd]}'",
+        notify(:msg => "[#{@name}] Would execute command '#{params[:cmd]}'",
                :tags => [:execute, :dryrun])
         nil
       else

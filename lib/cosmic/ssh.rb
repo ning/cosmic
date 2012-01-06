@@ -43,6 +43,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [SSH] The new instance
     def initialize(environment, name = :ssh)
+      @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
@@ -71,13 +72,15 @@ module Cosmic
       user = params[:user] || @config[:auth][:username]
       cmd = params[:cmd] or raise "No :cmd argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would connect as user #{user} to host #{host} and execute command '#{cmd}'",
+        notify(:msg => "[#{@name}] Would execute command '#{cmd}' as user #{user} on host #{host}",
                :tags => [:ssh, :dryrun])
       else
         response = nil
         Net::SSH.start(host, user, @ssh_opts) do |ssh|
           response = ssh.exec!(cmd)
         end
+        notify(:msg => "[#{@name}] Executed command '#{cmd}' as user #{user} on host #{host}",
+               :tags => [:ssh, :trace])
         response
       end
     end
@@ -102,13 +105,15 @@ module Cosmic
       local = params[:local] or raise "No :local argument given"
       remote = params[:remote] || params[:local]
       if @environment.in_dry_run_mode
-        notify(:msg => "Would upload local file #{local} as user #{user} to host #{host} at #{remote}",
+        notify(:msg => "[#{@name}] Would upload local file #{local} as user #{user} to host #{host} at #{remote}",
                :tags => [:ssh, :dryrun])
       else
         response = nil
         Net::SCP.start(host, user, @ssh_opts) do |scp|
           scp.upload!(local, remote, &block)
         end
+        notify(:msg => "[#{@name}] Uploaded local file #{local} as user #{user} to host #{host} at #{remote}",
+               :tags => [:ssh, :trace])
       end
     end
 
@@ -132,13 +137,15 @@ module Cosmic
       local = params[:local] || params[:remote]
       remote = params[:remote] or raise "No :remote argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would download remote file #{remote} as user #{user} from host #{host} to local file #{local}",
+        notify(:msg => "[#{@name}] Would download remote file #{remote} as user #{user} from host #{host} to local file #{local}",
                :tags => [:ssh, :dryrun])
       else
         response = nil
         Net::SCP.start(host, user, @ssh_opts) do |scp|
           scp.download!(remote, local, &block)
         end
+        notify(:msg => "[#{@name}] Downloaded remote file #{remote} as user #{user} from host #{host} to local file #{local}",
+               :tags => [:ssh, :trace])
       end
     end
   end

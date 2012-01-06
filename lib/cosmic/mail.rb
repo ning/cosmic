@@ -51,6 +51,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Mail] The new instance
     def initialize(environment, name = :mail)
+      @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
@@ -101,13 +102,15 @@ module Cosmic
         end
       end
       if @environment.in_dry_run_mode
-        notify(:msg => "Would send an email with subject #{mail.subject} from #{mail.from} to #{mail.to}",
+        notify(:msg => "[#{@name}] Would send an email with subject #{mail.subject} from #{mail.from} to #{mail.to}",
                :tags => [:mail, :dryrun])
       else
         if @delivery_method
           mail.delivery_method(@delivery_method, @delivery_config)
         end
         mail.deliver!
+        notify(:msg => "[#{@name}] Sent an email with subject #{mail.subject} from #{mail.from} to #{mail.to}",
+               :tags => [:mail, :trace])
       end
     end
   end

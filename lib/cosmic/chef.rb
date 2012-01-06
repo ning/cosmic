@@ -25,6 +25,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Chef] The new instance
     def initialize(environment, name = :chef)
+      @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @connections = {}
@@ -60,7 +61,7 @@ module Cosmic
     # @return [Hash,nil] A hash with the info for the host
     def add_role(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "Would add role #{params[:role]} to #{params[:host] || params[:node]} ",
+        notify(:msg => "[#{@name}] Would add role #{params[:role]} to #{params[:host] || params[:node]} ",
                :tags => [:chef, :dryrun])
         nil
       else

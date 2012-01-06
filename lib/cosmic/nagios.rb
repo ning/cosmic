@@ -29,6 +29,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Nagios] The new instance
     def initialize(environment, name = :nagios)
+      @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
@@ -55,10 +56,15 @@ module Cosmic
       service = params[:service]
       if service
         request = Net::HTTP::Get.new("/hosts/#{host}/#{service}/attributes?format=json")
+        response = @nagix.request(request)
+        notify(:msg => "[#{@name}] Retrieved Nagios status for service #{service} on host #{host}",
+               :tags => [:nagios, :trace])
       else
         request = Net::HTTP::Get.new("/hosts/#{host}/attributes?format=json")
+        response = @nagix.request(request)
+        notify(:msg => "[#{@name}] Retrieved Nagios status for host #{host}",
+               :tags => [:nagios, :trace])
       end
-      response = @nagix.request(request)
       if response.code.to_i < 300
         statuses = JSON.parse(response.body)
         if statuses.length > 0
@@ -102,20 +108,20 @@ module Cosmic
       service = params[:service]
       if @environment.in_dry_run_mode
         if service
-          notify(:msg => "Would enable Nagios notifications for service #{service} on host #{host}",
+          notify(:msg => "[#{@name}] Would enable Nagios notifications for service #{service} on host #{host}",
                  :tags => [:nagios, :dryrun])
         else
-          notify(:msg => "Would enable Nagios notifications for host #{host}",
+          notify(:msg => "[#{@name}] Would enable Nagios notifications for host #{host}",
                  :tags => [:nagios, :dryrun])
         end
       else
         if service
-          notify(:msg => "[Nagios] Enabling notifications for service #{service} on host #{host}",
-                 :tags => [:nagios, :info])
+          notify(:msg => "[#{@name}] Enabling notifications for service #{service} on host #{host}",
+                 :tags => [:nagios, :trace])
           request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/ENABLE_SVC_NOTIFICATIONS")
         else
-          notify(:msg => "[Nagios] Enabling notifications for host #{host}",
-                 :tags => [:nagios, :info])
+          notify(:msg => "[#{@name}] Enabling notifications for host #{host}",
+                 :tags => [:nagios, :trace])
           request = Net::HTTP::Put.new("/hosts/#{host}/command/ENABLE_HOST_SVC_NOTIFICATIONS")
         end
         request.body = "{}"
@@ -141,20 +147,20 @@ module Cosmic
       service = params[:service]
       if @environment.in_dry_run_mode
         if service
-          notify(:msg => "Would disable Nagios notifications for service #{service} on host #{host}",
+          notify(:msg => "[#{@name}] Would disable Nagios notifications for service #{service} on host #{host}",
                  :tags => [:nagios, :dryrun])
         else
-          notify(:msg => "Would disable Nagios notifications for host #{host}",
+          notify(:msg => "[#{@name}] Would disable Nagios notifications for host #{host}",
                  :tags => [:nagios, :dryrun])
         end
       else
         if service
-          notify(:msg => "[Nagios] Disabling notifications for service #{service} on host #{host}",
-                 :tags => [:nagios, :info])
+          notify(:msg => "[#{@name}] Disabling notifications for service #{service} on host #{host}",
+                 :tags => [:nagios, :trace])
           request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/DISABLE_SVC_NOTIFICATIONS")
         else
-          notify(:msg => "[Nagios] Disabling notifications for host #{host}",
-                 :tags => [:nagios, :info])
+          notify(:msg => "[#{@name}] Disabling notifications for host #{host}",
+                 :tags => [:nagios, :trace])
           request = Net::HTTP::Put.new("/hosts/#{host}/command/DISABLE_HOST_SVC_NOTIFICATIONS")
         end
         request.body = "{}"

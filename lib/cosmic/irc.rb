@@ -140,6 +140,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [IRC] The new instance
     def initialize(environment, name = :irc)
+      @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       raise "No irc host specified in the configuration" unless @config[:host]
@@ -164,7 +165,7 @@ module Cosmic
       channels = arrayify(params[:channels])
       if !channels.empty?
         if @environment.in_dry_run_mode
-          notify(:msg => "Would write message '#{msg}' to channels #{channels.join(',')}",
+          notify(:msg => "[#{@name}] Would write message '#{msg}' to channels #{channels.join(',')}",
                  :tags => [:irc, :dryrun])
         else
           channels.each { |channel| write_to_channel(msg, channel) }
@@ -192,9 +193,14 @@ module Cosmic
     # @return [Cinch::Channel,nil] The channel if the plugin was able to connect it
     def connect(params)
       channel_name = params[:channel] or raise "No :channel argument given"
-      channel = get_channel_internal(channel_name)
-      if channel
-        @environment.connect_message_listener(:listener => ChannelMessageListener.new(channel), :tags => params[:to])
+      if @environment.in_dry_run_mode
+        notify(:msg => "[#{@name}] Would connect the message bus to channel #{channel_name} for tags #{params[:to]}",
+               :tags => [:irc, :dryrun])
+      else
+        channel = get_channel_internal(channel_name)
+        if channel
+          @environment.connect_message_listener(:listener => ChannelMessageListener.new(channel), :tags => params[:to])
+        end
       end
       channel
     end
@@ -207,9 +213,14 @@ module Cosmic
     # @return [Cinch::Channel,nil] The channel
     def disconnect(params)
       channel_name = params[:channel] or raise "No :channel argument given"
-      channel = get_channel_internal(channel_name)
-      if channel
-        @environment.disconnect_message_listener(:listener => ChannelMessageListener.new(channel))
+      if @environment.in_dry_run_mode
+        notify(:msg => "[#{@name}] Would disconnect the message bus from channel #{channel_name}",
+               :tags => [:irc, :dryrun])
+      else
+        channel = get_channel_internal(channel_name)
+        if channel
+          @environment.disconnect_message_listener(:listener => ChannelMessageListener.new(channel))
+        end
       end
       channel
     end
@@ -233,7 +244,7 @@ module Cosmic
 
     def authenticate
       if @environment.in_dry_run_mode
-        notify(:msg => "Would connect to IRC server #{@config[:host]}:#{@config[:port]} with nick #{@config[:nick]}",
+        notify(:msg => "[#{@name}] Would connect to IRC server #{@config[:host]}:#{@config[:port]} with nick #{@config[:nick]}",
                :tags => [:irc, :dryrun])
       else
         config = @config
@@ -270,7 +281,7 @@ module Cosmic
       if channel_or_name.is_a?(Cinch::Channel)
         channel = channel_or_name
       elsif @environment.in_dry_run_mode
-        notify(:msg => "Would join channel #{channel_or_name.to_s} on IRC server #{@config[:host]}:#{@config[:port]}",
+        notify(:msg => "[#{@name}] Would join channel #{channel_or_name.to_s} on IRC server #{@config[:host]}:#{@config[:port]}",
                :tags => [:irc, :dryrun])
         nil
       else

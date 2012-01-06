@@ -72,6 +72,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Galaxy] The new instance
     def initialize(environment, name = :galaxy)
+      @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       raise "No gonsole host specified in the configuration" unless @config[:host]
@@ -109,22 +110,22 @@ module Cosmic
         path_regex = params[:path]
         path_regex = Regexp.new(path_regex.to_s) unless path_regex.is_a?(Regexp)
         selector = lambda {|agent| agent.config_path && path_regex.match(agent.config_path) }
-        notify(:msg => "[Galaxy] Selecting all services for path #{path_regex.inspect}",
-               :tags => [:galaxy, :info])
+        notify(:msg => "[#{@name}] Selecting all services for path #{path_regex.inspect}",
+               :tags => [:galaxy, :trace])
       elsif params[:type]
         type_regex = params[:type]
         type_regex = Regexp.new(type_regex.to_s) unless type_regex.is_a?(Regexp)
         selector = lambda {|agent| agent.config_path && type_regex.match(type_of?(agent)) }
-        notify(:msg => "[Galaxy] Selecting all services of type #{type_regex.inspect}",
-               :tags => [:galaxy, :info])
+        notify(:msg => "[#{@name}] Selecting all services of type #{type_regex.inspect}",
+               :tags => [:galaxy, :trace])
       elsif params[:host] || params[:hosts]
         host_names = arrayify(params[:host]) & arrayify(params[:hosts])
         selector = lambda {|agent| host_names.include?(agent.host) }
-        notify(:msg => "[Galaxy] Selecting all services for hosts #{host_names.inspect}",
-               :tags => [:galaxy, :info])
+        notify(:msg => "[#{@name}] Selecting all services for hosts #{host_names.inspect}",
+               :tags => [:galaxy, :trace])
       else
-        notify(:msg => "[Galaxy] Selecting all services",
-               :tags => [:galaxy, :info])
+        notify(:msg => "[#{@name}] Selecting all services",
+               :tags => [:galaxy, :trace])
       end
       command = ::Galaxy::Commands::ShowCommand.new([], @galaxy_options)
       command.report = GalaxyGatheringReport.new(@environment)
@@ -152,12 +153,15 @@ module Cosmic
       type = params[:type] or raise "No :type argument given"
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would assign #{agent.host} to /#{env}/#{version}/#{type}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would assign #{agent.host} to /#{env}/#{version}/#{type}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::AssignCommand.new([ env, version, type ], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment)
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Assigned #{agent.host} to /' + env + '/' + version + '/' + type,
+                                                   [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
       end
@@ -177,12 +181,15 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would start #{agent.host}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would start #{agent.host}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::StartCommand.new([], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Started #{agent.host}', [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Started #{agent.host}',
+                                                   [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
       end
@@ -202,12 +209,15 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would restart #{agent.host}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would restart #{agent.host}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::RestartCommand.new([], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Restarted #{agent.host}', [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Restarted #{agent.host}',
+                                                   [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
       end
@@ -227,12 +237,15 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would stop #{agent.host}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would stop #{agent.host}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::StopCommand.new([], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Stopped #{agent.host}', [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Stopped #{agent.host}',
+                                                   [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
       end
@@ -254,12 +267,15 @@ module Cosmic
       to = params[:to] or raise "No :to argument given"
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would update #{agent.host} to version #{to}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would update #{agent.host} to version #{to}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::UpdateCommand.new([ to ], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated #{agent.host} to ' + to, [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Updated #{agent.host} to ' + to,
+                                                   [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
       end
@@ -281,12 +297,15 @@ module Cosmic
       to = params[:to] or raise "No :to argument given"
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would update the configuration of #{agent.host} to version #{to}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would update the configuration of #{agent.host} to version #{to}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::UpdateConfigCommand.new([ to ], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated the configuration of #{agent.host} to ' + to, [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Updated the configuration of #{agent.host} to ' + to,
+                                                   [:galaxy, :trace])
         command.execute(services)
         command.report.results
       end
@@ -308,12 +327,15 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would rollback #{agent.host}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would rollback #{agent.host}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::RollbackCommand.new([], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Rolled back #{agent.host}', [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Rolled back #{agent.host}',
+                                                   [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
       end
@@ -365,12 +387,15 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "Would clear #{agent.host}", :tags => [:galaxy, :dryrun])
+          notify(:msg => "[#{@name}] Would clear #{agent.host}",
+                 :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::ClearCommand.new([], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Cleared #{agent.host}', [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Cleared #{agent.host}',
+                                                   [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
       end

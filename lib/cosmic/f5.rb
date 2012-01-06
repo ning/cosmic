@@ -28,6 +28,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [Galaxy] The new instance
     def initialize(environment, name = :f5)
+      @name = name.to_s
       # Using Monitor instead of Mutex as the former is reentrant
       @monitor = Monitor.new
       @environment = environment
@@ -53,12 +54,12 @@ module Cosmic
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       if @environment.in_dry_run_mode
-        notify(:msg => "Would add node node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
+        notify(:msg => "[#{@name}] Would add node node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :dryrun])
         get_member(params)
       else
-        notify(:msg => "[F5] Adding node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
+        notify(:msg => "[#{@name}] Adding node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :trace])
         @monitor.synchronize do
           @f5['LocalLB.Pool'].add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
@@ -97,11 +98,11 @@ module Cosmic
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       if @environment.in_dry_run_mode
-        notify(:msg => "Would set monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+        notify(:msg => "[#{@name}] Would set monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :dryrun])
       else
-        notify(:msg => "[F5] Setting monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
+        notify(:msg => "[#{@name}] Setting monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :trace])
         if params[:monitor_rule]
           ip_port = { 'address' => node_ip,
                       'port' => node_port }
@@ -135,11 +136,11 @@ module Cosmic
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       if @environment.in_dry_run_mode
-        notify(:msg => "Would remote node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
+        notify(:msg => "[#{@name}] Would remote node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :dryrun])
       else
-        notify(:msg => "[F5] Removing node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
+        notify(:msg => "[#{@name}] Removing node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :trace])
         @monitor.synchronize do
           @f5['LocalLB.Pool'].remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
@@ -155,8 +156,8 @@ module Cosmic
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def get_members(params)
       pool_name = params[:pool] or raise "No :pool argument given"
-      notify(:msg => "[F5] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
-             :tags => [:f5, :info])
+      notify(:msg => "[#{@name}] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
+             :tags => [:f5, :trace])
       members = @monitor.synchronize do
         @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
           member = pool_member['member']
@@ -199,8 +200,8 @@ module Cosmic
       pool_name = params[:pool] or raise "No :pool argument given"
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
-      notify(:msg => "[F5] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-             :tags => [:f5, :info])
+      notify(:msg => "[#{@name}] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+             :tags => [:f5, :trace])
       member = nil
       @monitor.synchronize do
         @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].each do |pool_member|
@@ -241,8 +242,8 @@ module Cosmic
     # @return [Hash,nil] The member as a hash with `:ip`, `:availability`, and `:enabled` entries
     def get_node(params)
       node_ip = get_ip(params)
-      notify(:msg => "[F5] Retrieving node #{node_ip} from load balancer #{@config[:host]}",
-             :tags => [:f5, :info])
+      notify(:msg => "[#{@name}] Retrieving node #{node_ip} from load balancer #{@config[:host]}",
+             :tags => [:f5, :trace])
       @monitor.synchronize do
         @f5['LocalLB.NodeAddress'].get_object_status([ node_ip ]).each do |status|
           return { :ip => node_ip,
@@ -267,15 +268,15 @@ module Cosmic
       result = {}
       if pool_name
         node_port = (params[:port] || 80).to_i
-        notify(:msg => "[F5] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
+        notify(:msg => "[#{@name}] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+               :tags => [:f5, :trace])
         stats = @monitor.synchronize do
           @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
         stats = stats[0] if stats[0]
       else
-        notify(:msg => "[F5] Retrieving stats for node #{node_ip} on load balancer #{@config[:host]}",
-               :tags => [:f5, :info])
+        notify(:msg => "[#{@name}] Retrieving stats for node #{node_ip} on load balancer #{@config[:host]}",
+               :tags => [:f5, :trace])
         stats = @monitor.synchronize do
           @f5['LocalLB.NodeAddress'].get_statistics([ node_ip ])
         end
@@ -324,24 +325,24 @@ module Cosmic
       if pool_name
         node_port = (params[:port] || 80).to_i
         if @environment.in_dry_run_mode
-          notify(:msg => "Would enable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+          notify(:msg => "[#{@name}] Would enable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                  :tags => [:f5, :dryrun])
           get_member(params)
         else
-          notify(:msg => "[F5] Enabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-                 :tags => [:f5, :info])
+          notify(:msg => "[#{@name}] Enabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :trace])
           set_pool_member_status(pool_name,
                                  'member' => { 'address' => node_ip, 'port' => node_port },
                                  'monitor_state' => 'STATE_ENABLED')
         end
       else
         if @environment.in_dry_run_mode
-          notify(:msg => "Would enable node #{node_ip} on load balancer #{@config[:host]}",
+          notify(:msg => "[#{@name}] Would enable node #{node_ip} on load balancer #{@config[:host]}",
                  :tags => [:f5, :dryrun])
           get_member(params)
         else
-          notify(:msg => "[F5] Enabling node #{node_ip} on load balancer #{@config[:host]}",
-                 :tags => [:f5, :info])
+          notify(:msg => "[#{@name}] Enabling node #{node_ip} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :trace])
           set_node_status(node_ip, 'STATE_ENABLED')
         end
       end
@@ -364,24 +365,24 @@ module Cosmic
       if pool_name
         node_port = (params[:port] || 80).to_i
         if @environment.in_dry_run_mode
-          notify(:msg => "Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+          notify(:msg => "[#{@name}] Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                  :tags => [:f5, :dryrun])
           get_member(params)
         else
-          notify(:msg => "[F5] Disabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
-                 :tags => [:f5, :info])
+          notify(:msg => "[#{@name}] Disabling member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :trace])
           set_pool_member_status(pool_name,
                                  'member' => { 'address' => node_ip, 'port' => node_port },
                                  'session_state' => 'STATE_DISABLED')
         end
       else
         if @environment.in_dry_run_mode
-          notify(:msg => "Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
+          notify(:msg => "[#{@name}] Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                  :tags => [:f5, :dryrun])
           get_member(params)
         else
-          notify(:msg => "[F5] Disabling node #{node_ip} on load balancer #{@config[:host]}",
-                 :tags => [:f5, :info])
+          notify(:msg => "[#{@name}] Disabling node #{node_ip} on load balancer #{@config[:host]}",
+                 :tags => [:f5, :trace])
           set_node_status(node_ip, 'STATE_DISABLED')
         end
       end
@@ -394,15 +395,26 @@ module Cosmic
     # @option params [String] :group The specific group to sync to; if omitted then all groups will be synced to
     # @return [void]
     def sync(params)
-      if @environment.in_dry_run_mode
-        notify(:msg => "Would sync configurations for load balancer #{@config[:host]}",
-               :tags => [:f5, :dryrun])
-      else
-        group = params[:group]
-        @monitor.synchronize do
-          if group
+      group = params[:group]
+      if group
+        if @environment.in_dry_run_mode
+          notify(:msg => "[#{@name}] Would sync configurations for load balancer #{@config[:host]} to group #{group}",
+                 :tags => [:f5, :dryrun])
+        else
+          notify(:msg => "[#{@name}] Syncing configurations for load balancer #{@config[:host]} to group #{group}",
+                 :tags => [:f5, :trace])
+          @monitor.synchronize do
             @f5['System.ConfigSync'].synchronize_to_group(group)
-          else
+          end
+        end
+      else
+        if @environment.in_dry_run_mode
+          notify(:msg => "[#{@name}] Would sync configurations for load balancer #{@config[:host]}",
+                 :tags => [:f5, :dryrun])
+        else
+          notify(:msg => "[#{@name}] Syncing configurations for load balancer #{@config[:host]}",
+                 :tags => [:f5, :trace])
+          @monitor.synchronize do
             @f5['System.ConfigSync'].synchronize_configuration('CONFIGSYNC_ALL')
           end
         end

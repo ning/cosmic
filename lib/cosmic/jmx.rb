@@ -31,6 +31,7 @@ module Cosmic
     # @param [Symbol] name The name for this plugin instance e.g. in the config
     # @return [JMX] The new instance
     def initialize(environment, name = :jmx)
+      @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @connections = {}
@@ -58,12 +59,20 @@ module Cosmic
     # @option params [String] :filter The mbean filter; default value is '*:*' for all mbeans
     # @return [Array<::JMX::MBean>] The found mbeans
     def find_mbeans(params)
+      filter = params[:filter] || '*:*'
       conn = get_connection(params)
-      if conn
-        ::JMX::MBean.find_all_by_name(params[:filter] || '*:*', :connection => conn)
+      if @environment.in_dry_run_mode
+        notify(:msg => "[#{@name}] Would find all mbeans matching #{filter} on host #{host}:#{port}",
+               :tags => [:jmx, :dryrun])
       else
-        []
+        if conn
+          result = ::JMX::MBean.find_all_by_name(filter, :connection => conn)
+          notify(:msg => "[#{@name}] Found all mbeans matching #{filter} on host #{host}:#{port}",
+                 :tags => [:jmx, :trace])
+          return result
+        end
       end
+      []
     end
 
     # Returns the value of an mbean attribute. This method will do nothing in dryrun mode
@@ -72,18 +81,25 @@ module Cosmic
     # @param [Hash] params The parameters
     # @option params [::JMX::MBean,nil] :mbean The mbean; if not specified, then `host`, `port` and `name` are required
     # @option params [String,nil] :host The host to query for the mbean; 'localhost' by default
-    # @option params [String,nil] :port The JMX port on the host; 3000 by default
+    # @option params [String,nil] :port The JMX port on the host
     # @option params [String,nil] :name The mbean name
     # @option params [String] :attribute The attribute to retrieve
     # @return [Object] The attribute value
     def get_attribute(params)
       attribute = params[:attribute] or raise "No :attribute argument given"
       mbean = mbeanify(params)
-      if mbean
-        mbean.send(attribute.snake_case)
+      if @environment.in_dry_run_mode
+        notify(:msg => "[#{@name}] Would retrieve attribute #{attribute} of mbean #{params[:name] || mbean}",
+               :tags => [:jmx, :dryrun])
       else
-        nil
+        if mbean
+          result = mbean.send(attribute.snake_case)
+          notify(:msg => "[#{@name}] Retrieved attribute #{attribute} of mbean #{params[:name] || mbean}",
+                 :tags => [:jmx, :trace])
+          return result
+        end
       end
+      nil
     end
 
     # Sets the value of an mbean attribute. This method will do nothing in dryrun mode
@@ -92,7 +108,7 @@ module Cosmic
     # @param [Hash] params The parameters
     # @option params [::JMX::MBean,nil] :mbean The mbean; if not specified, then `host`, `port` and `name` are required
     # @option params [String,nil] :host The host to query for the mbean; 'localhost' by default
-    # @option params [String,nil] :port The JMX port on the host; 3000 by default
+    # @option params [String,nil] :port The JMX port on the host
     # @option params [String,nil] :name The mbean name
     # @option params [String] :attribute The attribute to set
     # @option params [Object] :value What to set the attribute to
@@ -101,8 +117,15 @@ module Cosmic
       attribute = params[:attribute] or raise "No :attribute argument given"
       value = params[:value] or raise "No :value argument given"
       mbean = mbeanify(params)
-      if mbean
-        mbean.send(attribute.snake_case + '=', value)
+      if @environment.in_dry_run_mode
+        notify(:msg => "[#{@name}] Would set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
+               :tags => [:jmx, :dryrun])
+      else
+        if mbean
+          mbean.send(attribute.snake_case + '=', value)
+          notify(:msg => "[#{@name}] Set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
+                 :tags => [:jmx, :trace])
+        end
       end
       mbean
     end
@@ -121,11 +144,18 @@ module Cosmic
     def invoke(params)
       operation = params[:operation] or raise "No :operation argument given"
       mbean = mbeanify(params)
-      if mbean
-        mbean.send(operation.snake_case, *(params[:args] || []))
+      if @environment.in_dry_run_mode
+        notify(:msg => "[#{@name}] Would invoke operation #{operation} on mbean #{params[:name] || mbean}",
+               :tags => [:jmx, :dryrun])
       else
-        nil
+        if mbean
+          result = mbean.send(operation.snake_case, *(params[:args] || []))
+          notify(:msg => "[#{@name}] Invoked operation #{operation} on mbean #{params[:name] || mbean}",
+                 :tags => [:jmx, :trace])
+          return result
+        end
       end
+      nil
     end
 
     private
@@ -134,8 +164,9 @@ module Cosmic
       host = params[:host] or raise "No :host argument given"
       port = params[:port] or raise "No :port argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "Would try to connect to JMX on host '#{host}:#{port}'",
+        notify(:msg => "[#{@name}] Would try to connect to JMX on host #{host}:#{port}",
                :tags => [:jmx, :dryrun])
+        nil
       else
         username = nil
         password = nil
@@ -143,10 +174,14 @@ module Cosmic
           username = @config[:auth][:username]
           password = @config[:auth][:password]
         end
-        @connections[host + ':' + port.to_s] ||= ::JMX::MBean.create_connection(:host => host,
-                                                                                :port => port.to_i,
-                                                                                :username => username,
-                                                                                :password => password)
+        key = host + ':' + port.to_s
+        @connections[key] ||= ::JMX::MBean.create_connection(:host => host,
+                                                             :port => port.to_i,
+                                                             :username => username,
+                                                             :password => password)
+        notify(:msg => "[#{@name}] Connected to JMX on host #{host}:#{port}",
+               :tags => [:jmx, :trace])
+        @connections[key]
       end
     end
 
@@ -154,11 +189,18 @@ module Cosmic
       return params[:mbean] if params[:mbean]
       name = params[:name] or raise "No :name argument given"
       conn = get_connection(params)
-      if conn
-        ::JMX::MBean.find_by_name(name, :connection => conn)
+      if @environment.in_dry_run_mode
+        notify(:msg => "[#{@name}] Would retrieve mbean #{name} from host #{host}:#{port}",
+               :tags => [:jmx, :dryrun])
       else
-        nil
+        if conn
+          mbean = ::JMX::MBean.find_by_name(name, :connection => conn)
+          notify(:msg => "[#{@name}] Retrieved mbean #{name} from host #{host}:#{port}",
+                 :tags => [:jmx, :trace])
+          return mbean
+        end
       end
+      nil
     end
   end
 end
