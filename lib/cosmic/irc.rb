@@ -190,20 +190,20 @@ module Cosmic
     # a message tagged as `:dryrun`.
     #
     # @param [Hash] params The parameters
-    # @option params [String] :channel The channel to join
+    # @option params [Cinch::Channel,String] :channel The channel to connect
     # @option params [Array<String>,String] :to The tags for the messages that the plugin should write to the channel
     # @return [Cinch::Channel,nil] The channel if the plugin was able to connect it
     def connect(params)
-      channel_name = params[:channel] or raise "No :channel argument given"
+      channel_or_name = params[:channel] or raise "No :channel argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would connect the message bus to channel #{channel_name} for tags #{params[:to]}",
+        notify(:msg => "[#{@name}] Would connect the message bus to channel #{channel_or_name} for tags #{params[:to]}",
                :tags => [:irc, :dryrun])
       else
-        channel = get_channel_internal(channel_name)
+        channel = get_channel_internal(channel_or_name)
         if channel
           # we do this before the actual action so that the message doesn't show up
           # in the channel itself (if trace happens to be in the tags)
-          notify(:msg => "[#{@name}] Connected the message bus to channel #{channel_name} for tags #{params[:to]}",
+          notify(:msg => "[#{@name}] Connected the message bus to channel #{channel_or_name} for tags #{params[:to]}",
                  :tags => [:irc, :trace])
           @environment.connect_message_listener(:listener => ChannelMessageListener.new(channel), :tags => params[:to])
         end
@@ -215,18 +215,18 @@ module Cosmic
     # except create a message tagged as `:dryrun`.
     #
     # @param [Hash] params The parameters
-    # @option params [String] :channel The channel to disconnect from the message bus
+    # @option params [Cinch::Channel,String] :channel The channel to disconnect from the message bus
     # @return [Cinch::Channel,nil] The channel
     def disconnect(params)
-      channel_name = params[:channel] or raise "No :channel argument given"
+      channel_or_name = params[:channel] or raise "No :channel argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would disconnect the message bus from channel #{channel_name}",
+        notify(:msg => "[#{@name}] Would disconnect the message bus from channel #{channel_or_name}",
                :tags => [:irc, :dryrun])
       else
-        channel = get_channel_internal(channel_name)
+        channel = get_channel_internal(channel_or_name)
         if channel
           @environment.disconnect_message_listener(:listener => ChannelMessageListener.new(channel))
-          notify(:msg => "[#{@name}] Disconnected the message bus from channel #{channel_name}",
+          notify(:msg => "[#{@name}] Disconnected the message bus from channel #{channel_or_name}",
                  :tags => [:irc, :trace])
         end
       end

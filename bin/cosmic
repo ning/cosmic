@@ -25,8 +25,14 @@ else
   cosmic = Cosmic::Environment.from_config_file(options)
   script_file = ARGV.shift
   with cosmic do
-    # Unfortunately this won't give us proper line info in case of errors (see https://redmine.ruby-lang.org/issues/4352)
-    eval(IO.read(script_file), binding, script_file, __LINE__)
+    begin
+      # Unfortunately this won't give us proper line info in case of errors (see https://redmine.ruby-lang.org/issues/4352)
+      eval(IO.read(script_file), binding, script_file, __LINE__)
+    rescue SystemCallError => e
+      puts "#{$!}\n\t" + e.backtrace.join("\n\t")
+    rescue => e
+      puts "#{$!}\n\t" + e.backtrace.join("\n\t")
+    end
   end
 end
 
