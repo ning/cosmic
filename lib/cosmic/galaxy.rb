@@ -229,7 +229,7 @@ module Cosmic
       to = params[:to] or raise "No :to argument given"
       dry_run_or_not(params, 'Would update #{agent.host} to version #{params[:to]}') {
         command = ::Galaxy::Commands::UpdateCommand.new([ params[:to] ], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated #{agent.host} to #{to}', [:galaxy, :info])
+        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated #{agent.host} to ' + to, [:galaxy, :info])
         command.execute(services_from_params(params))
         command.report.results
       }
@@ -248,12 +248,13 @@ module Cosmic
     # @return [Array<Galaxy::Agent>] The updated services
     def update_config(params)
       to = params[:to] or raise "No :to argument given"
-      dry_run_or_not(params, 'Would update the config of #{agent.host} to version #{params[:to]}') {
-        command = ::Galaxy::Commands::UpdateConfigCommand.new([ params[:to] ], @galaxy_options)
-        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated the configuration of #{agent.host} to #{to}', [:galaxy, :info])
-        command.execute(services_from_params(params))
+      dry_run_or_not(params, 'Would update the configuration of #{agent.host} to version #{params[:to]}') {
+        command = ::Galaxy::Commands::UpdateConfigCommand.new([ to ], @galaxy_options)
+        command.report = GalaxyGatheringReport.new(@environment, '[Galaxy] Updated the configuration of #{agent.host} to ' + to, [:galaxy, :info])
+        command.execute(services)
         command.report.results
       }
+
     end
 
     # Rolls back one or more services. Use one of `:service`, `:services`, `:host`, or `:hosts`
