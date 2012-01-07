@@ -16,6 +16,9 @@ optparse = OptionParser.new do |opts|
   opts.on('-c', '--config-file PATH', 'Specifies the config file to use') do |path|
     options[:config_file] = path
   end
+  opts.on('-v', '--verbose', 'Turns on verbose output') do
+    options[:verbose] = true
+  end
 end
 optparse.parse!
 

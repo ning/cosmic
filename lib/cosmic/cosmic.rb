@@ -280,7 +280,11 @@ module Cosmic
       @in_dry_run_mode = @config[:dry_run_mode] || false # we don't allow changing after the environment object is created
       @cached_plugins = {}
       @message_bus = MessageBus.new
-      @message_bus.add_listener(StdoutListener.new, [:dryrun, :warn])
+      if @config[:verbose] === true
+        @message_bus.add_listener(StdoutListener.new, [:dryrun, :warn, :info, :trace])
+      else
+        @message_bus.add_listener(StdoutListener.new, [:dryrun, :warn, :info])
+      end
       @message_bus.add_listener(StderrListener.new, :error)
       authenticate
     end

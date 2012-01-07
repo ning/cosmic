@@ -8,6 +8,7 @@ Cosmic and the plugins are configured via a single YAML file. The default locati
 
 The basic environment configuration looks like this::
 
+    verbose: <true or false; default is false>
     auth_type: <Authentication type>
     <Authentication type configuration section>
     plugins:
@@ -34,6 +35,13 @@ For example::
         ldap:
           path:          o=irc.example.com,ou=apps,dc=example,dc=com
           password_attr: password
+
+Debug output
+============
+
+The ``verbose`` setting allows to define how verbose cosmic's output to ``stdout`` should be. By default, cosmic runs in non-default mode which means it will output messages tagged as ``:dryrun``, ``:warn``, and ``:info`` to ``stdout`` (and ``:error`` to stderr). When ``verbose`` is set to ``true``, it will also output messages tagged as ``:trace`` to stdout. Most plugins emit trace messages describing individual actions they perform, so this is a good way to see what's going on.
+
+Note that this setting can be overriden with the ``-v`` commandline option for the ``cosmic`` tool.
 
 Authentication types
 ====================
