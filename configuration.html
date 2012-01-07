@@ -54,7 +54,8 @@
 <h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
 <p>Cosmic and the plugins are configured via a single YAML file. The default location for the file is <tt class="docutils literal"><span class="pre">$HOME/.cosmicrc</span></tt>, but both the commandline tool and the <tt class="docutils literal"><span class="pre">Cosmic::Environment</span></tt> constructor support specifying a different file.</p>
 <p>The basic environment configuration looks like this:</p>
-<div class="highlight-python"><pre>auth_type: &lt;Authentication type&gt;
+<div class="highlight-python"><pre>verbose: &lt;true or false; default is false&gt;
+auth_type: &lt;Authentication type&gt;
 &lt;Authentication type configuration section&gt;
 plugins:
   &lt;Plugin configuration sections&gt;</pre>
@@ -79,6 +80,11 @@ plugins:
     ldap:
       path:          o=irc.example.com,ou=apps,dc=example,dc=com
       password_attr: password</pre>
+</div>
+<div class="section" id="debug-output">
+<h2>Debug output<a class="headerlink" href="#debug-output" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">verbose</span></tt> setting allows to define how verbose cosmic&#8217;s output to <tt class="docutils literal"><span class="pre">stdout</span></tt> should be. By default, cosmic runs in non-default mode which means it will output messages tagged as <tt class="docutils literal"><span class="pre">:dryrun</span></tt>, <tt class="docutils literal"><span class="pre">:warn</span></tt>, and <tt class="docutils literal"><span class="pre">:info</span></tt> to <tt class="docutils literal"><span class="pre">stdout</span></tt> (and <tt class="docutils literal"><span class="pre">:error</span></tt> to stderr). When <tt class="docutils literal"><span class="pre">verbose</span></tt> is set to <tt class="docutils literal"><span class="pre">true</span></tt>, it will also output messages tagged as <tt class="docutils literal"><span class="pre">:trace</span></tt> to stdout. Most plugins emit trace messages describing individual actions they perform, so this is a good way to see what&#8217;s going on.</p>
+<p>Note that this setting can be overriden with the <tt class="docutils literal"><span class="pre">-v</span></tt> commandline option for the <tt class="docutils literal"><span class="pre">cosmic</span></tt> tool.</p>
 </div>
 <div class="section" id="authentication-types">
 <h2>Authentication types<a class="headerlink" href="#authentication-types" title="Permalink to this headline">¶</a></h2>
@@ -230,6 +236,7 @@ end</pre>
 <li class="toctree-l1"><a class="reference internal" href="concepts.html">Concepts</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">How to use Cosmic</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#debug-output">Debug output</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#authentication-types">Authentication types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#plugin-configuration">Plugin configuration</a></li>
 </ul>

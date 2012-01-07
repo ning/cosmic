@@ -23,6 +23,14 @@ The above script ``irc-test.rb`` could then be invoked as::
 
     cosmic irc-test.rb 'Hello World'
 
+You can get a list of supported options via the ``-h``/``--help`` option:
+
+    Usage: cosmic [options] <script> [<commandline arguments for the script>]
+        -h, --help                       Display this screen
+        -d, --dry-run                    Runs the script(s) in dry-run mode
+        -c, --config-file PATH           Specifies the config file to use
+        -v, --verbose                    Turns on verbose output
+
 Standalone tool
 ===============
 

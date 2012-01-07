@@ -258,12 +258,14 @@ Instead it will only send messages tagged as <code>:execute</code> and <code>:dr
 
 26
 27
-28</pre>
+28
+29</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/execute.rb', line 26</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:execute</span><span class='rparen token'>)</span>
+  <span class='rubyid_@name ivar id'>@name</span> <span class='assign token'>=</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
   <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
@@ -368,7 +370,6 @@ combined)</p>
       <pre class="lines">
 
 
-36
 37
 38
 39
@@ -400,14 +401,15 @@ combined)</p>
 65
 66
 67
-68</pre>
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/execute.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/execute.rb', line 37</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_exec identifier id'>exec</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would execute command '#{params[:cmd]}'&quot;</span><span class='comma token'>,</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would execute command '#{params[:cmd]}'&quot;</span><span class='comma token'>,</span>
            <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:execute</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_nil nil kw'>nil</span>
   <span class='rubyid_else else kw'>else</span>
@@ -449,7 +451,7 @@ combined)</p>
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:38 2012 by 
+  Generated on Fri Jan  6 17:29:27 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>

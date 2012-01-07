@@ -313,12 +313,14 @@ For other operations it will only send messages tagged as <code>:chef</code> and
 31
 32
 33
-34</pre>
+34
+35</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/chef.rb', line 27</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:chef</span><span class='rparen token'>)</span>
+  <span class='rubyid_@name ivar id'>@name</span> <span class='assign token'>=</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
   <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
   <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
   <span class='rubyid_@connections ivar id'>@connections</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
@@ -494,7 +496,6 @@ For other operations it will only send messages tagged as <code>:chef</code> and
       <pre class="lines">
 
 
-61
 62
 63
 64
@@ -512,14 +513,15 @@ For other operations it will only send messages tagged as <code>:chef</code> and
 76
 77
 78
-79</pre>
+79
+80</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/chef.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/chef.rb', line 62</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_add_role identifier id'>add_role</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would add role #{params[:role]} to #{params[:host] || params[:node]} &quot;</span><span class='comma token'>,</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would add role #{params[:role]} to #{params[:host] || params[:node]} &quot;</span><span class='comma token'>,</span>
            <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:chef</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_nil nil kw'>nil</span>
   <span class='rubyid_else else kw'>else</span>
@@ -620,7 +622,6 @@ For other operations it will only send messages tagged as <code>:chef</code> and
       <pre class="lines">
 
 
-41
 42
 43
 44
@@ -631,10 +632,11 @@ For other operations it will only send messages tagged as <code>:chef</code> and
 49
 50
 51
-52</pre>
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/chef.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/chef.rb', line 42</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_get_info identifier id'>get_info</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_host identifier id'>host</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :host argument given&quot;</span>
@@ -659,7 +661,7 @@ For other operations it will only send messages tagged as <code>:chef</code> and
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:36 2012 by 
+  Generated on Fri Jan  6 17:29:23 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>

@@ -328,12 +328,14 @@ Instead it will only send messages tagged as <code>:mail</code> and <code>:dryru
 65
 66
 67
-68</pre>
+68
+69</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/mail.rb', line 53</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:mail</span><span class='rparen token'>)</span>
+  <span class='rubyid_@name ivar id'>@name</span> <span class='assign token'>=</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
   <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
   <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
   <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_resolve_service_auth identifier id'>resolve_service_auth</span><span class='lparen token'>(</span><span class='symbol val'>:service_name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='comma token'>,</span> <span class='symbol val'>:config</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_@config ivar id'>@config</span><span class='rparen token'>)</span>
@@ -485,7 +487,6 @@ more info about how to use this</p>
       <pre class="lines">
 
 
-83
 84
 85
 86
@@ -514,10 +515,13 @@ more info about how to use this</p>
 109
 110
 111
-112</pre>
+112
+113
+114
+115</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/mail.rb', line 83</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/mail.rb', line 84</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='mult op'>*</span><span class='rubyid_args identifier id'>args</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_block_given? fid id'>block_given?</span>
@@ -540,13 +544,15 @@ more info about how to use this</p>
     <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would send an email with subject #{mail.subject} from #{mail.from} to #{mail.to}&quot;</span><span class='comma token'>,</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would send an email with subject #{mail.subject} from #{mail.from} to #{mail.to}&quot;</span><span class='comma token'>,</span>
            <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:mail</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_if if kw'>if</span> <span class='rubyid_@delivery_method ivar id'>@delivery_method</span>
       <span class='rubyid_mail identifier id'>mail</span><span class='dot token'>.</span><span class='rubyid_delivery_method identifier id'>delivery_method</span><span class='lparen token'>(</span><span class='rubyid_@delivery_method ivar id'>@delivery_method</span><span class='comma token'>,</span> <span class='rubyid_@delivery_config ivar id'>@delivery_config</span><span class='rparen token'>)</span>
     <span class='rubyid_end end kw'>end</span>
     <span class='rubyid_mail identifier id'>mail</span><span class='dot token'>.</span><span class='rubyid_deliver! fid id'>deliver!</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Sent an email with subject #{mail.subject} from #{mail.from} to #{mail.to}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:mail</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
@@ -560,7 +566,7 @@ more info about how to use this</p>
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:38 2012 by 
+  Generated on Fri Jan  6 17:29:24 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>

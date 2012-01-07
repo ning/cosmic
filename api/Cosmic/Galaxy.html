@@ -239,6 +239,28 @@ messages tagged as <code>:galaxy</code> and <code>:dryrun</code> in those cases.
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#print-instance_method" title="#print (instance method)">- (String) <strong>print</strong>(params) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Utility method that returns a textual representation of the given service(s).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#restart-instance_method" title="#restart (instance method)">- (Array&lt;Galaxy::Agent&gt;) <strong>restart</strong>(params) </a>
     
 
@@ -518,12 +540,14 @@ messages tagged as <code>:galaxy</code> and <code>:dryrun</code> in those cases.
 80
 81
 82
-83</pre>
+83
+84</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 74</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:galaxy</span><span class='rparen token'>)</span>
+  <span class='rubyid_@name ivar id'>@name</span> <span class='assign token'>=</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
   <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
   <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
   <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No gonsole host specified in the configuration&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span>
@@ -743,7 +767,6 @@ except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-148
 149
 150
 151
@@ -753,21 +776,40 @@ except create a message tagged as <code>:dryrun</code>.</p>
 155
 156
 157
-158</pre>
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 148</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 149</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_assign identifier id'>assign</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_env identifier id'>env</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:env</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :env argument given&quot;</span>
   <span class='rubyid_version identifier id'>version</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:version</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :version argument given&quot;</span>
   <span class='rubyid_type identifier id'>type</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :type argument given&quot;</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would assign #{agent.host} to /#{params[:env]}/#{params[:version]}/#{params[:type]}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would assign #{agent.host} to /#{env}/#{version}/#{type}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_AssignCommand constant id'>AssignCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_env identifier id'>env</span><span class='comma token'>,</span> <span class='rubyid_version identifier id'>version</span><span class='comma token'>,</span> <span class='rubyid_type identifier id'>type</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Assigned #{agent.host} to /'</span> <span class='plus op'>+</span> <span class='rubyid_env identifier id'>env</span> <span class='plus op'>+</span> <span class='string val'>'/'</span> <span class='plus op'>+</span> <span class='rubyid_version identifier id'>version</span> <span class='plus op'>+</span> <span class='string val'>'/'</span> <span class='plus op'>+</span> <span class='rubyid_type identifier id'>type</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -885,25 +927,177 @@ messages tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-322
-323
-324
-325
-326
-327
-328
-329</pre>
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 322</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 386</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_clear identifier id'>clear</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would clear #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would clear #{agent.host}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_ClearCommand constant id'>ClearCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Cleared #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Cleared #{agent.host}'</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
+<span class='rubyid_end end kw'>end</span>
+</pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="print-instance_method">
+  
+    - (<tt>String</tt>) <strong>print</strong>(params) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>Utility method that returns a textual representation of the given service(s).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <h3>Parameters:</h3>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>params</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parameters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  
+    
+    
+    <h3>Options Hash (<tt>params</tt>):</h3>
+    <ul class="option">
+      
+        <li>
+          <span class="name">:service</span>
+          <span class="type">(<tt>Galaxy::Agent</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The service to print</p>
+</div>
+        </li>
+      
+        <li>
+          <span class="name">:services</span>
+          <span class="type">(<tt>Array&lt;Galaxy::Agent&gt;</tt>)</span>
+          <span class="default">
+            
+          </span>
+          &mdash; <div class='inline'><p>The services to print</p>
+</div>
+        </li>
+      
+    </ul>
+  
+
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The textual representation</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 410</span>
+
+<span class='rubyid_def def kw'>def</span> <span class='rubyid_print identifier id'>print</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :service or :services argument given&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:service</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:services</span><span class='rbrack token'>]</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:services</span><span class='rbrack token'>]</span><span class='rparen token'>)</span> <span class='bitor op'>|</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:service</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+
+  <span class='rubyid_result identifier id'>result</span> <span class='assign token'>=</span> <span class='string val'>&quot;&quot;</span>
+  <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_service identifier id'>service</span><span class='bitor op'>|</span>
+    <span class='rubyid_result identifier id'>result</span> <span class='opasgn op'>+=</span> <span class='rubyid_sprintf identifier id'>sprintf</span><span class='lparen token'>(</span><span class='string val'>&quot;%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n&quot;</span><span class='comma token'>,</span> 
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_host identifier id'>host</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_config_path identifier id'>config_path</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_status identifier id'>status</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_build identifier id'>build</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_core_type identifier id'>core_type</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_machine identifier id'>machine</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_ip identifier id'>ip</span><span class='rparen token'>)</span><span class='comma token'>,</span>
+                      <span class='rubyid_format_field identifier id'>format_field</span><span class='lparen token'>(</span><span class='rubyid_service identifier id'>service</span><span class='dot token'>.</span><span class='rubyid_agent_status identifier id'>agent_status</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+  <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_result identifier id'>result</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -1021,25 +1215,43 @@ a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-189
-190
-191
-192
-193
-194
-195
-196</pre>
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 189</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 208</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_restart identifier id'>restart</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would restart #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would restart #{agent.host}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_RestartCommand constant id'>RestartCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Restarted #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Restarted #{agent.host}'</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -1171,25 +1383,25 @@ do nothing in dryrun mode except create messages tagged as <code>:dryrun</code>.
       <pre class="lines">
 
 
-295
-296
-297
-298
-299
-300
-301
-302
-303
-304
-305
-306
-307
-308
-309
-310</pre>
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 295</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 359</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_revert identifier id'>revert</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_to identifier id'>to</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
@@ -1325,25 +1537,43 @@ dryrun mode except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-271
-272
-273
-274
-275
-276
-277
-278</pre>
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 271</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 326</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_rollback identifier id'>rollback</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would rollback #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would rollback #{agent.host}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_RollbackCommand constant id'>RollbackCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Rolled back #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Rolled back #{agent.host}'</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -1470,7 +1700,6 @@ dryrun mode except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-107
 108
 109
 110
@@ -1496,32 +1725,33 @@ dryrun mode except create a message tagged as <code>:dryrun</code>.</p>
 130
 131
 132
-133</pre>
+133
+134</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 107</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 108</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_select identifier id'>select</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span><span class='rparen token'>)</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:path</span><span class='rbrack token'>]</span>
     <span class='rubyid_path_regex identifier id'>path_regex</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:path</span><span class='rbrack token'>]</span>
     <span class='rubyid_path_regex identifier id'>path_regex</span> <span class='assign token'>=</span> <span class='rubyid_Regexp constant id'>Regexp</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_path_regex identifier id'>path_regex</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span><span class='rparen token'>)</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_path_regex identifier id'>path_regex</span><span class='dot token'>.</span><span class='rubyid_is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='rubyid_Regexp constant id'>Regexp</span><span class='rparen token'>)</span>
     <span class='rubyid_selector identifier id'>selector</span> <span class='assign token'>=</span> <span class='rubyid_lambda identifier id'>lambda</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span> <span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_config_path identifier id'>config_path</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_path_regex identifier id'>path_regex</span><span class='dot token'>.</span><span class='rubyid_match identifier id'>match</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_config_path identifier id'>config_path</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[Galaxy] Selecting all services for path #{path_regex.inspect}&quot;</span><span class='comma token'>,</span>
-           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Selecting all services for path #{path_regex.inspect}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_elsif elsif kw'>elsif</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span>
     <span class='rubyid_type_regex identifier id'>type_regex</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:type</span><span class='rbrack token'>]</span>
     <span class='rubyid_type_regex identifier id'>type_regex</span> <span class='assign token'>=</span> <span class='rubyid_Regexp constant id'>Regexp</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_type_regex identifier id'>type_regex</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span><span class='rparen token'>)</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_type_regex identifier id'>type_regex</span><span class='dot token'>.</span><span class='rubyid_is_a? fid id'>is_a?</span><span class='lparen token'>(</span><span class='rubyid_Regexp constant id'>Regexp</span><span class='rparen token'>)</span>
     <span class='rubyid_selector identifier id'>selector</span> <span class='assign token'>=</span> <span class='rubyid_lambda identifier id'>lambda</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span> <span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_config_path identifier id'>config_path</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_type_regex identifier id'>type_regex</span><span class='dot token'>.</span><span class='rubyid_match identifier id'>match</span><span class='lparen token'>(</span><span class='rubyid_type_of? fid id'>type_of?</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='rparen token'>)</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[Galaxy] Selecting all services of type #{type_regex.inspect}&quot;</span><span class='comma token'>,</span>
-           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Selecting all services of type #{type_regex.inspect}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_elsif elsif kw'>elsif</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:hosts</span><span class='rbrack token'>]</span>
     <span class='rubyid_host_names identifier id'>host_names</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span><span class='rparen token'>)</span> <span class='bitand op'>&amp;</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:hosts</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_selector identifier id'>selector</span> <span class='assign token'>=</span> <span class='rubyid_lambda identifier id'>lambda</span> <span class='lbrace token'>{</span><span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span> <span class='rubyid_host_names identifier id'>host_names</span><span class='dot token'>.</span><span class='rubyid_include? fid id'>include?</span><span class='lparen token'>(</span><span class='rubyid_agent identifier id'>agent</span><span class='dot token'>.</span><span class='rubyid_host identifier id'>host</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[Galaxy] Selecting all services for hosts #{host_names.inspect}&quot;</span><span class='comma token'>,</span>
-           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Selecting all services for hosts #{host_names.inspect}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='string val'>&quot;[Galaxy] Selecting all services&quot;</span><span class='comma token'>,</span>
-           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Selecting all services&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_ShowCommand constant id'>ShowCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
   <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='rparen token'>)</span>
@@ -1644,25 +1874,43 @@ create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-170
-171
-172
-173
-174
-175
-176
-177</pre>
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 170</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 180</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_start identifier id'>start</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would start #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would start #{agent.host}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_StartCommand constant id'>StartCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Started #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Started #{agent.host}'</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -1780,25 +2028,43 @@ message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-208
-209
-210
-211
-212
-213
-214
-215</pre>
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 208</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 236</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_stop identifier id'>stop</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would stop #{agent.host}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would stop #{agent.host}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_StopCommand constant id'>StopCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Stopped #{agent.host}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Stopped #{agent.host}'</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -1846,12 +2112,12 @@ message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-88
 89
-90</pre>
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 88</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 89</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_take_snapshot identifier id'>take_snapshot</span>
   <span class='rubyid_select identifier id'>select</span>
@@ -1982,27 +2248,45 @@ message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-228
-229
-230
-231
-232
-233
-234
-235
-236</pre>
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 228</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 265</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_update identifier id'>update</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_to identifier id'>to</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would update #{agent.host} to version #{params[:to]}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
-    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_UpdateCommand constant id'>UpdateCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Updated #{agent.host} to #{to}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would update #{agent.host} to version #{to}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_UpdateCommand constant id'>UpdateCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_to identifier id'>to</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Updated #{agent.host} to '</span> <span class='plus op'>+</span> <span class='rubyid_to identifier id'>to</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -2130,27 +2414,45 @@ mode except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-249
-250
-251
-252
-253
-254
-255
-256
-257</pre>
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 249</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/galaxy.rb', line 295</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_update_config identifier id'>update_config</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_services identifier id'>services</span> <span class='assign token'>=</span> <span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_to identifier id'>to</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :to argument given&quot;</span>
-  <span class='rubyid_dry_run_or_not identifier id'>dry_run_or_not</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='string val'>'Would update the config of #{agent.host} to version #{params[:to]}'</span><span class='rparen token'>)</span> <span class='lbrace token'>{</span>
-    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_UpdateConfigCommand constant id'>UpdateConfigCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span> <span class='string val'>'[Galaxy] Updated the configuration of #{agent.host} to #{to}'</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
-    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services_from_params identifier id'>services_from_params</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_services identifier id'>services</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_agent identifier id'>agent</span><span class='bitor op'>|</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would update the configuration of #{agent.host} to version #{to}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_services identifier id'>services</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_command identifier id'>command</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_Galaxy constant id'>Galaxy</span><span class='colon2 op'>::</span><span class='rubyid_Commands constant id'>Commands</span><span class='colon2 op'>::</span><span class='rubyid_UpdateConfigCommand constant id'>UpdateConfigCommand</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='lbrack token'>[</span> <span class='rubyid_to identifier id'>to</span> <span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_@galaxy_options ivar id'>@galaxy_options</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span> <span class='assign token'>=</span> <span class='rubyid_GalaxyGatheringReport constant id'>GalaxyGatheringReport</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_@environment ivar id'>@environment</span><span class='comma token'>,</span>
+                                               <span class='string val'>'['</span> <span class='plus op'>+</span> <span class='rubyid_@name ivar id'>@name</span> <span class='plus op'>+</span> <span class='string val'>'] Updated the configuration of #{agent.host} to '</span> <span class='plus op'>+</span> <span class='rubyid_to identifier id'>to</span><span class='comma token'>,</span>
+                                               <span class='lbrack token'>[</span><span class='symbol val'>:galaxy</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_execute identifier id'>execute</span><span class='lparen token'>(</span><span class='rubyid_services identifier id'>services</span><span class='rparen token'>)</span>
     <span class='rubyid_command identifier id'>command</span><span class='dot token'>.</span><span class='rubyid_report identifier id'>report</span><span class='dot token'>.</span><span class='rubyid_results identifier id'>results</span>
-  <span class='rbrace token'>}</span>
+  <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -2163,7 +2465,7 @@ mode except create a message tagged as <code>:dryrun</code>.</p>
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:40 2012 by 
+  Generated on Fri Jan  6 17:29:26 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>

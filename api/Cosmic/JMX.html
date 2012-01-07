@@ -385,12 +385,14 @@ Instead it will only send messages tagged as <code>:jmx</code> and <code>:dryrun
 35
 36
 37
-38</pre>
+38
+39</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 33</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:jmx</span><span class='rparen token'>)</span>
+  <span class='rubyid_@name ivar id'>@name</span> <span class='assign token'>=</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
   <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
   <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
   <span class='rubyid_@connections ivar id'>@connections</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
@@ -565,25 +567,41 @@ a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-60
 61
 62
 63
 64
 65
 66
-67</pre>
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 60</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 61</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_find_mbeans identifier id'>find_mbeans</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
+  <span class='rubyid_filter identifier id'>filter</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:filter</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>'*:*'</span>
   <span class='rubyid_conn identifier id'>conn</span> <span class='assign token'>=</span> <span class='rubyid_get_connection identifier id'>get_connection</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_if if kw'>if</span> <span class='rubyid_conn identifier id'>conn</span>
-    <span class='colon3 op'>::</span><span class='rubyid_JMX constant id'>JMX</span><span class='colon2 op'>::</span><span class='rubyid_MBean constant id'>MBean</span><span class='dot token'>.</span><span class='rubyid_find_all_by_name identifier id'>find_all_by_name</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:filter</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='string val'>'*:*'</span><span class='comma token'>,</span> <span class='symbol val'>:connection</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_conn identifier id'>conn</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would find all mbeans matching #{filter} on host #{host}:#{port}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
-    <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_conn identifier id'>conn</span>
+      <span class='rubyid_result identifier id'>result</span> <span class='assign token'>=</span> <span class='colon3 op'>::</span><span class='rubyid_JMX constant id'>JMX</span><span class='colon2 op'>::</span><span class='rubyid_MBean constant id'>MBean</span><span class='dot token'>.</span><span class='rubyid_find_all_by_name identifier id'>find_all_by_name</span><span class='lparen token'>(</span><span class='rubyid_filter identifier id'>filter</span><span class='comma token'>,</span> <span class='symbol val'>:connection</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_conn identifier id'>conn</span><span class='rparen token'>)</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Found all mbeans matching #{filter} on host #{host}:#{port}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_return return kw'>return</span> <span class='rubyid_result identifier id'>result</span>
+    <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
+  <span class='lbrack token'>[</span><span class='rbrack token'>]</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -659,7 +677,7 @@ except create a message tagged as <code>:dryrun</code>.</p>
           <span class="default">
             
           </span>
-          &mdash; <div class='inline'><p>The JMX port on the host; 3000 by default</p>
+          &mdash; <div class='inline'><p>The JMX port on the host</p>
 </div>
         </li>
       
@@ -710,27 +728,41 @@ except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-79
-80
-81
-82
-83
-84
-85
-86
-87</pre>
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 79</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 88</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_get_attribute identifier id'>get_attribute</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_attribute identifier id'>attribute</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:attribute</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :attribute argument given&quot;</span>
   <span class='rubyid_mbean identifier id'>mbean</span> <span class='assign token'>=</span> <span class='rubyid_mbeanify identifier id'>mbeanify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_if if kw'>if</span> <span class='rubyid_mbean identifier id'>mbean</span>
-    <span class='rubyid_mbean identifier id'>mbean</span><span class='dot token'>.</span><span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='rubyid_attribute identifier id'>attribute</span><span class='dot token'>.</span><span class='rubyid_snake_case identifier id'>snake_case</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would retrieve attribute #{attribute} of mbean #{params[:name] || mbean}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
-    <span class='rubyid_nil nil kw'>nil</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_mbean identifier id'>mbean</span>
+      <span class='rubyid_result identifier id'>result</span> <span class='assign token'>=</span> <span class='rubyid_mbean identifier id'>mbean</span><span class='dot token'>.</span><span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='rubyid_attribute identifier id'>attribute</span><span class='dot token'>.</span><span class='rubyid_snake_case identifier id'>snake_case</span><span class='rparen token'>)</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Retrieved attribute #{attribute} of mbean #{params[:name] || mbean}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_return return kw'>return</span> <span class='rubyid_result identifier id'>result</span>
+    <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_nil nil kw'>nil</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -837,12 +869,12 @@ a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-48
 49
-50</pre>
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 49</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_get_mbean identifier id'>get_mbean</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_mbeanify identifier id'>mbeanify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
@@ -982,27 +1014,41 @@ except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-121
-122
-123
-124
-125
-126
-127
-128
-129</pre>
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 144</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_invoke identifier id'>invoke</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_operation identifier id'>operation</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:operation</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :operation argument given&quot;</span>
   <span class='rubyid_mbean identifier id'>mbean</span> <span class='assign token'>=</span> <span class='rubyid_mbeanify identifier id'>mbeanify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_if if kw'>if</span> <span class='rubyid_mbean identifier id'>mbean</span>
-    <span class='rubyid_mbean identifier id'>mbean</span><span class='dot token'>.</span><span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='rubyid_operation identifier id'>operation</span><span class='dot token'>.</span><span class='rubyid_snake_case identifier id'>snake_case</span><span class='comma token'>,</span> <span class='mult op'>*</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:args</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would invoke operation #{operation} on mbean #{params[:name] || mbean}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
-    <span class='rubyid_nil nil kw'>nil</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_mbean identifier id'>mbean</span>
+      <span class='rubyid_result identifier id'>result</span> <span class='assign token'>=</span> <span class='rubyid_mbean identifier id'>mbean</span><span class='dot token'>.</span><span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='rubyid_operation identifier id'>operation</span><span class='dot token'>.</span><span class='rubyid_snake_case identifier id'>snake_case</span><span class='comma token'>,</span> <span class='mult op'>*</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:args</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='lbrack token'>[</span><span class='rbrack token'>]</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Invoked operation #{operation} on mbean #{params[:name] || mbean}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_return return kw'>return</span> <span class='rubyid_result identifier id'>result</span>
+    <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
+  <span class='rubyid_nil nil kw'>nil</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
     </td>
@@ -1078,7 +1124,7 @@ except create a message tagged as <code>:dryrun</code>.</p>
           <span class="default">
             
           </span>
-          &mdash; <div class='inline'><p>The JMX port on the host; 3000 by default</p>
+          &mdash; <div class='inline'><p>The JMX port on the host</p>
 </div>
         </li>
       
@@ -1139,25 +1185,39 @@ except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-100
-101
-102
-103
-104
-105
-106
-107
-108</pre>
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 100</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/jmx.rb', line 116</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_set_attribute identifier id'>set_attribute</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_attribute identifier id'>attribute</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:attribute</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :attribute argument given&quot;</span>
   <span class='rubyid_value identifier id'>value</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:value</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :value argument given&quot;</span>
   <span class='rubyid_mbean identifier id'>mbean</span> <span class='assign token'>=</span> <span class='rubyid_mbeanify identifier id'>mbeanify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_if if kw'>if</span> <span class='rubyid_mbean identifier id'>mbean</span>
-    <span class='rubyid_mbean identifier id'>mbean</span><span class='dot token'>.</span><span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='rubyid_attribute identifier id'>attribute</span><span class='dot token'>.</span><span class='rubyid_snake_case identifier id'>snake_case</span> <span class='plus op'>+</span> <span class='string val'>'='</span><span class='comma token'>,</span> <span class='rubyid_value identifier id'>value</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_mbean identifier id'>mbean</span>
+      <span class='rubyid_mbean identifier id'>mbean</span><span class='dot token'>.</span><span class='rubyid_send identifier id'>send</span><span class='lparen token'>(</span><span class='rubyid_attribute identifier id'>attribute</span><span class='dot token'>.</span><span class='rubyid_snake_case identifier id'>snake_case</span> <span class='plus op'>+</span> <span class='string val'>'='</span><span class='comma token'>,</span> <span class='rubyid_value identifier id'>value</span><span class='rparen token'>)</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:jmx</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_mbean identifier id'>mbean</span>
 <span class='rubyid_end end kw'>end</span>
@@ -1172,7 +1232,7 @@ except create a message tagged as <code>:dryrun</code>.</p>
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:38 2012 by 
+  Generated on Fri Jan  6 17:29:29 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>

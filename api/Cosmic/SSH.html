@@ -360,12 +360,14 @@ command.</p>
 54
 55
 56
-57</pre>
+57
+58</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/ssh.rb', line 45</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:ssh</span><span class='rparen token'>)</span>
+  <span class='rubyid_@name ivar id'>@name</span> <span class='assign token'>=</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
   <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
   <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
   <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_resolve_service_auth identifier id'>resolve_service_auth</span><span class='lparen token'>(</span><span class='symbol val'>:service_name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='comma token'>,</span> <span class='symbol val'>:config</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_@config ivar id'>@config</span><span class='rparen token'>)</span>
@@ -561,11 +563,6 @@ of the file</p>
       <pre class="lines">
 
 
-129
-130
-131
-132
-133
 134
 135
 136
@@ -575,10 +572,17 @@ of the file</p>
 140
 141
 142
-143</pre>
+143
+144
+145
+146
+147
+148
+149
+150</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/ssh.rb', line 129</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/ssh.rb', line 134</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_download identifier id'>download</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
   <span class='rubyid_host identifier id'>host</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :host argument given&quot;</span>
@@ -586,13 +590,15 @@ of the file</p>
   <span class='rubyid_local identifier id'>local</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:local</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:remote</span><span class='rbrack token'>]</span>
   <span class='rubyid_remote identifier id'>remote</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:remote</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :remote argument given&quot;</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would download remote file #{remote} as user #{user} from host #{host} to local file #{local}&quot;</span><span class='comma token'>,</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would download remote file #{remote} as user #{user} from host #{host} to local file #{local}&quot;</span><span class='comma token'>,</span>
            <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:ssh</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_response identifier id'>response</span> <span class='assign token'>=</span> <span class='rubyid_nil nil kw'>nil</span>
     <span class='rubyid_Net constant id'>Net</span><span class='colon2 op'>::</span><span class='rubyid_SCP constant id'>SCP</span><span class='dot token'>.</span><span class='rubyid_start identifier id'>start</span><span class='lparen token'>(</span><span class='rubyid_host identifier id'>host</span><span class='comma token'>,</span> <span class='rubyid_user identifier id'>user</span><span class='comma token'>,</span> <span class='rubyid_@ssh_opts ivar id'>@ssh_opts</span><span class='rparen token'>)</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_scp identifier id'>scp</span><span class='bitor op'>|</span>
       <span class='rubyid_scp identifier id'>scp</span><span class='dot token'>.</span><span class='rubyid_download! fid id'>download!</span><span class='lparen token'>(</span><span class='rubyid_remote identifier id'>remote</span><span class='comma token'>,</span> <span class='rubyid_local identifier id'>local</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
     <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Downloaded remote file #{remote} as user #{user} from host #{host} to local file #{local}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:ssh</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
@@ -702,7 +708,6 @@ or the current user</p>
       <pre class="lines">
 
 
-69
 70
 71
 72
@@ -716,23 +721,28 @@ or the current user</p>
 80
 81
 82
-83</pre>
+83
+84
+85
+86</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/ssh.rb', line 69</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/ssh.rb', line 70</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_exec identifier id'>exec</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_host identifier id'>host</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :host argument given&quot;</span>
   <span class='rubyid_user identifier id'>user</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:user</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth</span><span class='rbrack token'>]</span><span class='lbrack token'>[</span><span class='symbol val'>:username</span><span class='rbrack token'>]</span>
   <span class='rubyid_cmd identifier id'>cmd</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:cmd</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :cmd argument given&quot;</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would connect as user #{user} to host #{host} and execute command '#{cmd}'&quot;</span><span class='comma token'>,</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would execute command '#{cmd}' as user #{user} on host #{host}&quot;</span><span class='comma token'>,</span>
            <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:ssh</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_response identifier id'>response</span> <span class='assign token'>=</span> <span class='rubyid_nil nil kw'>nil</span>
     <span class='rubyid_Net constant id'>Net</span><span class='colon2 op'>::</span><span class='rubyid_SSH constant id'>SSH</span><span class='dot token'>.</span><span class='rubyid_start identifier id'>start</span><span class='lparen token'>(</span><span class='rubyid_host identifier id'>host</span><span class='comma token'>,</span> <span class='rubyid_user identifier id'>user</span><span class='comma token'>,</span> <span class='rubyid_@ssh_opts ivar id'>@ssh_opts</span><span class='rparen token'>)</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_ssh identifier id'>ssh</span><span class='bitor op'>|</span>
       <span class='rubyid_response identifier id'>response</span> <span class='assign token'>=</span> <span class='rubyid_ssh identifier id'>ssh</span><span class='dot token'>.</span><span class='rubyid_exec! fid id'>exec!</span><span class='lparen token'>(</span><span class='rubyid_cmd identifier id'>cmd</span><span class='rparen token'>)</span>
     <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Executed command '#{cmd}' as user #{user} on host #{host}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:ssh</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_response identifier id'>response</span>
   <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
@@ -855,9 +865,6 @@ of the file</p>
       <pre class="lines">
 
 
-99
-100
-101
 102
 103
 104
@@ -869,10 +876,15 @@ of the file</p>
 110
 111
 112
-113</pre>
+113
+114
+115
+116
+117
+118</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/ssh.rb', line 99</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/ssh.rb', line 102</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_upload identifier id'>upload</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
   <span class='rubyid_host identifier id'>host</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :host argument given&quot;</span>
@@ -880,13 +892,15 @@ of the file</p>
   <span class='rubyid_local identifier id'>local</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:local</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :local argument given&quot;</span>
   <span class='rubyid_remote identifier id'>remote</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:remote</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:local</span><span class='rbrack token'>]</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
-    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would upload local file #{local} as user #{user} to host #{host} at #{remote}&quot;</span><span class='comma token'>,</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would upload local file #{local} as user #{user} to host #{host} at #{remote}&quot;</span><span class='comma token'>,</span>
            <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:ssh</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_else else kw'>else</span>
     <span class='rubyid_response identifier id'>response</span> <span class='assign token'>=</span> <span class='rubyid_nil nil kw'>nil</span>
     <span class='rubyid_Net constant id'>Net</span><span class='colon2 op'>::</span><span class='rubyid_SCP constant id'>SCP</span><span class='dot token'>.</span><span class='rubyid_start identifier id'>start</span><span class='lparen token'>(</span><span class='rubyid_host identifier id'>host</span><span class='comma token'>,</span> <span class='rubyid_user identifier id'>user</span><span class='comma token'>,</span> <span class='rubyid_@ssh_opts ivar id'>@ssh_opts</span><span class='rparen token'>)</span> <span class='rubyid_do do kw'>do</span> <span class='bitor op'>|</span><span class='rubyid_scp identifier id'>scp</span><span class='bitor op'>|</span>
       <span class='rubyid_scp identifier id'>scp</span><span class='dot token'>.</span><span class='rubyid_upload! fid id'>upload!</span><span class='lparen token'>(</span><span class='rubyid_local identifier id'>local</span><span class='comma token'>,</span> <span class='rubyid_remote identifier id'>remote</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
     <span class='rubyid_end end kw'>end</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Uploaded local file #{local} as user #{user} to host #{host} at #{remote}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:ssh</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
 </pre>
@@ -900,7 +914,7 @@ of the file</p>
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:41 2012 by 
+  Generated on Fri Jan  6 17:29:24 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>

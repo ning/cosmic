@@ -462,7 +462,11 @@ See the configuration documentation for details.</p>
 283
 284
 285
-286</pre>
+286
+287
+288
+289
+290</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 278</span>
@@ -472,7 +476,11 @@ See the configuration documentation for details.</p>
   <span class='rubyid_@in_dry_run_mode ivar id'>@in_dry_run_mode</span> <span class='assign token'>=</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:dry_run_mode</span><span class='rbrack token'>]</span> <span class='orop op'>||</span> <span class='rubyid_false false kw'>false</span> <span class='comment val'># we don't allow changing after the environment object is created</span>
   <span class='rubyid_@cached_plugins ivar id'>@cached_plugins</span> <span class='assign token'>=</span> <span class='lbrace token'>{</span><span class='rbrace token'>}</span>
   <span class='rubyid_@message_bus ivar id'>@message_bus</span> <span class='assign token'>=</span> <span class='rubyid_MessageBus constant id'>MessageBus</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span>
-  <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_StdoutListener constant id'>StdoutListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:dryrun</span><span class='comma token'>,</span> <span class='symbol val'>:warn</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:verbose</span><span class='rbrack token'>]</span> <span class='eqq op'>===</span> <span class='rubyid_true true kw'>true</span>
+    <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_StdoutListener constant id'>StdoutListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:dryrun</span><span class='comma token'>,</span> <span class='symbol val'>:warn</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_StdoutListener constant id'>StdoutListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='comma token'>,</span> <span class='lbrack token'>[</span><span class='symbol val'>:dryrun</span><span class='comma token'>,</span> <span class='symbol val'>:warn</span><span class='comma token'>,</span> <span class='symbol val'>:info</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_StderrListener constant id'>StderrListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='comma token'>,</span> <span class='symbol val'>:error</span><span class='rparen token'>)</span>
   <span class='rubyid_authenticate identifier id'>authenticate</span>
 <span class='rubyid_end end kw'>end</span>
@@ -609,10 +617,6 @@ plugin as explained above.</p>
       <pre class="lines">
 
 
-440
-441
-442
-443
 444
 445
 446
@@ -639,10 +643,14 @@ plugin as explained above.</p>
 467
 468
 469
-470</pre>
+470
+471
+472
+473
+474</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 440</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 444</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_method_missing identifier id'>method_missing</span><span class='lparen token'>(</span><span class='rubyid_method_sym identifier id'>method_sym</span><span class='comma token'>,</span> <span class='mult op'>*</span><span class='rubyid_args identifier id'>args</span><span class='comma token'>,</span> <span class='bitand op'>&amp;</span><span class='rubyid_block identifier id'>block</span><span class='rparen token'>)</span>
   <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='rubyid_method_sym identifier id'>method_sym</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
@@ -961,12 +969,12 @@ no listener or tags are given.</p>
       <pre class="lines">
 
 
-384
-385
-386</pre>
+388
+389
+390</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 384</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 388</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_connect_message_listener identifier id'>connect_message_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_add_listener identifier id'>add_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:listener</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:tags</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
@@ -1039,12 +1047,12 @@ no listener was given.</p>
       <pre class="lines">
 
 
-394
-395
-396</pre>
+398
+399
+400</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 394</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 398</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_disconnect_message_listener identifier id'>disconnect_message_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_remove_listener identifier id'>remove_listener</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:listener</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
@@ -1134,16 +1142,16 @@ will return the entry referenced by the given path.</p>
       <pre class="lines">
 
 
-369
-370
-371
-372
 373
 374
-375</pre>
+375
+376
+377
+378
+379</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 369</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 373</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_get_from_ldap identifier id'>get_from_ldap</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_case case kw'>case</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:auth_type</span><span class='rbrack token'>]</span>
@@ -1236,16 +1244,16 @@ will return the entry referenced by the given path.</p>
       <pre class="lines">
 
 
-293
-294
-295
-296
 297
 298
-299</pre>
+299
+300
+301
+302
+303</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 293</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 297</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_if if kw'>if</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:plugins</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:name</span><span class='rbrack token'>]</span>
@@ -1332,12 +1340,12 @@ are given.</p>
       <pre class="lines">
 
 
-405
-406
-407</pre>
+409
+410
+411</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 405</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 409</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_@message_bus ivar id'>@message_bus</span><span class='dot token'>.</span><span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:msg</span><span class='rbrack token'>]</span><span class='comma token'>,</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:tags</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
@@ -1425,10 +1433,6 @@ environment (e.g. for ssh private keys).</p>
       <pre class="lines">
 
 
-313
-314
-315
-316
 317
 318
 319
@@ -1473,10 +1477,14 @@ environment (e.g. for ssh private keys).</p>
 358
 359
 360
-361</pre>
+361
+362
+363
+364
+365</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 313</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 317</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_resolve_service_auth identifier id'>resolve_service_auth</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_return return kw'>return</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:service_name</span><span class='rbrack token'>]</span> <span class='andop op'>&amp;&amp;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:config</span><span class='rbrack token'>]</span>
@@ -1612,17 +1620,17 @@ the rules.</p>
       <pre class="lines">
 
 
-480
-481
-482
-483
 484
 485
 486
-487</pre>
+487
+488
+489
+490
+491</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 480</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/cosmic.rb', line 484</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_respond_to? fid id'>respond_to?</span><span class='lparen token'>(</span><span class='rubyid_method_sym identifier id'>method_sym</span><span class='comma token'>,</span> <span class='rubyid_include_private identifier id'>include_private</span> <span class='assign token'>=</span> <span class='rubyid_false false kw'>false</span><span class='rparen token'>)</span>
   <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='rubyid_method_sym identifier id'>method_sym</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
@@ -1643,7 +1651,7 @@ the rules.</p>
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:36 2012 by 
+  Generated on Fri Jan  6 17:29:25 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>

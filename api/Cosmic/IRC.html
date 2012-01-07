@@ -386,12 +386,14 @@ dryrun mode it will not actually connect but instead create a message tagged as 
 150
 151
 152
-153</pre>
+153
+154</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 143</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_initialize identifier id'>initialize</span><span class='lparen token'>(</span><span class='rubyid_environment identifier id'>environment</span><span class='comma token'>,</span> <span class='rubyid_name identifier id'>name</span> <span class='assign token'>=</span> <span class='symbol val'>:irc</span><span class='rparen token'>)</span>
+  <span class='rubyid_@name ivar id'>@name</span> <span class='assign token'>=</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_s identifier id'>to_s</span>
   <span class='rubyid_@environment ivar id'>@environment</span> <span class='assign token'>=</span> <span class='rubyid_environment identifier id'>environment</span>
   <span class='rubyid_@config ivar id'>@config</span> <span class='assign token'>=</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_get_plugin_config identifier id'>get_plugin_config</span><span class='lparen token'>(</span><span class='symbol val'>:name</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_name identifier id'>name</span><span class='dot token'>.</span><span class='rubyid_to_sym identifier id'>to_sym</span><span class='rparen token'>)</span>
   <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No irc host specified in the configuration&quot;</span> <span class='rubyid_unless unless_mod kw'>unless</span> <span class='rubyid_@config ivar id'>@config</span><span class='lbrack token'>[</span><span class='symbol val'>:host</span><span class='rbrack token'>]</span>
@@ -516,11 +518,11 @@ a message tagged as <code>:dryrun</code>.</p>
       
         <li>
           <span class="name">:channel</span>
-          <span class="type">(<tt>String</tt>)</span>
+          <span class="type">(<tt>Cinch::Channel</tt>, <tt>String</tt>)</span>
           <span class="default">
             
           </span>
-          &mdash; <div class='inline'><p>The channel to join</p>
+          &mdash; <div class='inline'><p>The channel to connect</p>
 </div>
         </li>
       
@@ -561,23 +563,41 @@ a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-194
-195
-196
 197
 198
 199
 200
-201</pre>
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 194</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 197</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_connect identifier id'>connect</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_channel_name identifier id'>channel_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:channel</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :channel argument given&quot;</span>
-  <span class='rubyid_channel identifier id'>channel</span> <span class='assign token'>=</span> <span class='rubyid_get_channel_internal identifier id'>get_channel_internal</span><span class='lparen token'>(</span><span class='rubyid_channel_name identifier id'>channel_name</span><span class='rparen token'>)</span>
-  <span class='rubyid_if if kw'>if</span> <span class='rubyid_channel identifier id'>channel</span>
-    <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_connect_message_listener identifier id'>connect_message_listener</span><span class='lparen token'>(</span><span class='symbol val'>:listener</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ChannelMessageListener constant id'>ChannelMessageListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_channel identifier id'>channel</span><span class='rparen token'>)</span><span class='comma token'>,</span> <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_channel_or_name identifier id'>channel_or_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:channel</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :channel argument given&quot;</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would connect the message bus to channel #{channel_or_name} for tags #{params[:to]}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:irc</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_channel identifier id'>channel</span> <span class='assign token'>=</span> <span class='rubyid_get_channel_internal identifier id'>get_channel_internal</span><span class='lparen token'>(</span><span class='rubyid_channel_or_name identifier id'>channel_or_name</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_channel identifier id'>channel</span>
+      <span class='comment val'># we do this before the actual action so that the message doesn't show up</span>
+      <span class='comment val'># in the channel itself (if trace happens to be in the tags)</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Connected the message bus to channel #{channel_or_name} for tags #{params[:to]}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:irc</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+      <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_connect_message_listener identifier id'>connect_message_listener</span><span class='lparen token'>(</span><span class='symbol val'>:listener</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ChannelMessageListener constant id'>ChannelMessageListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_channel identifier id'>channel</span><span class='rparen token'>)</span><span class='comma token'>,</span> <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:to</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_channel identifier id'>channel</span>
 <span class='rubyid_end end kw'>end</span>
@@ -631,7 +651,7 @@ except create a message tagged as <code>:dryrun</code>.</p>
       
         <li>
           <span class="name">:channel</span>
-          <span class="type">(<tt>String</tt>)</span>
+          <span class="type">(<tt>Cinch::Channel</tt>, <tt>String</tt>)</span>
           <span class="default">
             
           </span>
@@ -666,23 +686,37 @@ except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-209
-210
-211
-212
-213
-214
-215
-216</pre>
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 209</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 221</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_disconnect identifier id'>disconnect</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
-  <span class='rubyid_channel_name identifier id'>channel_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:channel</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :channel argument given&quot;</span>
-  <span class='rubyid_channel identifier id'>channel</span> <span class='assign token'>=</span> <span class='rubyid_get_channel_internal identifier id'>get_channel_internal</span><span class='lparen token'>(</span><span class='rubyid_channel_name identifier id'>channel_name</span><span class='rparen token'>)</span>
-  <span class='rubyid_if if kw'>if</span> <span class='rubyid_channel identifier id'>channel</span>
-    <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_disconnect_message_listener identifier id'>disconnect_message_listener</span><span class='lparen token'>(</span><span class='symbol val'>:listener</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ChannelMessageListener constant id'>ChannelMessageListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_channel identifier id'>channel</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+  <span class='rubyid_channel_or_name identifier id'>channel_or_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:channel</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :channel argument given&quot;</span>
+  <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
+    <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would disconnect the message bus from channel #{channel_or_name}&quot;</span><span class='comma token'>,</span>
+           <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:irc</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+  <span class='rubyid_else else kw'>else</span>
+    <span class='rubyid_channel identifier id'>channel</span> <span class='assign token'>=</span> <span class='rubyid_get_channel_internal identifier id'>get_channel_internal</span><span class='lparen token'>(</span><span class='rubyid_channel_or_name identifier id'>channel_or_name</span><span class='rparen token'>)</span>
+    <span class='rubyid_if if kw'>if</span> <span class='rubyid_channel identifier id'>channel</span>
+      <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_disconnect_message_listener identifier id'>disconnect_message_listener</span><span class='lparen token'>(</span><span class='symbol val'>:listener</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='rubyid_ChannelMessageListener constant id'>ChannelMessageListener</span><span class='dot token'>.</span><span class='rubyid_new identifier id'>new</span><span class='lparen token'>(</span><span class='rubyid_channel identifier id'>channel</span><span class='rparen token'>)</span><span class='rparen token'>)</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Disconnected the message bus from channel #{channel_or_name}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:irc</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
+    <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_channel identifier id'>channel</span>
 <span class='rubyid_end end kw'>end</span>
@@ -771,13 +805,13 @@ mode except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-182
-183
-184
-185</pre>
+185
+186
+187
+188</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 182</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 185</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_join identifier id'>join</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_channel_name identifier id'>channel_name</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:channel</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :channel argument given&quot;</span>
@@ -861,16 +895,16 @@ mode except create a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-225
-226
-227
-228
-229
-230
-231</pre>
+244
+245
+246
+247
+248
+249
+250</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 225</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 244</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_leave identifier id'>leave</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_channel identifier id'>channel</span> <span class='assign token'>=</span> <span class='rubyid_disconnect identifier id'>disconnect</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
@@ -957,7 +991,6 @@ a message tagged as <code>:dryrun</code>.</p>
       <pre class="lines">
 
 
-162
 163
 164
 165
@@ -969,10 +1002,13 @@ a message tagged as <code>:dryrun</code>.</p>
 171
 172
 173
-174</pre>
+174
+175
+176
+177</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 162</span>
+      <pre class="code"><span class="info file"># File 'lib/cosmic/irc.rb', line 163</span>
 
 <span class='rubyid_def def kw'>def</span> <span class='rubyid_write identifier id'>write</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='rparen token'>)</span>
   <span class='rubyid_msg identifier id'>msg</span> <span class='assign token'>=</span> <span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:msg</span><span class='rbrack token'>]</span> <span class='rubyid_or or kw'>or</span> <span class='rubyid_raise identifier id'>raise</span> <span class='string val'>&quot;No :msg argument given&quot;</span>
@@ -980,10 +1016,12 @@ a message tagged as <code>:dryrun</code>.</p>
   <span class='rubyid_channels identifier id'>channels</span> <span class='assign token'>=</span> <span class='rubyid_arrayify identifier id'>arrayify</span><span class='lparen token'>(</span><span class='rubyid_params identifier id'>params</span><span class='lbrack token'>[</span><span class='symbol val'>:channels</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
   <span class='rubyid_if if kw'>if</span> <span class='notop op'>!</span><span class='rubyid_channels identifier id'>channels</span><span class='dot token'>.</span><span class='rubyid_empty? fid id'>empty?</span>
     <span class='rubyid_if if kw'>if</span> <span class='rubyid_@environment ivar id'>@environment</span><span class='dot token'>.</span><span class='rubyid_in_dry_run_mode identifier id'>in_dry_run_mode</span>
-      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;Would write message '#{msg}' to channels #{channels.join(',')}&quot;</span><span class='comma token'>,</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Would write message '#{msg}' to channels #{channels.join(',')}&quot;</span><span class='comma token'>,</span>
              <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:irc</span><span class='comma token'>,</span> <span class='symbol val'>:dryrun</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_else else kw'>else</span>
       <span class='rubyid_channels identifier id'>channels</span><span class='dot token'>.</span><span class='rubyid_each identifier id'>each</span> <span class='lbrace token'>{</span> <span class='bitor op'>|</span><span class='rubyid_channel identifier id'>channel</span><span class='bitor op'>|</span> <span class='rubyid_write_to_channel identifier id'>write_to_channel</span><span class='lparen token'>(</span><span class='rubyid_msg identifier id'>msg</span><span class='comma token'>,</span> <span class='rubyid_channel identifier id'>channel</span><span class='rparen token'>)</span> <span class='rbrace token'>}</span>
+      <span class='rubyid_notify identifier id'>notify</span><span class='lparen token'>(</span><span class='symbol val'>:msg</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='dstring node'>&quot;[#{@name}] Wrote message '#{msg}' to channels #{channels.join(',')}&quot;</span><span class='comma token'>,</span>
+             <span class='symbol val'>:tags</span> <span class='assign token'>=</span><span class='gt op'>&gt;</span> <span class='lbrack token'>[</span><span class='symbol val'>:irc</span><span class='comma token'>,</span> <span class='symbol val'>:trace</span><span class='rbrack token'>]</span><span class='rparen token'>)</span>
     <span class='rubyid_end end kw'>end</span>
   <span class='rubyid_end end kw'>end</span>
 <span class='rubyid_end end kw'>end</span>
@@ -998,7 +1036,7 @@ a message tagged as <code>:dryrun</code>.</p>
 </div>
     
     <div id="footer">
-  Generated on Tue Jan  3 12:53:40 2012 by 
+  Generated on Fri Jan  6 17:29:24 2012 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.7.4 (ruby-1.8.7).
 </div>
