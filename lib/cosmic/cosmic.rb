@@ -147,6 +147,11 @@ module Cosmic
         end
       end
     end
+
+    # Shuts down this message bus by removing all listeners.
+    def shutdown
+      @listeners.clear
+    end
   end
 
   # Helper class that responds to any method call with itself.
@@ -488,6 +493,15 @@ module Cosmic
       end
 
       return @cached_plugins[name.downcase] || find_plugin_class(name)
+    end
+
+    # Shuts down this environment. This method will basically shut down all registered
+    # plugins and the message bus.
+    def shutdown
+      @cached_plugins.values.each do |plugin|
+        plugin.shutdown
+      end
+      @message_bus.shutdown
     end
 
     private

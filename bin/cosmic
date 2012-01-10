@@ -37,5 +37,6 @@ else
       puts "#{$!}\n\t" + e.backtrace.join("\n\t")
     end
   end
+  cosmic.shutdown
 end
 

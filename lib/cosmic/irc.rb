@@ -248,6 +248,17 @@ module Cosmic
       end
     end
 
+    # Shuts down this IRC plugin instance by quitting from the server.
+    def shutdown
+      if @bot
+        channels = Array.new(@joined_channels.values)
+        channels.each do |channel|
+          disconnect(:channel => channel)
+        end
+        @bot.quit
+      end
+    end
+
     private
 
     def authenticate

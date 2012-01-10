@@ -158,6 +158,14 @@ module Cosmic
       nil
     end
 
+    # Shuts down this JMX plugin instance by releasing all connections to remote mbeans.
+    def shutdown
+      @connections.values.each do |conn|
+        conn.close
+      end
+      @connections.clear
+    end
+
     private
 
     def get_connection(params)

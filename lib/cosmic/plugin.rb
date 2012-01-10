@@ -55,6 +55,12 @@ module Cosmic
         super
       end
     end
+
+    # No-op implementation for the plugin shut down method. Override this method in a
+    # plugin if it for instance has some network connections that should be shut down
+    # cleanly, or things of that nature. 
+    def shutdown
+    end
   end
 end
 
