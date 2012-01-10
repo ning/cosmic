@@ -215,7 +215,7 @@ module Cosmic
     def link(params)
       kind = params[:kind] or raise "No :kind argument given"
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would create a link of type #{kind} from issue #{params[:issue]} to #{params[:to]}",
+        notify(:msg => "[#{@name}] Would create a link of type #{kind} from issue #{params[:issue]} to issue #{params[:to]}",
                :tags => [:jira, :dryrun])
         nil
       else
@@ -258,7 +258,7 @@ module Cosmic
             if response.code.to_i >= 400
               raise "Could not link JIRA issue #{issue.key} to #{to.key}, response status was #{response.code.to_i}"
             end
-            notify(:msg => "[#{@name}] Created a link of type #{kind} from issue #{params[:issue]} to #{params[:to]}",
+            notify(:msg => "[#{@name}] Created a link of type #{kind} from issue #{issue.key} to issue #{to.key}",
                    :tags => [:jira, :trace])
           else
             raise "Could not login to JIRA via http/https, response status was #{response.code.to_i}"
@@ -289,7 +289,7 @@ module Cosmic
         from_key = params[:issue] or raise "No :issue argument given"
         issue = issueify(from_key)
         perform_workflow_action_internal(issue, action_name, params[:params] || [])
-        notify(:msg => "[#{@name}] Performed workflow action #{action_name} on issue #{params[:issue]}",
+        notify(:msg => "[#{@name}] Performed workflow action #{action_name} on issue #{issue.key}",
                :tags => [:jira, :trace])
         issue
       end
@@ -320,7 +320,7 @@ module Cosmic
           resolution_field.id = "resolution"
           resolution_field.values = resolution.id
           perform_workflow_action_internal(issue, action_name, [resolution_field])
-          notify(:msg => "[#{@name}] Resolved issue #{params[:issue]}",
+          notify(:msg => "[#{@name}] Resolved issue #{issue.key}",
                  :tags => [:jira, :trace])
         else
           raise "Could not find JIRA issue #{params[:issue]}"
@@ -349,7 +349,7 @@ module Cosmic
         issue = issueify(key)
         if issue
           @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => tags)
-          notify(:msg => "[#{@name}] Connected issue #{params[:issue]} to the message bus for tags #{tags}",
+          notify(:msg => "[#{@name}] Connected issue #{issue.key} to the message bus for tags #{tags}",
                  :tags => [:jira, :trace])
         else
           raise "Could not find JIRA issue #{key}"
@@ -375,7 +375,7 @@ module Cosmic
         issue = issueify(key)
         if issue
           @environment.disconnect_message_listener(:listener => IssueMessageListener.new(self, issue))
-          notify(:msg => "[#{@name}] Disconnected issue #{params[:issue]} from the message bus",
+          notify(:msg => "[#{@name}] Disconnected issue #{issue.key} from the message bus",
                  :tags => [:jira, :trace])
         end
         issue
@@ -396,7 +396,7 @@ module Cosmic
                                Logger::FATAL => [:jira, :error])
         @jira.logger = log
         @jira.login(@config[:auth][:username], @config[:auth][:password])
-        notify(:msg => "[#{@name}] Login in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Logging in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :trace])
       end
     end
