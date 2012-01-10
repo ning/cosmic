@@ -34,6 +34,11 @@ Threading
 
 Cosmic is deliberately single-threaded unless it can't be avoided. This means that for instance the message bus will only return from the notify method once all listeners have been notified. Therefore, self referential code such as listening for its own messages should be avoided.
 
+External resources
+------------------
+
+If your plugin maintains references to external resources, e.g. keeps tcp connections to a server open, then you'll want to override the ``shutdown`` method in your plugin to clean these up when the environment gets shut down. 
+
 Error handling
 --------------
 
