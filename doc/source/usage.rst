@@ -52,3 +52,6 @@ You can also require the cosmic gem in your scripts. You will then have to creat
       end
       ...
     end
+    cosmic.shutdown
+
+The call to ``shutdown`` ensures that plugins are cleanly shut down, e.g. release connections to remote services etc.
