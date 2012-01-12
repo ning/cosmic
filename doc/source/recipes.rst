@@ -1,3 +1,5 @@
+.. _`highline`: https://github.com/JEG2/highline
+
 Recipes
 *******
 
@@ -96,4 +98,43 @@ The latter makes use of the implicitly available ``cosmic`` environment instance
       end
 
       puts "Issue is: #{issue.key}" if issue
+    end
+
+Continue/abort scripts
+----------------------
+
+Sometimes you want to write a script that performs a single action first, then asks the user whether to continue or not, and then either aborts (or rolls back the changes) or continues. Cosmic uses the `highline`_ gem which makes things like that easy. For example, let's say you want to update a bunch of services via galaxy. Without any user interaction, this could look like::
+
+    require 'cosmic/galaxy'
+
+    with galaxy do
+      services = select :type => ...
+      update :services => services, :to => ...
+      restart :services => services
+    end
+
+This will update all selected services without any user interaction. Now if you want to update only the first one, and then give the user the ability to check that the update was fine and potentially abort or roll back the update, you could use code like this:
+
+    require 'cosmic/galaxy'
+    require 'highline/import'
+
+    services = galaxy.select :type => ...
+    first_service, *remaining_services = *services
+
+    with galaxy do
+      update :service => first_service, :to => ...
+      restart :service => first_service
+    end
+
+    response = ask("Service #{first_service.host} updated & restarted, [c]ontinue, [r]evert, [a]bort ?") { |q| q.in = 'cra' }
+    case response.downcase
+      when 'c'
+        with galaxy do
+          update :services => remaining_services, :to => ...
+          restart :services => remaining_services
+        end
+      when 'r'
+        with galaxy do
+          revert :service => first_service, :to => services
+        end
     end
