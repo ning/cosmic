@@ -142,3 +142,78 @@ This will update all selected services without any user interaction. Now if you 
           revert :service => first_service, :to => services
         end
     end
+
+Nested `with`/`with_available` blocks
+-------------------------------------
+
+In short, code like this is not possible::
+
+    with galaxy do
+      services = select ...
+      with irc do
+        ...
+      end
+    end
+
+The reason is that this code runs in the context of the environment instance, and both `galaxy` and `irc` are looked up at it (using the `method_missing` mechanism). In general, its better to structure the code in separate with blocks, potentially carrying values around::
+
+    services = with galaxy do
+      select ...
+    end
+    with irc do
+      ...
+    end
+
+If you really have to nest, use a local variable::
+
+    _irc = irc
+    with galaxy do
+      services = select ...
+      with _irc do
+        ...
+      end
+    end
+
+Defining functions and variables in cosmic scripts
+--------------------------------------------------
+
+Say you want to define a function in your script and then execute it later::
+
+    def do_something
+      ...
+    end
+
+    do_something
+    with galaxy do
+      do_something
+    end
+
+The first call will work fine, but the second one will fail with an ``undefined method `do_something' for #<Cosmic::Galaxy:0x7002ee59>`` error. The reason for this is that the script is executed in the context of an environment instance, and all methods defined in the script will be attached to that instance. So what you can do instead is reference the environment directly::
+
+    def do_something
+      ...
+    end
+
+    with galaxy do
+      cosmic.do_something
+    end
+
+This is not true for variables however::
+
+    foo = ...
+
+    def do_something
+      # use foo somehow
+    end
+
+    do_something
+
+will fail with ``undefined local variable or method `foo' for #<Cosmic::Environment:0x6dd33544>`` because ``foo`` is not visible inside the method. In this case, you can bind the variable to the instance using ``@``::
+
+    @foo = ...
+
+    def do_something
+      # now use @foo somehow
+    end
+
+    do_something
