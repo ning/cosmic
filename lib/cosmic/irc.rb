@@ -160,8 +160,8 @@ module Cosmic
     # @option params [String,Array<String>,Cinch::Channel,Array<Cinch::Channel>] :channels The channels to write to
     # @return [void]
     def write(params)
-      msg = params[:msg] or raise "No :msg argument given"
-      raise "No :channels argument given" unless params[:channels]
+      msg = get_param(params, :msg)
+      raise "No :channels argument given" unless params.has_key?(:channels)
       channels = arrayify(params[:channels])
       if !channels.empty?
         if @environment.in_dry_run_mode
@@ -182,7 +182,7 @@ module Cosmic
     # @option params [String] :channel The channel to join
     # @return [Cinch::Channel,nil] The channel if the plugin was able to join it
     def join(params)
-      channel_name = params[:channel] or raise "No :channel argument given"
+      channel_name = get_param(params, :channel)
       get_channel_internal(channel_name)
     end
 
@@ -194,7 +194,7 @@ module Cosmic
     # @option params [Array<String>,String] :to The tags for the messages that the plugin should write to the channel
     # @return [Cinch::Channel,nil] The channel if the plugin was able to connect it
     def connect(params)
-      channel_or_name = params[:channel] or raise "No :channel argument given"
+      channel_or_name = get_param(params, :channel)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would connect the message bus to channel #{channel_or_name} for tags #{params[:to]}",
                :tags => [:irc, :dryrun])
@@ -218,7 +218,7 @@ module Cosmic
     # @option params [Cinch::Channel,String] :channel The channel to disconnect from the message bus
     # @return [Cinch::Channel,nil] The channel
     def disconnect(params)
-      channel_or_name = params[:channel] or raise "No :channel argument given"
+      channel_or_name = get_param(params, :channel)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would disconnect the message bus from channel #{channel_or_name}",
                :tags => [:irc, :dryrun])

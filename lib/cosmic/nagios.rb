@@ -52,9 +52,9 @@ module Cosmic
     #                                      be returned
     # @return [Hash,nil] The Nagios status of the host/service as a Hash
     def status(params)
-      host = params[:host] or raise "No :host argument given"
-      service = params[:service]
-      if service
+      host = get_param(params, :host)
+      if params.has_key?(:service)
+        service = params[:service]
         request = Net::HTTP::Get.new("/hosts/#{host}/#{service}/attributes?format=json")
         response = @nagix.request(request)
         notify(:msg => "[#{@name}] Retrieved Nagios status for service #{service} on host #{host}",
@@ -104,21 +104,20 @@ module Cosmic
     #                                      if not specified then all services will be enabled
     # @return [Hash] The Nagios status of the host/service as a Hash
     def enable(params)
-      host = params[:host] or raise "No :host argument given"
-      service = params[:service]
+      host = get_param(params, :host)
       if @environment.in_dry_run_mode
-        if service
-          notify(:msg => "[#{@name}] Would enable Nagios notifications for service #{service} on host #{host}",
+        if params.has_key?(:service)
+          notify(:msg => "[#{@name}] Would enable Nagios notifications for service #{params[:service]} on host #{host}",
                  :tags => [:nagios, :dryrun])
         else
           notify(:msg => "[#{@name}] Would enable Nagios notifications for host #{host}",
                  :tags => [:nagios, :dryrun])
         end
       else
-        if service
-          notify(:msg => "[#{@name}] Enabling notifications for service #{service} on host #{host}",
+        if params.has_key?(:service)
+          notify(:msg => "[#{@name}] Enabling notifications for service #{params[:service]} on host #{host}",
                  :tags => [:nagios, :trace])
-          request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/ENABLE_SVC_NOTIFICATIONS")
+          request = Net::HTTP::Put.new("/hosts/#{host}/#{params[:service]}/command/ENABLE_SVC_NOTIFICATIONS")
         else
           notify(:msg => "[#{@name}] Enabling notifications for host #{host}",
                  :tags => [:nagios, :trace])
@@ -143,21 +142,20 @@ module Cosmic
     #                                      if not specified then all services will be disabled
     # @return [Hash] The Nagios status of the host/service as a Hash
     def disable(params)
-      host = params[:host] or raise "No :host argument given"
-      service = params[:service]
+      host = get_param(params, :host)
       if @environment.in_dry_run_mode
-        if service
-          notify(:msg => "[#{@name}] Would disable Nagios notifications for service #{service} on host #{host}",
+        if params.has_key?(:service)
+          notify(:msg => "[#{@name}] Would disable Nagios notifications for service #{params[:service]} on host #{host}",
                  :tags => [:nagios, :dryrun])
         else
           notify(:msg => "[#{@name}] Would disable Nagios notifications for host #{host}",
                  :tags => [:nagios, :dryrun])
         end
       else
-        if service
-          notify(:msg => "[#{@name}] Disabling notifications for service #{service} on host #{host}",
+        if params.has_key?(:service)
+          notify(:msg => "[#{@name}] Disabling notifications for service #{params[:service]} on host #{host}",
                  :tags => [:nagios, :trace])
-          request = Net::HTTP::Put.new("/hosts/#{host}/#{service}/command/DISABLE_SVC_NOTIFICATIONS")
+          request = Net::HTTP::Put.new("/hosts/#{host}/#{params[:service]}/command/DISABLE_SVC_NOTIFICATIONS")
         else
           notify(:msg => "[#{@name}] Disabling notifications for host #{host}",
                  :tags => [:nagios, :trace])

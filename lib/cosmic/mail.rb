@@ -87,11 +87,11 @@ module Cosmic
       else
         params = args.flatten.first
         mail_sender = params[:from]
-        if !mail_sender && @config[:auth]
+        if mail_sender.nil? && @config[:auth]
           mail_sender = @config[:auth][:username]
         end
         raise "No :from argument given" unless mail_sender
-        mail_recipient = params[:to] or raise "No :to argument given"
+        mail_recipient = get_param(params, :to)
         mail_subject = params[:subject] || ''
         mail_body = params[:body] || ''
         mail = ::Mail.new do

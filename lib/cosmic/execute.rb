@@ -40,7 +40,7 @@ module Cosmic
                :tags => [:execute, :dryrun])
         nil
       else
-        cmd = params[:cmd] or raise "No :cmd argument given"
+        cmd = get_param(params, :cmd)
         output = ""
         pid, ignored, stdout, stderr = (JRUBY ? IO : Open4).send(:popen4, cmd)
         threads = []

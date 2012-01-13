@@ -50,7 +50,7 @@ module Cosmic
     # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def add_to_pool(params)
-      pool_name = params[:pool] or raise "No :pool argument given"
+      pool_name = get_param(params, :pool)
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       if @environment.in_dry_run_mode
@@ -63,7 +63,7 @@ module Cosmic
         @monitor.synchronize do
           @f5['LocalLB.Pool'].add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
-        if params[:monitor_rule]
+        if params.has_key?(:monitor_rule)
           set_monitor_rule(params)
         else
           get_member(params)
@@ -94,7 +94,7 @@ module Cosmic
     # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def set_monitor_rule(params)
-      pool_name = params[:pool] or raise "No :pool argument given"
+      pool_name = get_param(params, :pool)
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       if @environment.in_dry_run_mode
@@ -103,7 +103,7 @@ module Cosmic
       else
         notify(:msg => "[#{@name}] Setting monitor rule for node #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :trace])
-        if params[:monitor_rule]
+        if params.has_key?(:monitor_rule)
           ip_port = { 'address' => node_ip,
                       'port' => node_port }
           monitor_ip_port = { 'address_type' => 'ATYPE_EXPLICIT_ADDRESS_EXPLICIT_PORT',
@@ -132,7 +132,7 @@ module Cosmic
     # @option params [String] :pool The pool name
     # @return [void]
     def remove_from_pool(params)
-      pool_name = params[:pool] or raise "No :pool argument given"
+      pool_name = get_param(params, :pool)
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       if @environment.in_dry_run_mode
@@ -155,7 +155,7 @@ module Cosmic
     # @return [Array<Hash>] The members as hashes with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def get_members(params)
-      pool_name = params[:pool] or raise "No :pool argument given"
+      pool_name = get_param(params, :pool)
       notify(:msg => "[#{@name}] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :trace])
       members = @monitor.synchronize do
@@ -197,7 +197,7 @@ module Cosmic
     # @return [Array<Hash>] The member as a hash with `:pool_name`,, `:ip`, `:port`,
     #                       `:availability`, `:enabled` and `:monitor_rule` entries
     def get_member(params)
-      pool_name = params[:pool] or raise "No :pool argument given"
+      pool_name = get_param(params, :pool)
       node_ip = get_ip(params)
       node_port = (params[:port] || 80).to_i
       notify(:msg => "[#{@name}] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
@@ -263,10 +263,10 @@ module Cosmic
     # @option params [String] :pool The pool name, 80 by default if a pool name is given
     # @return [Hash,nil] The statistics as a hash of statistics name to current value
     def get_stats(params)
-      pool_name = params[:pool]
       node_ip = get_ip(params)
       result = {}
-      if pool_name
+      if params.has_key?(:pool)
+        pool_name = params[:pool]
         node_port = (params[:port] || 80).to_i
         notify(:msg => "[#{@name}] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :trace])
@@ -320,9 +320,9 @@ module Cosmic
     # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly
     #                    `:pool_name`, `:port`, and `:monitor_rule` entries
     def enable(params)
-      pool_name = params[:pool]
       node_ip = get_ip(params)
-      if pool_name
+      if params.has_key?(:pool)
+        pool_name = params[:pool]
         node_port = (params[:port] || 80).to_i
         if @environment.in_dry_run_mode
           notify(:msg => "[#{@name}] Would enable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
@@ -360,9 +360,9 @@ module Cosmic
     # @return [Hash,nil] The hash of the node/member `:ip`, `:availability`, `:enabled` and possibly
     #                    `:pool_name`, `:port`, and `:monitor_rule` entries
     def disable(params)
-      pool_name = params[:pool]
       node_ip = get_ip(params)
-      if pool_name
+      if params.has_key?(:pool)
+        pool_name = params[:pool]
         node_port = (params[:port] || 80).to_i
         if @environment.in_dry_run_mode
           notify(:msg => "[#{@name}] Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
@@ -395,8 +395,8 @@ module Cosmic
     # @option params [String] :group The specific group to sync to; if omitted then all groups will be synced to
     # @return [void]
     def sync(params)
-      group = params[:group]
-      if group
+      if params.has_key?(:group)
+        group = params[:group]
         if @environment.in_dry_run_mode
           notify(:msg => "[#{@name}] Would sync configurations for load balancer #{@config[:host]} to group #{group}",
                  :tags => [:f5, :dryrun])
@@ -432,9 +432,9 @@ module Cosmic
     end
 
     def get_ip(params)
-      if params[:host]
+      if params.has_key?(:host)
         Socket::getaddrinfo(params[:host], nil)[0][3]
-      elsif params[:ip]
+      elsif params.has_key?(:ip)
         params[:ip]
       else
         raise "No :host or :ip argument given"

@@ -106,19 +106,19 @@ module Cosmic
     # @option params [String] :hosts The hosts to select
     # @return [Array<Galaxy::Agent>] The selected servies
     def select(params = {})
-      if params[:path]
+      if params.has_key?(:path)
         path_regex = params[:path]
         path_regex = Regexp.new(path_regex.to_s) unless path_regex.is_a?(Regexp)
         selector = lambda {|agent| agent.config_path && path_regex.match(agent.config_path) }
         notify(:msg => "[#{@name}] Selecting all services for path #{path_regex.inspect}",
                :tags => [:galaxy, :trace])
-      elsif params[:type]
+      elsif params.has_key?(:type)
         type_regex = params[:type]
         type_regex = Regexp.new(type_regex.to_s) unless type_regex.is_a?(Regexp)
         selector = lambda {|agent| agent.config_path && type_regex.match(type_of?(agent)) }
         notify(:msg => "[#{@name}] Selecting all services of type #{type_regex.inspect}",
                :tags => [:galaxy, :trace])
-      elsif params[:host] || params[:hosts]
+      elsif params.has_key?(:host) || params.has_key?(:hosts)
         host_names = arrayify(params[:host]) & arrayify(params[:hosts])
         selector = lambda {|agent| host_names.include?(agent.host) }
         notify(:msg => "[#{@name}] Selecting all services for hosts #{host_names.inspect}",
@@ -148,9 +148,9 @@ module Cosmic
     # @return [Array<Galaxy::Agent>] The assigned services
     def assign(params)
       services = services_from_params(params)
-      env = params[:env] or raise "No :env argument given"
-      version = params[:version] or raise "No :version argument given"
-      type = params[:type] or raise "No :type argument given"
+      env = get_param(params, :env)
+      version = get_param(params, :version)
+      type = get_param(params, :type)
       if @environment.in_dry_run_mode
         services.each do |agent|
           notify(:msg => "[#{@name}] Would assign #{agent.host} to /#{env}/#{version}/#{type}",
@@ -264,7 +264,7 @@ module Cosmic
     # @return [Array<Galaxy::Agent>] The updated services
     def update(params)
       services = services_from_params(params)
-      to = params[:to] or raise "No :to argument given"
+      to = get_param(params, :to)
       if @environment.in_dry_run_mode
         services.each do |agent|
           notify(:msg => "[#{@name}] Would update #{agent.host} to version #{to}",
@@ -294,7 +294,7 @@ module Cosmic
     # @return [Array<Galaxy::Agent>] The updated services
     def update_config(params)
       services = services_from_params(params)
-      to = params[:to] or raise "No :to argument given"
+      to = get_param(params, :to)
       if @environment.in_dry_run_mode
         services.each do |agent|
           notify(:msg => "[#{@name}] Would update the configuration of #{agent.host} to version #{to}",
@@ -357,7 +357,7 @@ module Cosmic
     # @option params [String] :hosts The hosts to revert
     # @return [Array<Galaxy::Agent>] The reverted services
     def revert(params)
-      to = params[:to] or raise "No :to argument given"
+      to = get_param(params, :to)
       services = services_from_params(params)
       ips = services.inject(Set.new) { |ips, agent| ips << agent.ip }
       agents_by_version = arrayify(to).inject(Hash.new) do |by_version, agent|
@@ -408,7 +408,7 @@ module Cosmic
     # @option params [Array<Galaxy::Agent>] :services The services to print
     # @return [String] The textual representation
     def print(params)
-      raise "No :service or :services argument given" unless params[:service] || params[:services]
+      raise "No :service or :services argument given" unless params.has_key?(:service) || params.has_key?(:services)
       services = arrayify(params[:services]) | arrayify(params[:service])
 
       result = ""
@@ -443,9 +443,9 @@ module Cosmic
     end
 
     def services_from_params(params)
-      raise "No :service or :services or :host or :hosts argument given" unless params[:service] || params[:services] || params[:host] || params[:hosts]
+      raise "No :service or :services or :host or :hosts argument given" unless params.has_key?(:service) || params.has_key?(:services) || params.has_key?(:host) || params.has_key?(:hosts)
       services = arrayify(params[:services]) | arrayify(params[:service])
-      if params[:host] || params[:hosts]
+      if params.has_key?(:host) || params.has_key?(:hosts)
         host_names = arrayify(params[:hosts]) | arrayify(params[:host])
         services &= select(:hosts => host_names)
       end

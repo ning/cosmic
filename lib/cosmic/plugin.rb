@@ -3,6 +3,16 @@ require 'cosmic'
 module Cosmic
   # Base class for plugins.
   class Plugin
+    # Helper method that returns a parameter if present, or raises an error if not.
+    #
+    # @param [Hash] params The parameters
+    # @param [Symbol] sym The name (symbol) of the parameter
+    # @return The value of the parameter
+    def get_param(params, sym)
+      raise "No :#{sym.to_s} argument given" unless params.has_key?(sym)
+      params[sym]
+    end
+
     # Helper method for plugins to send events to the environment. The method
     # will fall back to `stdout` if no environment is available, which is
     # mostly useful for errors during plugin initialization.

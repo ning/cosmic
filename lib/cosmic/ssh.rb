@@ -68,9 +68,9 @@ module Cosmic
     # @option params [String] :cmd The command to run on the host
     # @return [String] All output of the command (stdout and stderr combined)
     def exec(params)
-      host = params[:host] or raise "No :host argument given"
+      host = get_param(params, :host)
       user = params[:user] || @config[:auth][:username]
-      cmd = params[:cmd] or raise "No :cmd argument given"
+      cmd = get_param(params, :cmd)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would execute command '#{cmd}' as user #{user} on host #{host}",
                :tags => [:ssh, :dryrun])
@@ -100,10 +100,10 @@ module Cosmic
     #        of the file
     # @return [void]
     def upload(params, &block)
-      host = params[:host] or raise "No :host argument given"
+      host = get_param(params, :host)
       user = params[:user] || @config[:auth][:username]
-      local = params[:local] or raise "No :local argument given"
-      remote = params[:remote] || params[:local]
+      local = get_param(params, :local)
+      remote = params[:remote] || local
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would upload local file #{local} as user #{user} to host #{host} at #{remote}",
                :tags => [:ssh, :dryrun])
@@ -132,10 +132,10 @@ module Cosmic
     #        of the file
     # @return [void]
     def download(params, &block)
-      host = params[:host] or raise "No :host argument given"
+      host = get_param(params, :host)
       user = params[:user] || @config[:auth][:username]
-      local = params[:local] || params[:remote]
-      remote = params[:remote] or raise "No :remote argument given"
+      remote = get_param(params, :remote)
+      local = params[:local] || remote
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would download remote file #{remote} as user #{user} from host #{host} to local file #{local}",
                :tags => [:ssh, :dryrun])

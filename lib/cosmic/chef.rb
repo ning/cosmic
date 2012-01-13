@@ -40,7 +40,7 @@ module Cosmic
     # @option params [String] :host The host to get the info for
     # @return [::Chef::Node,nil] The chef node object for the host if it knows about the host
     def get_info(params)
-      host = params[:host] or raise "No :host argument given"
+      host = get_param(params, :host)
       begin
         ::Chef::Node.load(host)
       rescue Net::HTTPServerException => ex
@@ -65,15 +65,13 @@ module Cosmic
                :tags => [:chef, :dryrun])
         nil
       else
+        raise "No :host or :node argument given" unless params.has_key?(:host) or params.has_key?(:node)
         node = params[:node]
         host = params[:host]
-        if !node && !host
-          raise "No :host or :node argument given"
-        end
-        if !node
+        role = get_param(params, :role)
+        if node.nil?
           node = get_info(params)
         end
-        role = params[:role] or raise "No :role argument given"
         ::Chef::Knife::NodeRunListAdd.new.add_to_run_list(node, role)
         get_info(params)
       end

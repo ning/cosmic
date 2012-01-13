@@ -86,9 +86,7 @@ module Cosmic
     # @option params [String] :attribute The attribute to retrieve
     # @return [Object] The attribute value
     def get_attribute(params)
-      raise "No :attribute argument given" unless params.has_key?(:attribute)
-
-      attribute = params[:attribute]
+      attribute = get_param(params, :attribute)
       mbean = mbeanify(params)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would retrieve attribute #{attribute} of mbean #{params[:name] || mbean}",
@@ -116,11 +114,8 @@ module Cosmic
     # @option params [Object] :value What to set the attribute to
     # @return [::JMX::MBean] The mbean
     def set_attribute(params)
-      raise "No :attribute argument given" unless params.has_key?(:attribute)
-      raise "No :value argument given" unless params.has_key?(:value)
-
-      attribute = params[:attribute]
-      value = params[:value]
+      attribute = get_param(params, :attribute)
+      value = get_param(params, :value)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would set attribute #{attribute} to '#{value}' on mbean #{params[:name] || params[:mbean]}",
                :tags => [:jmx, :dryrun])
@@ -147,9 +142,7 @@ module Cosmic
     # @option params [Array<Object>,nil] :args The (optional) arguments to use when invoking the mbean operation
     # @return [Object,nil] The return value of the operation if any
     def invoke(params)
-      raise "No :operation argument given" unless params.has_key?(:operation)
-
-      operation = params[:operation]
+      operation = get_param(params, :operation)
       mbean = mbeanify(params)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would invoke operation #{operation} on mbean #{params[:name] || mbean}",
@@ -176,11 +169,8 @@ module Cosmic
     private
 
     def get_connection(params)
-      raise "No :host argument given" unless params.has_key?(:host)
-      raise "No :port argument given" unless params.has_key?(:port)
-
-      host = params[:host]
-      port = params[:port]
+      host = get_param(params, :host)
+      port = get_param(params, :port)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would try to connect to JMX on host #{host}:#{port}",
                :tags => [:jmx, :dryrun])
@@ -206,9 +196,7 @@ module Cosmic
     def mbeanify(params)
       return params[:mbean] if params.has_key?(:mbean)
       unless @environment.in_dry_run_mode
-        raise "No :name argument given" unless params.has_key?(:name)
-
-        name = params[:name]
+        name = get_param(params, :name)
         conn = get_connection(params)
         if conn
           mbean = ::JMX::MBean.find_by_name(name, :connection => conn)

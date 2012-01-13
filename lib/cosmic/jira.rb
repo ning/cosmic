@@ -99,7 +99,7 @@ module Cosmic
     # @option params [String] :key The key of the issue
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def get_issue(params)
-      key = params[:key] or raise "No :key argument given"
+      key = get_param(params, :key)
       issueify(key)
     end
 
@@ -118,9 +118,9 @@ module Cosmic
     # @option params [Hash,nil] :custom_fields Any custom fields as key value pairs
     # @return [Jira4R::V2::RemoteIssue,nil] The new issue
     def create_issue(params)
-      project_name = params[:project] or raise "No :project argument given"
-      type = params[:type] or raise "No :type argument given"
-      summary = params[:summary] or raise "No :summary argument given"
+      project_name = get_param(params, :project)
+      type = get_param(params, :type)
+      summary = get_param(params, :summary)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would create a new issue in project #{project_name}",
                :tags => [:jira, :dryrun])
@@ -185,7 +185,7 @@ module Cosmic
                :tags => [:jira, :dryrun])
         nil
       else
-        key = params[:issue] or raise "No :issue argument given"
+        key = get_param(params, :issue)
         issue = issueify(key)
         if issue
           comment = Jira4R::V2::RemoteComment.new()
@@ -213,14 +213,14 @@ module Cosmic
     # @option params [String,nil] :comment The link comment
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def link(params)
-      kind = params[:kind] or raise "No :kind argument given"
+      kind = get_param(params, :kind)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would create a link of type #{kind} from issue #{params[:issue]} to issue #{params[:to]}",
                :tags => [:jira, :dryrun])
         nil
       else
-        from_key = params[:issue] or raise "No :issue argument given"
-        to_key = params[:to] or raise "No :to argument given"
+        from_key = get_param(params, :issue)
+        to_key = get_param(params, :to)
         issue = issueify(from_key)
         to = issueify(to_key)
         if issue && to
@@ -280,13 +280,13 @@ module Cosmic
     # @option params [Array,nil] :params An array of parameters for the workflow action
     # @return [Jira4R::V2::RemoteIssue,nil] The issue
     def perform_workflow_action(params)
-      action_name = params[:action] or raise "No :action argument given"
+      action_name = get_param(params, :action)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would perform workflow action #{action_name} on issue #{params[:issue]}",
                :tags => [:jira, :dryrun])
         nil
       else
-        from_key = params[:issue] or raise "No :issue argument given"
+        from_key = get_param(params, :issue)
         issue = issueify(from_key)
         perform_workflow_action_internal(issue, action_name, params[:params] || [])
         notify(:msg => "[#{@name}] Performed workflow action #{action_name} on issue #{issue.key}",
@@ -344,8 +344,8 @@ module Cosmic
                :tags => [:jira, :dryrun])
         nil
       else
-        key = params[:issue] or raise "No :issue argument given"
-        tags = params[:to] or raise "No :to argument given"
+        key = get_param(params, :issue)
+        tags = get_param(params, :to)
         issue = issueify(key)
         if issue
           @environment.connect_message_listener(:listener => IssueMessageListener.new(self, issue), :tags => tags)
@@ -371,7 +371,7 @@ module Cosmic
                :tags => [:jira, :dryrun])
         nil
       else
-        key = params[:issue] or raise "No :issue argument given"
+        key = get_param(params, :issue)
         issue = issueify(key)
         if issue
           @environment.disconnect_message_listener(:listener => IssueMessageListener.new(self, issue))
