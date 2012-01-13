@@ -74,6 +74,23 @@ def arrayify(obj)
   end
 end
 
+# Helper method that runs a block peridically until the block returns
+# a non `nil` value or a certain amount of time has passed
+#
+# @params [Integer] timeout The timeout to wait in seconds
+# @params [Integer] sleep_time How long to wait between executions of the block
+# @yield The block of arity 0 that will be executed
+# @return The result of the block if any
+def repeat_until_result(timeout = 60, sleep_time = 5)
+  raise "No block given" unless block_given?
+  start_time = Time.new.to_i
+  while Time.new.to_i - start_time < timeout
+    result = yield
+    return result if result
+    sleep sleep_time
+  end
+end
+
 # A version of the `require` method that prints out an optional text telling the user
 # how to fix the load problem.
 #
