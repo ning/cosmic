@@ -126,7 +126,11 @@ This will update all selected services without any user interaction. Now if you 
       restart :service => first_service
     end
 
-    response = ask("Service #{first_service.host} updated & restarted, [c]ontinue, [r]evert, [a]bort ?") { |q| q.in = 'cra' }
+    if remaining_services.empty?
+      response = ask("Service #{first_service.host} updated & restarted, [c]ontinue or [r]evert ?") { |q| q.in = 'cr' }
+    else
+      response = ask("Service #{first_service.host} updated & restarted, [c]ontinue, [r]evert, [a]bort ?") { |q| q.in = 'cra' }
+    end
     case response.downcase
       when 'c'
         with galaxy do
