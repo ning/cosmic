@@ -86,7 +86,9 @@ module Cosmic
     # @option params [String] :attribute The attribute to retrieve
     # @return [Object] The attribute value
     def get_attribute(params)
-      attribute = params[:attribute] or raise "No :attribute argument given"
+      raise "No :attribute argument given" unless params.has_key?(:attribute)
+
+      attribute = params[:attribute]
       mbean = mbeanify(params)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would retrieve attribute #{attribute} of mbean #{params[:name] || mbean}",
@@ -114,13 +116,16 @@ module Cosmic
     # @option params [Object] :value What to set the attribute to
     # @return [::JMX::MBean] The mbean
     def set_attribute(params)
-      attribute = params[:attribute] or raise "No :attribute argument given"
-      value = params[:value] or raise "No :value argument given"
-      mbean = mbeanify(params)
+      raise "No :attribute argument given" unless params.has_key?(:attribute)
+      raise "No :value argument given" unless params.has_key?(:value)
+
+      attribute = params[:attribute]
+      value = params[:value]
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
+        notify(:msg => "[#{@name}] Would set attribute #{attribute} to '#{value}' on mbean #{params[:name] || params[:mbean]}",
                :tags => [:jmx, :dryrun])
       else
+        mbean = mbeanify(params)
         if mbean
           mbean.send(attribute.snake_case + '=', value)
           notify(:msg => "[#{@name}] Set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
@@ -142,7 +147,9 @@ module Cosmic
     # @option params [Array<Object>,nil] :args The (optional) arguments to use when invoking the mbean operation
     # @return [Object,nil] The return value of the operation if any
     def invoke(params)
-      operation = params[:operation] or raise "No :operation argument given"
+      raise "No :operation argument given" unless params.has_key?(:operation)
+
+      operation = params[:operation]
       mbean = mbeanify(params)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would invoke operation #{operation} on mbean #{params[:name] || mbean}",
@@ -169,8 +176,11 @@ module Cosmic
     private
 
     def get_connection(params)
-      host = params[:host] or raise "No :host argument given"
-      port = params[:port] or raise "No :port argument given"
+      raise "No :host argument given" unless params.has_key?(:host)
+      raise "No :port argument given" unless params.has_key?(:port)
+
+      host = params[:host]
+      port = params[:port]
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would try to connect to JMX on host #{host}:#{port}",
                :tags => [:jmx, :dryrun])
@@ -194,16 +204,15 @@ module Cosmic
     end
 
     def mbeanify(params)
-      return params[:mbean] if params[:mbean]
-      name = params[:name] or raise "No :name argument given"
-      conn = get_connection(params)
-      if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would retrieve mbean #{name} from host #{host}:#{port}",
-               :tags => [:jmx, :dryrun])
-      else
+      return params[:mbean] if params.has_key?(:mbean)
+      unless @environment.in_dry_run_mode
+        raise "No :name argument given" unless params.has_key?(:name)
+
+        name = params[:name]
+        conn = get_connection(params)
         if conn
           mbean = ::JMX::MBean.find_by_name(name, :connection => conn)
-          notify(:msg => "[#{@name}] Retrieved mbean #{name} from host #{host}:#{port}",
+          notify(:msg => "[#{@name}] Retrieved mbean #{name} from host #{params[:host]}:#{params[:port]}",
                  :tags => [:jmx, :trace])
           return mbean
         end
