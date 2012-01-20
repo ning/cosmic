@@ -19,13 +19,16 @@ module Cosmic
   class ChannelMessageListener
     # The channel
     attr_reader :channel
+    # Prefix for messages put on the channel
+    attr_reader :prefix
 
     # Creates a new listener instance for the given channel.
     #
     # @param [Cinch::Channel] channel The channel
     # @return [ChannelMessageListener] The new instance
-    def initialize(channel)
+    def initialize(channel, prefix = nil)
       @channel = channel
+      @prefix = (prefix.nil? ? '' : prefix)
     end
 
     # Sends a message to this listener.
@@ -34,7 +37,7 @@ module Cosmic
     # @option params [String] :msg The message
     # @return [void]
     def on_message(params)
-      @channel.msg(params[:msg])
+      @channel.msg(prefix + params[:msg])
     end
 
     # Compares this listener with another listener and returns true if both represent
@@ -192,6 +195,7 @@ module Cosmic
     # @param [Hash] params The parameters
     # @option params [Cinch::Channel,String] :channel The channel to connect
     # @option params [Array<String>,String] :to The tags for the messages that the plugin should write to the channel
+    # @option params [String] :prefix An optional prefix to use when writing to the channel
     # @return [Cinch::Channel,nil] The channel if the plugin was able to connect it
     def connect(params)
       channel_or_name = get_param(params, :channel)
@@ -205,7 +209,8 @@ module Cosmic
           # in the channel itself (if trace happens to be in the tags)
           notify(:msg => "[#{@name}] Connected the message bus to channel #{channel_or_name} for tags #{params[:to]}",
                  :tags => [:irc, :trace])
-          @environment.connect_message_listener(:listener => ChannelMessageListener.new(channel), :tags => params[:to])
+          listener = ChannelMessageListener.new(channel, params[:prefix])
+          @environment.connect_message_listener(:listener => listener, :tags => params[:to])
         end
       end
       channel
