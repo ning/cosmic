@@ -37,7 +37,7 @@ module Cosmic
     # @option params [String] :msg The message
     # @return [void]
     def on_message(params)
-      @channel.msg(prefix + params[:msg])
+      @channel.msg("#{@prefix}#{params[:msg]}")
     end
 
     # Compares this listener with another listener and returns true if both represent
