@@ -10,6 +10,23 @@ rescue LoadError => e
 end
 
 module Cosmic
+  # Mixin module for galaxy agent objects that provides additional methods.
+  module AgentEnhancements
+    # Returns the current version of the agent.
+    #
+    # @return [String] The version
+    def version
+      self.config_path.split(/\//, 4)[2]
+    end
+
+    # Returns the assigned type of the agent.
+    #
+    # @return [String] The type
+    def type
+      self.config_path.split(/\//, 4)[3]
+    end
+  end
+
   # A galaxy report that gathers results (agents) instead of outputing them to stdout.
   # It optionally can also send messages to the environment. For that purpose, the
   # constructor takes an optional message template and set of tags. The template is
@@ -41,7 +58,7 @@ module Cosmic
     #
     # @param [Galaxy::Agent] agent The agent
     def record_result agent
-      @results << agent
+      @results << agent.extend(AgentEnhancements)
       if @msg_template
         @environment.notify(:msg => eval('"' + @msg_template + '"'), :tags => @tags)
       end
@@ -115,7 +132,7 @@ module Cosmic
       elsif params.has_key?(:type)
         type_regex = params[:type]
         type_regex = Regexp.new(type_regex.to_s) unless type_regex.is_a?(Regexp)
-        selector = lambda {|agent| agent.config_path && type_regex.match(type_of?(agent)) }
+        selector = lambda {|agent| agent.config_path && type_regex.match(agent.type) }
         notify(:msg => "[#{@name}] Selecting all services of type #{type_regex.inspect}",
                :tags => [:galaxy, :trace])
       elsif params.has_key?(:host) || params.has_key?(:hosts)
@@ -181,14 +198,14 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "[#{@name}] Would start #{agent.host}",
+          notify(:msg => "[#{@name}] Would start #{agent.host} (#{agent.type})",
                  :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::StartCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment,
-                                                   '[' + @name + '] Started #{agent.host}',
+                                                   '[' + @name + '] Started #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
@@ -209,14 +226,14 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "[#{@name}] Would restart #{agent.host}",
+          notify(:msg => "[#{@name}] Would restart #{agent.host} (#{agent.type})",
                  :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::RestartCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment,
-                                                   '[' + @name + '] Restarted #{agent.host}',
+                                                   '[' + @name + '] Restarted #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
@@ -237,14 +254,14 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "[#{@name}] Would stop #{agent.host}",
+          notify(:msg => "[#{@name}] Would stop #{agent.host} (#{agent.type})",
                  :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::StopCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment,
-                                                   '[' + @name + '] Stopped #{agent.host}',
+                                                   '[' + @name + '] Stopped #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
@@ -267,14 +284,14 @@ module Cosmic
       to = get_param(params, :to)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "[#{@name}] Would update #{agent.host} to version #{to}",
+          notify(:msg => "[#{@name}] Would update #{agent.host} (#{agent.type}) to version #{to}",
                  :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::UpdateCommand.new([ to ], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment,
-                                                   '[' + @name + '] Updated #{agent.host} to ' + to,
+                                                   '[' + @name + '] Updated #{agent.host} (#{agent.type}) to ' + to,
                                                    [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
@@ -297,14 +314,14 @@ module Cosmic
       to = get_param(params, :to)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "[#{@name}] Would update the configuration of #{agent.host} to version #{to}",
+          notify(:msg => "[#{@name}] Would update the configuration of #{agent.host} (#{agent.type}) to version #{to}",
                  :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::UpdateConfigCommand.new([ to ], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment,
-                                                   '[' + @name + '] Updated the configuration of #{agent.host} to ' + to,
+                                                   '[' + @name + '] Updated the configuration of #{agent.host} (#{agent.type}) to ' + to,
                                                    [:galaxy, :trace])
         command.execute(services)
         command.report.results
@@ -327,14 +344,14 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "[#{@name}] Would rollback #{agent.host}",
+          notify(:msg => "[#{@name}] Would rollback #{agent.host} (#{agent.type})",
                  :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::RollbackCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment,
-                                                   '[' + @name + '] Rolled back #{agent.host}',
+                                                   '[' + @name + '] Rolled back #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
@@ -362,7 +379,7 @@ module Cosmic
       ips = services.inject(Set.new) { |ips, agent| ips << agent.ip }
       agents_by_version = arrayify(to).inject(Hash.new) do |by_version, agent|
         if ips.include?(agent.ip)
-          version = version_of?(agent)
+          version = agent.version
           for_version = by_version[version]
           by_version[version] = (for_version = []) unless for_version
           for_version << agent
@@ -387,14 +404,14 @@ module Cosmic
       services = services_from_params(params)
       if @environment.in_dry_run_mode
         services.each do |agent|
-          notify(:msg => "[#{@name}] Would clear #{agent.host}",
+          notify(:msg => "[#{@name}] Would clear #{agent.host} (#{agent.type})",
                  :tags => [:galaxy, :dryrun])
         end
         services
       else
         command = ::Galaxy::Commands::ClearCommand.new([], @galaxy_options)
         command.report = GalaxyGatheringReport.new(@environment,
-                                                   '[' + @name + '] Cleared #{agent.host}',
+                                                   '[' + @name + '] Cleared #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
         command.execute(services_from_params(params))
         command.report.results
@@ -432,14 +449,6 @@ module Cosmic
       agents = command.select_agents(filters)
       agents.each { |agent| agent.proxy = ::Galaxy::Transport.locate(agent.url) if agent.url }
       command.execute(agents)
-    end
-
-    def version_of?(agent)
-      agent.config_path.split(/\//, 4)[2]
-    end
-
-    def type_of?(agent)
-      agent.config_path.split(/\//, 4)[3]
     end
 
     def services_from_params(params)
