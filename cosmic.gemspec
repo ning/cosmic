@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Thomas Dudziak"]
-  s.date = %q{2012-01-11}
+  s.date = %q{2012-01-26}
   s.default_executable = %q{cosmic}
   s.description = %q{Library/tool for automating deployments}
   s.email = %q{thomas@ning.com}
@@ -37,14 +37,15 @@ Gem::Specification.new do |s|
      "lib/cosmic/nagios.rb",
      "lib/cosmic/patches.rb",
      "lib/cosmic/plugin.rb",
-     "lib/cosmic/ssh.rb"
+     "lib/cosmic/ssh.rb",
+     "lib/cosmic/taskgroup.rb"
   ]
   s.homepage = %q{https://github.com/ning/cosmic}
   s.licenses = ["ASL2"]
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.required_ruby_version = Gem::Requirement.new(">= 1.8.7")
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{Library/tool for automating deployments}
 
   if s.respond_to? :specification_version then
