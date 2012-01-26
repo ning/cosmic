@@ -203,7 +203,7 @@ module Cosmic
     # @option params [Array<Symbol>] :tags The message's tags
     # @return [void]
     def on_message(params)
-      puts params[:msg]
+      $stdout.printf("#{params[:msg]}\n")
     end
   end
 
@@ -216,7 +216,7 @@ module Cosmic
     # @option params [Array<Symbol>] :tags The message's tags
     # @return [void]
     def on_message(params)
-      $stderr.puts params[:msg]
+      $stderr.printf("#{params[:msg]}\n")
     end
   end
 
