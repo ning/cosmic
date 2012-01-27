@@ -129,8 +129,8 @@ module Cosmic
         project = get_project(project_name)
         if project
           type_id = nil
-          @monitor.synchronize do
-            @jira.getIssueTypesForProject(project.id).each do |issue_type|
+          with_jira do
+            getIssueTypesForProject(project.id).each do |issue_type|
               if issue_type.name == type
                 type_id = issue_type.id
               end
@@ -158,8 +158,8 @@ module Cosmic
             end
             issue.customFieldValues = field_values
           end
-          new_issue = @monitor.synchronize do
-            @jira.createIssue(issue)
+          new_issue = with_jira do
+            createIssue(issue)
           end
           notify(:msg => "[#{@name}] Created new issue #{new_issue.key} in project #{project_name}",
                  :tags => [:jira, :trace])
@@ -191,8 +191,8 @@ module Cosmic
           comment = Jira4R::V2::RemoteComment.new()
           comment.author = params[:author] || @config[:auth][:username]
           comment.body = params[:comment] || ''
-          @monitor.synchronize do
-            @jira.addComment(issue.key.upcase, comment)
+          with_jira do
+            addComment(issue.key.upcase, comment)
           end
           notify(:msg => "[#{@name}] Added a comment to issue #{issue.key}",
                  :tags => [:jira, :trace])
@@ -396,14 +396,35 @@ module Cosmic
                                Logger::FATAL => [:jira, :error])
         @jira.logger = log
         @jira.login(@config[:auth][:username], @config[:auth][:password])
-        notify(:msg => "[#{@name}] Logging in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+        notify(:msg => "[#{@name}] Logged in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :trace])
       end
     end
 
-    def get_project(key)
+    def with_jira(&block)
+      result = nil
       @monitor.synchronize do
-        @jira.getProjectByKey(key)
+        begin
+          result = @jira.instance_eval(&block)
+        rescue Errno::ECONNRESET
+          retry
+        rescue SOAP::FaultError => e
+          if e.to_s == "com.atlassian.jira.rpc.exception.RemoteAuthenticationException: User not authenticated yet, or session timed out."
+            @jira.login(@config[:auth][:username], @config[:auth][:password])
+            notify(:msg => "[#{@name}] Re-logged in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]} after timeout",
+                   :tags => [:jira, :trace])
+            retry
+          else
+            raise
+          end
+        end
+      end
+      return result
+    end
+
+    def get_project(key)
+      with_jira do
+        getProjectByKey(key)
       end
     end
 
@@ -411,15 +432,15 @@ module Cosmic
       if issue_or_key.is_a?(Jira4R::V2::RemoteIssue)
         issue_or_key
       else
-        @monitor.synchronize do
-          @jira.getIssue(issue_or_key.to_s)
+        with_jira do
+          getIssue(issue_or_key.to_s)
         end
       end
     end
 
     def find_resolution(resolution_name)
-      @monitor.synchronize do
-        @jira.getResolutions().each do |resolution|
+      with_jira do
+        getResolutions().each do |resolution|
           if resolution.name == resolution_name
             return resolution
           end
@@ -429,8 +450,8 @@ module Cosmic
     end
 
     def find_component(project_key, component_name)
-      @monitor.synchronize do
-        @jira.getComponents(project_key).each do |component|
+      with_jira do
+        getComponents(project_key).each do |component|
           if component.name == component_name
             return component
           end
@@ -440,8 +461,8 @@ module Cosmic
     end
 
     def find_available_action(issue_key, action_name)
-      @monitor.synchronize do
-        @jira.getAvailableActions(issue_key.upcase).each do |action|
+      with_jira do
+        getAvailableActions(issue_key.upcase).each do |action|
           if action.name == action_name
             return action
           end
@@ -454,8 +475,8 @@ module Cosmic
       action = find_available_action(issue.key, action_name)
       raise "The workflow action #{action_name} does not seem to be supported" unless action
 
-      @monitor.synchronize do
-        @jira.progressWorkflowAction(issue.key.upcase, action.id, args_array)
+      with_jira do
+        progressWorkflowAction(issue.key.upcase, action.id, args_array)
       end
     end
   end
