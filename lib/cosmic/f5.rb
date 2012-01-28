@@ -337,9 +337,10 @@ module Cosmic
         end
       else
         if @environment.in_dry_run_mode
+          node = get_node(params)
           notify(:msg => "[#{@name}] Would enable node #{node_ip} on load balancer #{@config[:host]}",
                  :tags => [:f5, :dryrun])
-          get_member(params)
+          node
         else
           notify(:msg => "[#{@name}] Enabling node #{node_ip} on load balancer #{@config[:host]}",
                  :tags => [:f5, :trace])
@@ -377,9 +378,10 @@ module Cosmic
         end
       else
         if @environment.in_dry_run_mode
+          node = get_node(params)
           notify(:msg => "[#{@name}] Would disable member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                  :tags => [:f5, :dryrun])
-          get_member(params)
+          node
         else
           notify(:msg => "[#{@name}] Disabling node #{node_ip} on load balancer #{@config[:host]}",
                  :tags => [:f5, :trace])

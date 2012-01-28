@@ -107,6 +107,30 @@ def require_with_hint(what, hint)
   end
 end
 
+def split_off!(arr)
+  result_idx = nil
+  arr.each_with_index do |item, idx|
+    is_match = yield item
+    if is_match
+      result_idx = idx
+      break
+    end
+  end
+  if result_idx.nil?
+    nil
+  else
+    arr.slice!(result_idx)
+  end
+end
+
+def map_by(arr)
+  arr.inject({}) do |result, item|
+    key = yield item
+    (result[key] ||= []).push(item)
+    result
+  end
+end
+
 # The main cosmic namespace.
 module Cosmic
   # Represents the message passing facility in between the environment or plugins.
