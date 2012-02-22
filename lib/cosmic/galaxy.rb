@@ -16,14 +16,22 @@ module Cosmic
     #
     # @return [String] The version
     def version
-      self.config_path.split(/\//, 4)[2]
+      if self.config_path
+        self.config_path.split(/\//, 4)[2]
+      else
+        nil
+      end
     end
 
     # Returns the assigned type of the agent.
     #
     # @return [String] The type
     def type
-      self.config_path.split(/\//, 4)[3]
+      if self.config_path
+        self.config_path.split(/\//, 4)[3]
+      else
+        nil
+      end
     end
   end
 
