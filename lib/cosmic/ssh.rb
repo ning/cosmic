@@ -65,6 +65,10 @@ module Cosmic
     # @option params [String] :user The user to use for the ssh connection; if not specified
     #                               then it will use the username from the credentials if configured,
     #                               or the current user
+    # @option params [String] :password The password to use for the ssh connection; if not specified
+    #                                   then it will use the one from the credentials if configured,
+    #                                   or leave it to the ssh agent otherwise (which will use a key
+    #                                   if possible or ask otherwise)
     # @option params [String] :cmd The command to run on the host
     # @return [String] All output of the command (stdout and stderr combined)
     def exec(params)
@@ -76,7 +80,7 @@ module Cosmic
                :tags => [:ssh, :dryrun])
       else
         response = nil
-        Net::SSH.start(host, user, @ssh_opts) do |ssh|
+        Net::SSH.start(host, user, merge_with_ssh_opts(params)) do |ssh|
           response = ssh.exec!(cmd)
         end
         notify(:msg => "[#{@name}] Executed command '#{cmd}' as user #{user} on host #{host}",
@@ -92,6 +96,10 @@ module Cosmic
     # @option params [String] :user The user to use for the ssh connection; if not specified
     #                               then it will use the username from the credentials if configured,
     #                               or the current user
+    # @option params [String] :password The password to use for the ssh connection; if not specified
+    #                                   then it will use the one from the credentials if configured,
+    #                                   or leave it to the ssh agent otherwise (which will use a key
+    #                                   if possible or ask otherwise)
     # @option params [String] :local The local path to the file to upload
     # @option params [String] :remote The remote path to the file to upload; if not specified then
     #                                 it will use the local path for this
@@ -109,7 +117,7 @@ module Cosmic
                :tags => [:ssh, :dryrun])
       else
         response = nil
-        Net::SCP.start(host, user, @ssh_opts) do |scp|
+        Net::SCP.start(host, user, merge_with_ssh_opts(params)) do |scp|
           scp.upload!(local, remote, &block)
         end
         notify(:msg => "[#{@name}] Uploaded local file #{local} as user #{user} to host #{host} at #{remote}",
@@ -124,6 +132,10 @@ module Cosmic
     # @option params [String] :user The user to use for the ssh connection; if not specified
     #                               then it will use the username from the credentials if configured,
     #                               or the current user
+    # @option params [String] :password The password to use for the ssh connection; if not specified
+    #                                   then it will use the one from the credentials if configured,
+    #                                   or leave it to the ssh agent otherwise (which will use a key
+    #                                   if possible or ask otherwise)
     # @option params [String] :local The local target path for the downloaded file to upload; if not
     #                                specified then it will use the remote path for this
     # @option params [String] :remote The remote path to the file to download
@@ -141,11 +153,21 @@ module Cosmic
                :tags => [:ssh, :dryrun])
       else
         response = nil
-        Net::SCP.start(host, user, @ssh_opts) do |scp|
+        Net::SCP.start(host, user, merge_with_ssh_opts(params)) do |scp|
           scp.download!(remote, local, &block)
         end
         notify(:msg => "[#{@name}] Downloaded remote file #{remote} as user #{user} from host #{host} to local file #{local}",
                :tags => [:ssh, :trace])
+      end
+    end
+
+    private
+
+    def merge_with_ssh_opts(params)
+      if params.has_key?(:password)
+        @ssh_opts.merge(:password => params[:password])
+      else
+        @ssh_opts
       end
     end
   end
