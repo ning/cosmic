@@ -3,6 +3,9 @@ require 'cosmic/plugin'
 
 require_with_hint 'jmx4r', "In order to use the jmx plugin please run 'gem install jmx4r'"
 
+require 'java'
+java_import 'javax.management.InstanceNotFoundException'
+
 module Cosmic
   # A plugin that makes JMX available to Cosmic scripts, e.g. to read out values or perform
   # operations on running Java services. You'd typically use it in a Cosmic context like so:
@@ -22,6 +25,8 @@ module Cosmic
   # Note that this plugin will not actually connect to the remote Java service in dry-run mode.
   # Instead it will only send messages tagged as `:jmx` and `:dryrun`.
   class JMX < Plugin
+    class JMXError < StandardError; end
+
     # The plugin's configuration
     attr_reader :config
 
@@ -65,7 +70,7 @@ module Cosmic
         notify(:msg => "[#{@name}] Would find all mbeans matching #{filter} on host #{host}:#{port}",
                :tags => [:jmx, :dryrun])
       else
-        if conn
+        unless conn.nil?
           result = ::JMX::MBean.find_all_by_name(filter, :connection => conn)
           notify(:msg => "[#{@name}] Found all mbeans matching #{filter} on host #{host}:#{port}",
                  :tags => [:jmx, :trace])
@@ -92,11 +97,16 @@ module Cosmic
         notify(:msg => "[#{@name}] Would retrieve attribute #{attribute} of mbean #{params[:name] || mbean}",
                :tags => [:jmx, :dryrun])
       else
-        if mbean
-          result = mbean.send(attribute.snake_case)
-          notify(:msg => "[#{@name}] Retrieved attribute #{attribute} of mbean #{params[:name] || mbean}",
-                 :tags => [:jmx, :trace])
-          return result
+        unless mbean.nil?
+          attr_name = attribute.snake_case
+          if mbean.respond_to?(attr_name)
+            result = mbean.send(attribute.snake_case)
+            notify(:msg => "[#{@name}] Retrieved attribute #{attribute} of mbean #{params[:name] || mbean}",
+                   :tags => [:jmx, :trace])
+            return result
+          else
+            raise JMXError, "The mbean does not have an attribute #{attribute}"
+          end
         end
       end
       nil
@@ -121,10 +131,15 @@ module Cosmic
                :tags => [:jmx, :dryrun])
       else
         mbean = mbeanify(params)
-        if mbean
-          mbean.send(attribute.snake_case + '=', value)
-          notify(:msg => "[#{@name}] Set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
-                 :tags => [:jmx, :trace])
+        unless mbean.nil?
+          attr_name = attribute.snake_case + '='
+          if mbean.respond_to?(attr_name)
+            mbean.send(attr_name, value)
+            notify(:msg => "[#{@name}] Set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
+                   :tags => [:jmx, :trace])
+          else
+            raise JMXError, "The mbean does not have an attribute #{attribute} or the attribute cannot be changed"
+          end
         end
       end
       mbean
@@ -148,11 +163,16 @@ module Cosmic
         notify(:msg => "[#{@name}] Would invoke operation #{operation} on mbean #{params[:name] || mbean}",
                :tags => [:jmx, :dryrun])
       else
-        if mbean
-          result = mbean.send(operation.snake_case, *(params[:args] || []))
-          notify(:msg => "[#{@name}] Invoked operation #{operation} on mbean #{params[:name] || mbean}",
-                 :tags => [:jmx, :trace])
-          return result
+        unless mbean.nil?
+          op_name = operation.snake_case + '='
+          if mbean.respond_to?(op_name)
+            result = mbean.send(op_name, *(params[:args] || []))
+            notify(:msg => "[#{@name}] Invoked operation #{operation} on mbean #{params[:name] || mbean}",
+                   :tags => [:jmx, :trace])
+            return result
+          else
+            raise JMXError, "The mbean does not have an operation #{operation}"
+          end
         end
       end
       nil
@@ -199,7 +219,11 @@ module Cosmic
         name = get_param(params, :name)
         conn = get_connection(params)
         if conn
-          mbean = ::JMX::MBean.find_by_name(name, :connection => conn)
+          begin
+            mbean = ::JMX::MBean.find_by_name(name, :connection => conn)
+          rescue InstanceNotFoundException
+            raise JMXError, "MBean #{name} not found on host #{params[:host]}:#{params[:port]}"
+          end
           notify(:msg => "[#{@name}] Retrieved mbean #{name} from host #{params[:host]}:#{params[:port]}",
                  :tags => [:jmx, :trace])
           return mbean
