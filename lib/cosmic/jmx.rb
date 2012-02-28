@@ -5,6 +5,7 @@ require_with_hint 'jmx4r', "In order to use the jmx plugin please run 'gem insta
 
 require 'java'
 java_import 'javax.management.InstanceNotFoundException'
+java_import 'java.rmi.ConnectException'
 
 module Cosmic
   # A plugin that makes JMX available to Cosmic scripts, e.g. to read out values or perform
@@ -203,10 +204,14 @@ module Cosmic
           password = @config[:auth][:password]
         end
         key = host + ':' + port.to_s
-        @connections[key] ||= ::JMX::MBean.create_connection(:host => host,
-                                                             :port => port.to_i,
-                                                             :username => username,
-                                                             :password => password)
+        begin
+          @connections[key] ||= ::JMX::MBean.create_connection(:host => host,
+                                                               :port => port.to_i,
+                                                               :username => username,
+                                                               :password => password)
+        rescue ConnectException
+          raise JMXError, "Could not connect to host #{params[:host]}:#{params[:port]}"
+        end
         notify(:msg => "[#{@name}] Connected to JMX on host #{host}:#{port}",
                :tags => [:jmx, :trace])
         @connections[key]
