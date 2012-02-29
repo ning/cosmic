@@ -395,9 +395,29 @@ module Cosmic
                                Logger::ERROR => [:jira, :error],
                                Logger::FATAL => [:jira, :error])
         @jira.logger = log
-        @jira.login(@config[:auth][:username], @config[:auth][:password])
+        login()
         notify(:msg => "[#{@name}] Logged in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :trace])
+      end
+    end
+
+    def login
+      logged_in = false
+      while !logged_in
+        begin
+          @jira.login(@config[:auth][:username], @config[:auth][:password])
+          logged_in = true
+        rescue SOAP::FaultError => e
+          if @config[:auth_type] =~ /^credentials$/ &&
+             e.to_s == "com.atlassian.jira.rpc.exception.RemoteAuthenticationException: Invalid username or password."
+            puts "Invalid username or password. Please try again"
+            @config[:auth][:username] = nil
+            @config[:auth][:password] = nil
+            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config)
+          else
+            raise e
+          end
+        end
       end
     end
 
@@ -410,7 +430,7 @@ module Cosmic
           retry
         rescue SOAP::FaultError => e
           if e.to_s == "com.atlassian.jira.rpc.exception.RemoteAuthenticationException: User not authenticated yet, or session timed out."
-            @jira.login(@config[:auth][:username], @config[:auth][:password])
+            login()
             notify(:msg => "[#{@name}] Re-logged in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]} after timeout",
                    :tags => [:jira, :trace])
             retry

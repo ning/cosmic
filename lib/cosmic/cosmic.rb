@@ -383,7 +383,7 @@ module Cosmic
             password = @config[:ldap][:auth][:password]
           end
         when /^credentials$/
-          if !username && !password
+          if username.nil? && password.nil?
             username = ask("Username for #{service_name.to_s}?\n")
             password = ask("Password for #{service_name.to_s}?\n") { |q| q.echo = false }
           end

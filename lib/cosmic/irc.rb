@@ -15,6 +15,8 @@ require_with_hint 'cinch', "In order to use the irc plugin please run 'gem insta
 require_with_hint 'atomic', "In order to use the irc plugin please run 'gem install atomic'"
 
 module Cosmic
+  class IRCError < StandardError; end
+
   # A listener for the message bus that outputs messages to an IRC channel.
   class ChannelMessageListener
     # The channel
@@ -94,7 +96,7 @@ module Cosmic
     # @param [String] message The message to log
     # @return [void]
     def debug(message)
-      log(message, :debug)
+      log(message, :debug) unless message.nil?
     end
 
       # This method is used for logging exceptions.
@@ -102,7 +104,7 @@ module Cosmic
       # @param [Exception] e The exception to log
       # @return [void]
     def log_exception(e)
-      log(e.message, :error)
+      log(e.message, :error) unless e.nil?
     end
 
     # This method is used by {#debug} and {#log_exception} to log
@@ -113,9 +115,7 @@ module Cosmic
     # @param [Symbol<:debug, :generic, :incoming, :outgoing>] kind The kind of message to log
     # @return [void]
     def log(message, kind = :generic)
-      if @environment
-        @environment.notify(:msg => message, :tags => @kind_map[kind])
-      end
+      @environment.notify(:msg => message, :tags => @kind_map[kind]) unless @environment.nil? || message.nil?
     end
   end
 
@@ -150,6 +150,7 @@ module Cosmic
       @config[:nick] ||= 'cosmic'
       @config[:port] ||= 6667
       @config[:connection_timeout_sec] ||= 60
+      @error_listener = ErrorListener.new
       @joined_channels = {}
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
       authenticate
@@ -266,6 +267,60 @@ module Cosmic
 
     private
 
+    class ErrorListener
+      def initialize
+        @mutex = Mutex.new
+        @errors = {}
+      end
+
+      def reset
+        @mutex.synchronize do
+          @errors.clear()
+        end
+      end
+
+      def add_error(code, msg)
+        @mutex.synchronize do
+          @errors[code] = msg
+        end
+      end
+
+      def has_errors?
+        @mutex.synchronize do
+          return !@errors.empty?
+        end
+      end
+
+      def errors
+        result = {}
+        @mutex.synchronize do
+          result.merge!(@errors)
+          @errors.clear()
+        end
+        result
+      end
+    end
+
+    class Result
+      attr_accessor :errors
+
+      def initialize
+        @success = Atomic.new(false)
+      end
+
+      def success=(value)
+        @success.value = value
+      end
+
+      def success
+        @success.value
+      end
+
+      def has_errors?
+        !@errors.nil? && !@errors.empty?
+      end
+    end
+
     def authenticate
       host = @config[:host]
       port = @config[:port]
@@ -274,33 +329,89 @@ module Cosmic
         notify(:msg => "[#{@name}] Would connect to IRC server #{host}:#{port} with nick #{nick}",
                :tags => [:irc, :dryrun])
       else
-        password = @config[:auth][:password]
-        environment = @environment
-        @bot = Cinch::Bot.new do
-          @logger = MessageBusLogger.new(:environment => environment,
-                                         :generic => [:irc, :trace],
-                                         :error => [:irc, :error])
-          configure do |c|
-            c.nick     = nick
-            c.server   = host
-            c.port     = port
-            c.password = password
-            c.verbose  = false
+        logged_in = false
+        while !logged_in
+          username = @config[:auth][:username]
+          password = @config[:auth][:password]
+          timeout = @config[:connection_timeout_sec]
+          environment = @environment
+          @bot = Cinch::Bot.new do
+            @logger = MessageBusLogger.new(:environment => environment,
+                                           :generic => [:irc, :trace],
+                                           :error => [:irc, :error])
+            configure do |c|
+              c.nick     = nick
+              c.server   = host
+              c.port     = port
+              c.user     = username unless username.nil? || username == ""
+              c.password = password unless password.nil? || password == ""
+              c.verbose  = false
+              c.timeouts.connect = timeout
+            end
           end
-        end
-        me = self
-        my_name = @name
-        connected = do_with_timeout(@config[:connection_timeout_sec]) { |done|
-          @bot.on :connect do |m|
-            done.value = true
-            me.notify(:msg => "[#{my_name}] Connected to IRC server #{host}:#{port} with nick #{nick}",
-                      :tags => [:irc, :trace])
+          me = self
+          error_listener = @error_listener
+          result = do_with_timeout(@config[:connection_timeout_sec]) { |result|
+            bot = @bot # for reference within the handler below
+            @bot.on :connect do |m|
+              result.success = true
+            end
+            @bot.on :error do |m|
+              if m.raw =~ /(?:\:[^\s]*\s+)?(\d+)\s+(.*)/
+                code = $1.to_i
+                text = $2
+                error_listener.add_error code, text
+                if (code == 461 && text =~ /\:Not enough parameters/) || code == 464
+                  bot.config.reconnect = false
+                end
+              end
+            end
+            @bot.start
+          }
+          if result.success
+            notify(:msg => "[#{@name}] Connected to IRC server #{host}:#{port} with nick #{nick}",
+                   :tags => [:irc, :trace])
+          else
+            @bot.config.reconnect = false
+            @bot.quit
+            quit_time = Time.now.to_i
+
+            should_retry = false
+            if @config[:auth_type] =~ /^credentials$/ && result.has_errors?
+              # Let's check for errors that we can retry
+              if result.errors[461] =~ /USER \:Not enough parameters/
+                puts "The IRC server at #{host}:#{port} requires a username. Please try again"
+                should_retry = true
+              elsif result.errors[461] =~ /PASS \:Not enough parameters/
+                puts "The IRC server at #{host}:#{port} requires a password. Please try again"
+                should_retry = true
+              elsif !result.errors[464].nil?
+                puts "Invalid username or password. Please try again"
+                should_retry = true
+              end
+            end
+            if should_retry
+              @config[:auth][:username] = nil
+              @config[:auth][:password] = nil
+              @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config)
+
+              # Now we need to wait for the bot to quit retrying. Unfortunately
+              # there is no way to tell whether the bot has stopped retrying
+              # so we'll actually have to wait here
+              # see https://github.com/cinchrb/cinch/issues/63
+              # What's worse is that there is no max retry time limit in cinch
+              # in version 1.1.3, so the object might actually wait forever
+              # So instead we'll simply wait 30sec altogether and hope for the best for now
+              wait_time = 30 - (Time.now.to_i - quit_time)
+
+              if wait_time > 0
+                puts "Need to wait #{wait_time} seconds before trying to connect to the IRC server again"
+                sleep(wait_time)
+              end
+            else
+              raise IRCError, "Could not connect to the irc server #{host}:#{port}"
+            end
           end
-          @bot.start
-        }
-        if !connected
-          @bot.quit
-          raise "Could not connect to the irc server #{host}:#{port}"
         end
       end
     end
@@ -315,24 +426,28 @@ module Cosmic
       else
         name = channel_or_name.to_s
         channel = @joined_channels[name]
-        if !channel
+        if channel.nil?
           me = self
-          my_name = @name
           channel = Cinch::Channel.new(name, @bot)
-          joined = do_with_timeout(@config[:connection_timeout_sec]) { |done|
+          result = do_with_timeout(@config[:connection_timeout_sec]) { |finished|
             @bot.on :join do |m|
               if m.channel == channel
-                done.value = true
-                me.notify(:msg => "[#{my_name}] Joined channel #{name}",
-                          :tags => [:irc, :trace])
+                finished.value = true
               end
             end
             channel.join
           }
-          if joined
+          if result.success
+            notify(:msg => "[#{@name}] Joined channel #{name}",
+                   :tags => [:irc, :trace])
             @joined_channels[name] = channel
           else
-            raise "Could not join the channel #{name}"
+            if result.has_errors?
+              # TODO
+              raise IRCError, "Foo"
+            else
+              raise IRCError, "Could not join the channel #{name}"
+            end
           end
         end
       end
@@ -347,20 +462,17 @@ module Cosmic
     end
 
     def do_with_timeout(timeout)
-      done = Atomic.new(false)
+      @error_listener.reset
+      result = Result.new
       thread = Thread.new do
-        yield done # implicit block binding
+        yield result # implicit block binding
       end
       start_time = Time.new
-      while !done.value && (Time.new - start_time).to_i < timeout
-        sleep 10
+      while !result.success && !@error_listener.has_errors? && (Time.new - start_time).to_i < timeout
+        sleep 1
       end
-      if done.value
-        true
-      else
-        thread.exit
-        false
-      end
+      result.errors = @error_listener.errors
+      result
     end
   end
 end
