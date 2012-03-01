@@ -47,14 +47,7 @@ module Cosmic
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
       @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
-      @ssh_opts = {}
-      if @config[:auth][:keys] || @config[:auth][:key_data]
-        @ssh_opts[:keys] = @config[:auth][:keys]
-        @ssh_opts[:key_data] = @config[:auth][:key_data]
-        @ssh_opts[:keys_only] = true
-      elsif @config[:auth][:password]
-        @ssh_opts[:password] = @config[:auth][:password]
-      end
+      init_ssh_opts
     end
 
     # Executes a command on a remote host and returns the output (stdin & stderr combined) of the
@@ -73,15 +66,27 @@ module Cosmic
     # @return [String] All output of the command (stdout and stderr combined)
     def exec(params)
       host = get_param(params, :host)
-      user = params[:user] || @config[:auth][:username]
       cmd = get_param(params, :cmd)
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would execute command '#{cmd}' as user #{user} on host #{host}",
+        notify(:msg => "[#{@name}] Would execute command '#{cmd}' as user #{params[:user] || @config[:auth][:username]} on host #{host}",
                :tags => [:ssh, :dryrun])
       else
         response = nil
-        Net::SSH.start(host, user, merge_with_ssh_opts(params)) do |ssh|
-          response = ssh.exec!(cmd)
+        begin
+          user = params[:user] || @config[:auth][:username]
+          opts = merge_with_ssh_opts(params)
+          Net::SSH.start(host, user, opts) do |ssh|
+            response = ssh.exec!(cmd)
+          end
+        rescue Net::SSH::AuthenticationFailed => e
+          if @config[:auth_type] =~ /^credentials$/ && !params.has_key?(:password)
+            puts "Invalid username or password. Please try again"
+            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config, :force => true)
+            init_ssh_opts
+            retry
+          else
+            raise e
+          end
         end
         notify(:msg => "[#{@name}] Executed command '#{cmd}' as user #{user} on host #{host}",
                :tags => [:ssh, :trace])
@@ -109,16 +114,27 @@ module Cosmic
     # @return [void]
     def upload(params, &block)
       host = get_param(params, :host)
-      user = params[:user] || @config[:auth][:username]
       local = get_param(params, :local)
       remote = params[:remote] || local
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would upload local file #{local} as user #{user} to host #{host} at #{remote}",
+        notify(:msg => "[#{@name}] Would upload local file #{local} as user #{params[:user] || @config[:auth][:username]} to host #{host} at #{remote}",
                :tags => [:ssh, :dryrun])
       else
-        response = nil
-        Net::SCP.start(host, user, merge_with_ssh_opts(params)) do |scp|
-          scp.upload!(local, remote, &block)
+        begin
+          user = params[:user] || @config[:auth][:username]
+          opts = merge_with_ssh_opts(params)
+          Net::SCP.start(host, user, opts) do |scp|
+            scp.upload!(local, remote, &block)
+          end
+        rescue Net::SSH::AuthenticationFailed => e
+          if @config[:auth_type] =~ /^credentials$/ && !params.has_key?(:password)
+            puts "Invalid username or password. Please try again"
+            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config, :force => true)
+            init_ssh_opts
+            retry
+          else
+            raise e
+          end
         end
         notify(:msg => "[#{@name}] Uploaded local file #{local} as user #{user} to host #{host} at #{remote}",
                :tags => [:ssh, :trace])
@@ -145,16 +161,27 @@ module Cosmic
     # @return [void]
     def download(params, &block)
       host = get_param(params, :host)
-      user = params[:user] || @config[:auth][:username]
       remote = get_param(params, :remote)
       local = params[:local] || remote
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would download remote file #{remote} as user #{user} from host #{host} to local file #{local}",
+        notify(:msg => "[#{@name}] Would download remote file #{remote} as user #{params[:user] || @config[:auth][:username]} from host #{host} to local file #{local}",
                :tags => [:ssh, :dryrun])
       else
-        response = nil
-        Net::SCP.start(host, user, merge_with_ssh_opts(params)) do |scp|
-          scp.download!(remote, local, &block)
+        begin
+          user = params[:user] || @config[:auth][:username]
+          opts = merge_with_ssh_opts(params)
+          Net::SCP.start(host, user, merge_with_ssh_opts(params)) do |scp|
+            scp.download!(remote, local, &block)
+          end
+        rescue Net::SSH::AuthenticationFailed => e
+          if @config[:auth_type] =~ /^credentials$/ && !params.has_key?(:password)
+            puts "Invalid username or password. Please try again"
+            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config, :force => true)
+            init_ssh_opts
+            retry
+          else
+            raise e
+          end
         end
         notify(:msg => "[#{@name}] Downloaded remote file #{remote} as user #{user} from host #{host} to local file #{local}",
                :tags => [:ssh, :trace])
@@ -162,6 +189,17 @@ module Cosmic
     end
 
     private
+
+    def init_ssh_opts
+      @ssh_opts = {}
+      if @config[:auth][:keys] || @config[:auth][:key_data]
+        @ssh_opts[:keys] = @config[:auth][:keys]
+        @ssh_opts[:key_data] = @config[:auth][:key_data]
+        @ssh_opts[:keys_only] = true
+      elsif @config[:auth][:password]
+        @ssh_opts[:password] = @config[:auth][:password]
+      end
+    end
 
     def merge_with_ssh_opts(params)
       if params.has_key?(:password)
