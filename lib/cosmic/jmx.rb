@@ -20,10 +20,14 @@ module Cosmic
   #       end
   #     end
   #
+  # It is important to note that the mbeans retrieved this way are only valid as long as the
+  # connection to the remote server is alive. If for instance the cosmic script restarts
+  # the server in between, then it will have to get new mbean instances.
+  #
   # This plugin does not require a section in the config file unless you want to instantiate
   # more than one instance under names other than `jmx`, or if JMX requires authentication.
   #
-  # Note that this plugin will not actually connect to the remote Java service in dry-run mode.
+  # This plugin will not actually connect to the remote Java service when in dry-run mode.
   # Instead it will only send messages tagged as `:jmx` and `:dryrun`.
   class JMX < Plugin
     class JMXError < StandardError; end
@@ -79,9 +83,7 @@ module Cosmic
             return result
           end
         rescue ConnectException
-          # let's try to reconnect
-          remove_from_cache(params)
-          conn = get_connection(params)
+          conn = reconnect(params)
           retry
         end
       end
@@ -100,21 +102,27 @@ module Cosmic
     # @return [Object] The attribute value
     def get_attribute(params)
       attribute = get_param(params, :attribute)
-      mbean = mbeanify(params)
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would retrieve attribute #{attribute} of mbean #{params[:name] || mbean}",
+        notify(:msg => "[#{@name}] Would retrieve attribute #{attribute} of mbean #{params[:name] || params[:mbean]}",
                :tags => [:jmx, :dryrun])
       else
-        unless mbean.nil?
-          attr_name = attribute.snake_case
-          if mbean.respond_to?(attr_name)
-            result = mbean.send(attribute.snake_case)
-            notify(:msg => "[#{@name}] Retrieved attribute #{attribute} of mbean #{params[:name] || mbean}",
-                   :tags => [:jmx, :trace])
-            return result
-          else
-            raise JMXError, "The mbean does not have an attribute #{attribute}"
+        attr_name = attribute.snake_case
+        begin
+          mbean = mbeanify(params)
+          unless mbean.nil?
+            if mbean.respond_to?(attr_name)
+              result = mbean.send(attribute.snake_case)
+              notify(:msg => "[#{@name}] Retrieved attribute #{attribute} of mbean #{params[:name] || mbean}",
+                     :tags => [:jmx, :trace])
+              return result
+            else
+              raise JMXError, "The mbean does not have an attribute #{attribute}"
+            end
           end
+        rescue ConnectException
+          reconnect(params)
+          params.delete(:mbean)
+          retry
         end
       end
       nil
@@ -137,20 +145,27 @@ module Cosmic
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would set attribute #{attribute} to '#{value}' on mbean #{params[:name] || params[:mbean]}",
                :tags => [:jmx, :dryrun])
+        nil
       else
+        attr_name = attribute.snake_case + '='
         mbean = mbeanify(params)
-        unless mbean.nil?
-          attr_name = attribute.snake_case + '='
-          if mbean.respond_to?(attr_name)
-            mbean.send(attr_name, value)
-            notify(:msg => "[#{@name}] Set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
-                   :tags => [:jmx, :trace])
-          else
-            raise JMXError, "The mbean does not have an attribute #{attribute} or the attribute cannot be changed"
+        begin
+          unless mbean.nil?
+            if mbean.respond_to?(attr_name)
+              mbean.send(attr_name, value)
+              notify(:msg => "[#{@name}] Set attribute #{attribute} to '#{value}' on mbean #{params[:name] || mbean}",
+                     :tags => [:jmx, :trace])
+            else
+              raise JMXError, "The mbean does not have an attribute #{attribute} or the attribute cannot be changed"
+            end
           end
+        rescue ConnectException
+          reconnect(params)
+          params.delete(:mbean)
+          retry
         end
+        mbean
       end
-      mbean
     end
 
     # Invokes an mbean operation. This method will do nothing in dryrun mode
@@ -166,21 +181,27 @@ module Cosmic
     # @return [Object,nil] The return value of the operation if any
     def invoke(params)
       operation = get_param(params, :operation)
-      mbean = mbeanify(params)
       if @environment.in_dry_run_mode
         notify(:msg => "[#{@name}] Would invoke operation #{operation} on mbean #{params[:name] || mbean}",
                :tags => [:jmx, :dryrun])
       else
-        unless mbean.nil?
-          op_name = operation.snake_case + '='
-          if mbean.respond_to?(op_name)
-            result = mbean.send(op_name, *(params[:args] || []))
-            notify(:msg => "[#{@name}] Invoked operation #{operation} on mbean #{params[:name] || mbean}",
-                   :tags => [:jmx, :trace])
-            return result
-          else
-            raise JMXError, "The mbean does not have an operation #{operation}"
+        op_name = operation.snake_case + '='
+        begin
+          mbean = mbeanify(params)
+          unless mbean.nil?
+            if mbean.respond_to?(op_name)
+              result = mbean.send(op_name, *(params[:args] || []))
+              notify(:msg => "[#{@name}] Invoked operation #{operation} on mbean #{params[:name] || mbean}",
+                     :tags => [:jmx, :trace])
+              return result
+            else
+              raise JMXError, "The mbean does not have an operation #{operation}"
+            end
           end
+        rescue ConnectException
+          reconnect(params)
+          params.delete(:mbean)
+          retry
         end
       end
       nil
@@ -234,11 +255,12 @@ module Cosmic
       end
     end
 
-    def remove_from_cache(params)
+    def reconnect(params)
       host = get_param(params, :host)
       port = get_param(params, :port)
       key = host + ':' + port.to_s
       @connections.delete(key)
+      get_connection(params)
     end
 
     def mbeanify(params)
@@ -254,9 +276,7 @@ module Cosmic
             return mbean
           end
         rescue ConnectException
-          # let's try to reconnect
-          remove_from_cache(params)
-          conn = get_connection(params)
+          conn = reconnect(params)
           retry
         rescue InstanceNotFoundException
           raise JMXError, "MBean #{name} not found on host #{params[:host]}:#{params[:port]}"
