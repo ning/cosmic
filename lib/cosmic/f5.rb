@@ -60,8 +60,8 @@ module Cosmic
       else
         notify(:msg => "[#{@name}] Adding node #{node_ip}:#{node_port} to pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :trace])
-        @monitor.synchronize do
-          @f5['LocalLB.Pool'].add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        with_f5('LocalLB.Pool') do
+          add_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
         if params.has_key?(:monitor_rule)
           set_monitor_rule(params)
@@ -116,8 +116,8 @@ module Cosmic
         else
           monitor_associations = []
         end
-        @monitor.synchronize do
-          @f5['LocalLB.PoolMember'].set_monitor_association([ pool_name ], [ monitor_associations ])
+        with_f5('LocalLB.PoolMember') do
+          set_monitor_association([ pool_name ], [ monitor_associations ])
         end
       end
       get_member(params)
@@ -141,8 +141,8 @@ module Cosmic
       else
         notify(:msg => "[#{@name}] Removing node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :trace])
-        @monitor.synchronize do
-          @f5['LocalLB.Pool'].remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        with_f5('LocalLB.Pool') do
+          remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
       end
       nil
@@ -158,8 +158,8 @@ module Cosmic
       pool_name = get_param(params, :pool)
       notify(:msg => "[#{@name}] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :trace])
-      members = @monitor.synchronize do
-        @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].collect do |pool_member|
+      members = with_f5('LocalLB.PoolMember') do
+        get_object_status([ pool_name ])[0].collect do |pool_member|
           member = pool_member['member']
           status = pool_member['object_status']
           { :ip => member['address'],
@@ -171,8 +171,8 @@ module Cosmic
       end
       members_hash = members.inject({}) { |h, member| h[member[:ip].to_s + ':' + member[:port].to_s] = member; h }
       pool_members = members.map { |member| { 'address' => member[:ip], 'port' => member[:port] } }
-      @monitor.synchronize do
-        @f5['LocalLB.PoolMember'].get_monitor_association([ pool_name ])[0].each do |monitor_associations|
+      with_f5('LocalLB.PoolMember') do
+        get_monitor_association([ pool_name ])[0].each do |monitor_associations|
           address = monitor_associations['member']['ipport']
           member = members_hash[address['address'].to_s + ':' + address['port'].to_s]
           if member
@@ -203,8 +203,8 @@ module Cosmic
       notify(:msg => "[#{@name}] Retrieving member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :trace])
       member = nil
-      @monitor.synchronize do
-        @f5['LocalLB.PoolMember'].get_object_status([ pool_name ])[0].each do |pool_member|
+      with_f5('LocalLB.PoolMember') do
+        get_object_status([ pool_name ])[0].each do |pool_member|
           member_info = pool_member['member']
           status = pool_member['object_status']
           if member_info['address'] == node_ip && member_info['port'] == node_port
@@ -217,9 +217,10 @@ module Cosmic
           end
         end
       end
+
       if member
-        @monitor.synchronize do
-          @f5['LocalLB.PoolMember'].get_monitor_association([ pool_name ])[0].each do |monitor_associations|
+        with_f5('LocalLB.PoolMember') do
+          get_monitor_association([ pool_name ])[0].each do |monitor_associations|
             address = monitor_associations['member']['ipport']
             if address['address'] == node_ip && address['port'] == node_port
               monitor_rule = monitor_associations['monitor_rule']
@@ -244,8 +245,8 @@ module Cosmic
       node_ip = get_ip(params)
       notify(:msg => "[#{@name}] Retrieving node #{node_ip} from load balancer #{@config[:host]}",
              :tags => [:f5, :trace])
-      @monitor.synchronize do
-        @f5['LocalLB.NodeAddress'].get_object_status([ node_ip ]).each do |status|
+      with_f5('LocalLB.NodeAddress') do
+        get_object_status([ node_ip ]).each do |status|
           return { :ip => node_ip,
                    :availability => status['availability_status'],
                    :enabled => (status['enabled_status'] == 'ENABLED_STATUS_ENABLED') }
@@ -270,15 +271,15 @@ module Cosmic
         node_port = (params[:port] || 80).to_i
         notify(:msg => "[#{@name}] Retrieving stats for member #{node_ip}:#{node_port} in pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :trace])
-        stats = @monitor.synchronize do
-          @f5['LocalLB.PoolMember'].get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
+        stats = with_f5('LocalLB.PoolMember') do
+          get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
         stats = stats[0] if stats[0]
       else
         notify(:msg => "[#{@name}] Retrieving stats for node #{node_ip} on load balancer #{@config[:host]}",
                :tags => [:f5, :trace])
-        stats = @monitor.synchronize do
-          @f5['LocalLB.NodeAddress'].get_statistics([ node_ip ])
+        stats = with_f5('LocalLB.NodeAddress') do
+          get_statistics([ node_ip ])
         end
       end
       if stats['statistics'] && stats['statistics'][0] && stats['statistics'][0]['statistics']
@@ -405,8 +406,8 @@ module Cosmic
         else
           notify(:msg => "[#{@name}] Syncing configurations for load balancer #{@config[:host]} to group #{group}",
                  :tags => [:f5, :trace])
-          @monitor.synchronize do
-            @f5['System.ConfigSync'].synchronize_to_group(group)
+          with_f5('System.ConfigSync') do
+            synchronize_to_group(group)
           end
         end
       else
@@ -416,8 +417,8 @@ module Cosmic
         else
           notify(:msg => "[#{@name}] Syncing configurations for load balancer #{@config[:host]}",
                  :tags => [:f5, :trace])
-          @monitor.synchronize do
-            @f5['System.ConfigSync'].synchronize_configuration('CONFIGSYNC_ALL')
+          with_f5('System.ConfigSync') do
+            synchronize_configuration('CONFIGSYNC_ALL')
           end
         end
       end
@@ -433,6 +434,27 @@ module Cosmic
                                ['LocalLB.Pool', 'LocalLB.PoolMember', 'LocalLB.NodeAddress', 'System.ConfigSync']).get_interfaces
     end
 
+    def with_f5(interface, &block)
+      result = nil
+      @monitor.synchronize do
+        begin
+          result = @f5[interface].instance_eval(&block)
+        rescue SOAP::Error => e
+          if @config[:auth_type] =~ /^credentials$/ && e.to_s == "401: F5 Authorization Required"
+            puts "Invalid username or password. Please try again"
+            @config[:auth][:username] = nil
+            @config[:auth][:password] = nil
+            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config)
+            authenticate
+            retry
+          else
+            raise
+          end
+        end
+      end
+      return result
+    end
+
     def get_ip(params)
       if params.has_key?(:host)
         Socket::getaddrinfo(params[:host], nil)[0][3]
@@ -444,8 +466,8 @@ module Cosmic
     end
 
     def set_pool_member_status(pool_name, object_status_hash)
-      @monitor.synchronize do
-        @f5['LocalLB.PoolMember'].set_session_enabled_state([ pool_name ], [[ object_status_hash ]])
+      with_f5('LocalLB.PoolMember') do
+        set_session_enabled_state([ pool_name ], [[ object_status_hash ]])
       end
       get_member(:ip => object_status_hash['member']['address'],
                  :port => object_status_hash['member']['port'],
@@ -453,8 +475,8 @@ module Cosmic
     end
 
     def set_node_status(node_ip, object_status_hash)
-      @monitor.synchronize do
-        @f5['LocalLB.NodeAddress'].set_session_enabled_state([ node_ip ], [ object_status_hash ])
+      with_f5('LocalLB.NodeAddress') do
+        set_session_enabled_state([ node_ip ], [ object_status_hash ])
       end
       get_node(:ip => node_ip)
     end
