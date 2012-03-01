@@ -6,3 +6,6 @@ require 'rubygems'
 require 'cosmic/cosmic'
 require 'cosmic/patches'
 
+module Cosmic
+  VERSION = IO.read(File.expand_path("../../VERSION", __FILE__))
+end

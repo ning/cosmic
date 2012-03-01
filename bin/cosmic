@@ -10,6 +10,10 @@ optparse = OptionParser.new do |opts|
     puts opts
     exit
   end
+  opts.on('-V', '--version', 'Display the cosmic version and exists') do
+    puts Cosmic::VERSION
+    exit
+  end
   opts.on('-d', '--dry-run', 'Runs the script(s) in dry-run mode') do
     options[:dry_run_mode] = true
   end
