@@ -71,11 +71,18 @@ module Cosmic
         notify(:msg => "[#{@name}] Would find all mbeans matching #{filter} on host #{host}:#{port}",
                :tags => [:jmx, :dryrun])
       else
-        unless conn.nil?
-          result = ::JMX::MBean.find_all_by_name(filter, :connection => conn)
-          notify(:msg => "[#{@name}] Found all mbeans matching #{filter} on host #{host}:#{port}",
-                 :tags => [:jmx, :trace])
-          return result
+        begin
+          unless conn.nil?
+            result = ::JMX::MBean.find_all_by_name(filter, :connection => conn)
+            notify(:msg => "[#{@name}] Found all mbeans matching #{filter} on host #{host}:#{port}",
+                   :tags => [:jmx, :trace])
+            return result
+          end
+        rescue ConnectException
+          # let's try to reconnect
+          remove_from_cache(params)
+          conn = get_connection(params)
+          retry
         end
       end
       []
@@ -181,8 +188,15 @@ module Cosmic
 
     # Shuts down this JMX plugin instance by releasing all connections to remote mbeans.
     def shutdown
-      @connections.values.each do |conn|
-        conn.close
+      @connections.each do |key, conn|
+        begin
+          conn.close
+        rescue ConnectException
+          # ignored, connection already closed
+        rescue => e
+          notify(:msg => "[#{@name}] Could not close a JMX connection to #{key}: #{e.message}",
+                 :tags => [:jmx, :warn])
+        end
       end
       @connections.clear
     end
@@ -204,18 +218,27 @@ module Cosmic
           password = @config[:auth][:password]
         end
         key = host + ':' + port.to_s
-        begin
-          @connections[key] ||= ::JMX::MBean.create_connection(:host => host,
+        unless @connections.has_key?(key)
+          begin
+            @connections[key] = ::JMX::MBean.create_connection(:host => host,
                                                                :port => port.to_i,
                                                                :username => username,
                                                                :password => password)
-        rescue ConnectException
-          raise JMXError, "Could not connect to host #{params[:host]}:#{params[:port]}"
+          rescue ConnectException
+            raise JMXError, "Could not connect to host #{params[:host]}:#{params[:port]}"
+          end
+          notify(:msg => "[#{@name}] Connected to JMX on host #{host}:#{port}",
+                 :tags => [:jmx, :trace])
         end
-        notify(:msg => "[#{@name}] Connected to JMX on host #{host}:#{port}",
-               :tags => [:jmx, :trace])
         @connections[key]
       end
+    end
+
+    def remove_from_cache(params)
+      host = get_param(params, :host)
+      port = get_param(params, :port)
+      key = host + ':' + port.to_s
+      @connections.delete(key)
     end
 
     def mbeanify(params)
@@ -223,15 +246,20 @@ module Cosmic
       unless @environment.in_dry_run_mode
         name = get_param(params, :name)
         conn = get_connection(params)
-        if conn
-          begin
+        begin
+          unless conn.nil?
             mbean = ::JMX::MBean.find_by_name(name, :connection => conn)
-          rescue InstanceNotFoundException
-            raise JMXError, "MBean #{name} not found on host #{params[:host]}:#{params[:port]}"
+            notify(:msg => "[#{@name}] Retrieved mbean #{name} from host #{params[:host]}:#{params[:port]}",
+                   :tags => [:jmx, :trace])
+            return mbean
           end
-          notify(:msg => "[#{@name}] Retrieved mbean #{name} from host #{params[:host]}:#{params[:port]}",
-                 :tags => [:jmx, :trace])
-          return mbean
+        rescue ConnectException
+          # let's try to reconnect
+          remove_from_cache(params)
+          conn = get_connection(params)
+          retry
+        rescue InstanceNotFoundException
+          raise JMXError, "MBean #{name} not found on host #{params[:host]}:#{params[:port]}"
         end
       end
       nil
