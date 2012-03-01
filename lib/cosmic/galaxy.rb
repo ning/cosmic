@@ -143,6 +143,12 @@ module Cosmic
         selector = lambda {|agent| agent.config_path && type_regex.match(agent.type) }
         notify(:msg => "[#{@name}] Selecting all services of type #{type_regex.inspect}",
                :tags => [:galaxy, :trace])
+      elsif params.has_key?(:core_type)
+        core_type_regex = params[:core_type]
+        core_type_regex = Regexp.new(core_type_regex.to_s) unless core_type_regex.is_a?(Regexp)
+        selector = lambda {|agent| agent.config_path && core_type_regex.match(agent.core_type) }
+        notify(:msg => "[#{@name}] Selecting all services of core type #{core_type_regex.inspect}",
+               :tags => [:galaxy, :trace])
       elsif params.has_key?(:host) || params.has_key?(:hosts)
         host_names = arrayify(params[:host]) & arrayify(params[:hosts])
         selector = lambda {|agent| host_names.include?(agent.host) }
