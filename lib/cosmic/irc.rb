@@ -391,9 +391,7 @@ module Cosmic
               end
             end
             if should_retry
-              @config[:auth][:username] = nil
-              @config[:auth][:password] = nil
-              @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config)
+              @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config, :force => true)
 
               # Now we need to wait for the bot to quit retrying. Unfortunately
               # there is no way to tell whether the bot has stopped retrying

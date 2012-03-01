@@ -411,9 +411,7 @@ module Cosmic
           if @config[:auth_type] =~ /^credentials$/ &&
              e.to_s == "com.atlassian.jira.rpc.exception.RemoteAuthenticationException: Invalid username or password."
             puts "Invalid username or password. Please try again"
-            @config[:auth][:username] = nil
-            @config[:auth][:password] = nil
-            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config)
+            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config, :force => true)
           else
             raise e
           end

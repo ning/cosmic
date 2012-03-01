@@ -442,9 +442,7 @@ module Cosmic
         rescue SOAP::Error => e
           if @config[:auth_type] =~ /^credentials$/ && e.to_s == "401: F5 Authorization Required"
             puts "Invalid username or password. Please try again"
-            @config[:auth][:username] = nil
-            @config[:auth][:password] = nil
-            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config)
+            @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config, :force => true)
             authenticate
             retry
           else

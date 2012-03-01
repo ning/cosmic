@@ -359,6 +359,12 @@ module Cosmic
     # @param [Hash] params The parameters
     # @option params [Symbol] :service_name The service name, e.g. `:irc`
     # @option params [Hash] :config The service's configuration
+    # @option params [Hash] :force Force resolving. Different authentication types
+    #                              have a different meaning of this. E.g. the
+    #                              `credentials` type will ask for username and
+    #                              passwords regardless of whether they are
+    #                              already credentials in the config. `false` by
+    #                              default
     # @return [void]
     def resolve_service_auth(params)
       return unless params[:service_name] && params[:config]
@@ -366,6 +372,7 @@ module Cosmic
       service_config = params[:config]
       service_config[:auth] ||= {}
       auth_config = service_config[:auth]
+      force = params.has_key?(:force) ? params[:force] : false
 
       if service_config[:credentials]
         username = service_config[:credentials][:username]
@@ -383,7 +390,7 @@ module Cosmic
             password = @config[:ldap][:auth][:password]
           end
         when /^credentials$/
-          if username.nil? && password.nil?
+          if force || (username.nil? && password.nil?)
             username = ask("Username for #{service_name.to_s}?\n")
             password = ask("Password for #{service_name.to_s}?\n") { |q| q.echo = false }
           end
