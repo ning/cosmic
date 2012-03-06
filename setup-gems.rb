@@ -15,7 +15,7 @@ end
 JRUBY = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 RUBY_19 = RUBY_VERSION =~ /^1.9/
 
-['rake', 'yard', 'jeweler', 'highline', 'net-ldap', 'chef', 'tomdz-soap4r', 'tomdz-jira4r', 'nokogiri', 'mail', 'json', 'net-ssh', 'net-scp'].each do |dep|
+['rake', 'yard', 'jeweler', 'highline', 'net-ldap', 'chef', 'tomdz-soap4r', 'tomdz-jira4r', 'nokogiri', 'mail', 'json', 'net-ssh', 'net-scp', 'atomic'].each do |dep|
   install_dep(dep)
 end
 
