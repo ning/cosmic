@@ -19,6 +19,8 @@ module Cosmic
   # operations (e.g. {#get_members}) but not destructive ones (such as {#enable}). Instead, it will send
   # messages tagged as `:f5` and `:dryrun` in those cases.
   class F5 < Plugin
+    class OperationFailed < StandardError; end
+
     # The plugin's configuration
     attr_reader :config
 
@@ -142,6 +144,7 @@ module Cosmic
         notify(:msg => "[#{@name}] Removing node #{node_ip}:#{node_port} from pool #{pool_name} on load balancer #{@config[:host]}",
                :tags => [:f5, :trace])
         with_f5('LocalLB.Pool') do
+          # TODO: deal with node not existing (exception)
           remove_member([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
       end
@@ -159,6 +162,7 @@ module Cosmic
       notify(:msg => "[#{@name}] Retrieving all members for pool #{pool_name} on load balancer #{@config[:host]}",
              :tags => [:f5, :trace])
       members = with_f5('LocalLB.PoolMember') do
+        # TODO: deal with pool not existing (get_object_status returns nil)
         get_object_status([ pool_name ])[0].collect do |pool_member|
           member = pool_member['member']
           status = pool_member['object_status']
@@ -204,6 +208,7 @@ module Cosmic
              :tags => [:f5, :trace])
       member = nil
       with_f5('LocalLB.PoolMember') do
+        # TODO: deal with pool not existing (get_object_status returns nil)
         get_object_status([ pool_name ])[0].each do |pool_member|
           member_info = pool_member['member']
           status = pool_member['object_status']
@@ -274,6 +279,7 @@ module Cosmic
         stats = with_f5('LocalLB.PoolMember') do
           get_statistics([ pool_name ], [[{ 'address' => node_ip, 'port' => node_port }]])
         end
+        # TODO: deal with node not existing (stats is nil)
         stats = stats[0] if stats[0]
       else
         notify(:msg => "[#{@name}] Retrieving stats for node #{node_ip} on load balancer #{@config[:host]}",
@@ -282,6 +288,7 @@ module Cosmic
           get_statistics([ node_ip ])
         end
       end
+      # TODO: deal with node not existing (stats is nil)
       if stats['statistics'] && stats['statistics'][0] && stats['statistics'][0]['statistics']
         stats['statistics'][0]['statistics'].each do |stat|
           name = extract_type(stat)
@@ -306,6 +313,7 @@ module Cosmic
     # @option params [String] :pool The pool name; optional
     # @return [Integer,nil] The number of active connections
     def get_num_connections(params)
+      # TODO: deal with node not existing (nil coming back from get_stats)
       get_stats(params)['STATISTIC_SERVER_SIDE_CURRENT_CONNECTIONS']
     end
 
@@ -446,7 +454,11 @@ module Cosmic
             authenticate
             retry
           else
-            raise
+            if e.faultstring.to_s =~ /Exception\: Common\:\:OperationFailed/
+              raise OperationFailed, e.faultstring.to_s, e.backtrace
+            else
+              raise
+            end
           end
         end
       end
