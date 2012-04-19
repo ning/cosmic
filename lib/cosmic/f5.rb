@@ -380,7 +380,7 @@ module Cosmic
       else
         if @environment.in_dry_run_mode
           node = get_node(params)
-          notify(:msg => "[#{@name}] Would disable member #{node_ip}:#{node_port} on load balancer #{@config[:host]}",
+          notify(:msg => "[#{@name}] Would disable member #{node_ip} on load balancer #{@config[:host]}",
                  :tags => [:f5, :dryrun])
           node
         else
