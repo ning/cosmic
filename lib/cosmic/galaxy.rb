@@ -64,11 +64,21 @@ module Cosmic
 
     # Records a single result (galaxy agent). Called by galaxy commands.
     #
-    # @param [Galaxy::Agent] agent The agent
-    def record_result agent
-      @results << agent.extend(AgentEnhancements)
-      if @msg_template
-        @environment.notify(:msg => eval('"' + @msg_template + '"'), :tags => @tags)
+    # @param [Galaxy::Agent,Array] result The result
+    def record_result result
+      agent = nil
+      output = ""
+      if result.is_a?(Array)
+        agent = result.shift
+        output = result.join(" ")
+      else
+        agent = result
+      end
+      unless agent.nil?
+        @results << agent.extend(AgentEnhancements)
+        if @msg_template
+          @environment.notify(:msg => eval('"' + @msg_template + '"'), :tags => @tags)
+        end
       end
     end
   end
@@ -193,7 +203,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Assigned #{agent.host} to /' + env + '/' + version + '/' + type,
                                                    [:galaxy, :trace])
-        command.execute(services_from_params(params))
+        command.execute(services)
         command.report.results
       end
     end
@@ -221,7 +231,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Started #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services_from_params(params))
+        command.execute(services)
         command.report.results
       end
     end
@@ -249,7 +259,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Restarted #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services_from_params(params))
+        command.execute(services)
         command.report.results
       end
     end
@@ -277,7 +287,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Stopped #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services_from_params(params))
+        command.execute(services)
         command.report.results
       end
     end
@@ -307,7 +317,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Updated #{agent.host} (#{agent.type}) to ' + to,
                                                    [:galaxy, :trace])
-        command.execute(services_from_params(params))
+        command.execute(services)
         command.report.results
       end
     end
@@ -367,7 +377,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Rolled back #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services_from_params(params))
+        command.execute(services)
         command.report.results
       end
     end
@@ -427,7 +437,39 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Cleared #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services_from_params(params))
+        command.execute(services)
+        command.report.results
+      end
+    end
+
+    # Performs a custom command on a host. Use one of `:service`, `:services`, `:host`, or 
+    # `:hosts` to select which hosts to perform the command on. This method will do nothing
+    # in dryrun mode except create a message tagged as `:dryrun`.
+    #
+    # @param [Hash] params The parameters
+    # @option params [String] :cmd The command name
+    # @option params [Array<String>] :args The array of arguments to the cmd
+    # @option params [Galaxy::Agent] :service The host/service
+    # @option params [Array<Galaxy::Agent>] :services The hosts/services
+    # @option params [String] :host The host
+    # @option params [String] :hosts The hosts
+    # @return [Array<Galaxy::Agent>] The services that the command was performed on
+    def perform(params)
+      services = services_from_params(params)
+      cmd = get_param(params, :cmd)
+      args = arrayify(params[:args])
+      if @environment.in_dry_run_mode
+        services.each do |agent|
+          notify(:msg => "[#{@name}] Would perform command '#{cmd}' with arguments '#{args.join(" ")}' on #{agent.host}",
+                 :tags => [:galaxy, :dryrun])
+        end
+        services
+      else
+        command = ::Galaxy::Commands::PerformCommand.new([ cmd ] + args, @galaxy_options)
+        command.report = GalaxyGatheringReport.new(@environment,
+                                                   '[' + @name + '] Performed command ' + cmd + ' with arguments ' + args.join(" ") + ' on #{agent.host}. Output: #{output}',
+                                                   [:galaxy, :trace])
+        command.execute(services)
         command.report.results
       end
     end
