@@ -1,18 +1,19 @@
-.. _`Nagix`: https://github.com/ning/nagix
+.. _`mk_livestatus`: http://mathias-kettner.de/checkmk_livestatus.html
+
 
 Nagios
 ======
 
-Nagios currently doesn't provide a simple way to interact with it remotely. To help with this, Ning has a project called `Nagix`_ that provides a REST server and CLI for Nagios. Tools can then interact with the REST server remotely to access status information or issue commands against a Nagios instance.
+The only somewhat official way to control Nagios remotely involves running `mk_livestatus`_ and
+then establishing an ssh connection to the Nagios server and talking to the unix socket that
+mk_livestatus maintains.
 
-The Nagios plugin interacts with a Nagix instance and provides a simplified interface to retrieve status information about hosts and enable/disable notifications for hosts and their services. In order to use it, you'll first have to install the json gem::
-
-    gem install json
-
-Currently the only piece of configuration necessary is the host url for the Nagix server::
+The configuration values for the plugin are::
 
     nagios:
-      nagix_host: <full host url for the Nagix server, e.g. http://nagix.example.com:8080>
+      host: <full host url for the Nagios server, e.g. http://nagios.example.com:8080>
+      mk_livestatus_socket_path: <full path to the mk_livestatus socket, e.g. /var/lib/nagios/rw/live>
+      <authentication configuration as explained for the ssh plugin>
 
 Scripts can then interact with the Nagios server::
 
