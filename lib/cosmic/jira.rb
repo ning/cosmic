@@ -7,6 +7,9 @@ require 'net/https'
 require_with_hint 'jira4r', "In order to use the jira plugin please run 'gem install tomdz-jira4r'"
 require_with_hint 'nokogiri', "In order to use the jira plugin please run 'gem install nokogiri'"
 
+# work around https://github.com/sparklemotion/nokogiri/issues/822
+Nokogiri::XML::SAX::Parser::ENCODINGS['utf-8'] ||= Nokogiri::XML::SAX::Parser::ENCODINGS['UTF-8']
+
 module Cosmic
   # A listener for the message bus that outputs messages as comments on a JIRA issue.
   class IssueMessageListener
