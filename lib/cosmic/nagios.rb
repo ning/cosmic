@@ -43,42 +43,42 @@ module Cosmic
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The host to return the status for
-    # @option params [String,nil] :service The service on the host to return the status for;
-    #                                      if not specified, then the status of the host will
-    #                                      be returned
-    # @return [Hash,nil] The Nagios status of the host/service as a Hash
+    # @option params [String,Array<String>,nil] :services The service(s) on the host to return
+    #                               the status for. If not specified, then the status of the host will
+    #                               be returned
+    # @return [Hash,nil] The Nagios status of the host as a hash/service(s) as a hash of hashes
     def status(params)
       host = get_param(params, :host)
-      cmd = <<-EOS
-        GET hosts
-        Filter: host_name = #{host}
-        Filter: alias = #{host}
-        Filter: address = #{host}
-        Or: 3
-        ColumnHeaders: on
-        ResponseHeader: fixed16
-      EOS
-      response = parse(exec(cmd))
-      if params.has_key?(:service)
-        host = response['name']
-        service = params[:service]
+      cmd = "GET hosts\n"\
+            "Filter: host_name = #{host}\n"\
+            "Filter: alias = #{host}\n"\
+            "Filter: address = #{host}\n"\
+            "Or: 3\n"\
+            "ColumnHeaders: on\n"\
+            "ResponseHeader: fixed16\n"
+      result = parse(exec(cmd))
+      if params.has_key?(:services) && !result.empty?
+        real_host = result[0]["name"]
+        services = arrayify(params[:services])
 
-        cmd = <<-EOS
-          GET services
-          Filter: host_name = #{host}
-          Filter: description = #{service}
-          And: 2
-          ColumnHeaders: on
-          ResponseHeader: fixed16
-        EOS
-        response = parse(exec(cmd))
-        notify(:msg => "[#{@name}] Retrieved Nagios status for service #{service} on host #{host}",
+        result = arrayify(params[:services]).inject({}) do |statuses, service|
+          cmd = "GET services\n"\
+                "Filter: host_name = #{real_host}\n"\
+                "Filter: description = #{service}\n"\
+                "And: 2\n"\
+                "ColumnHeaders: on\n"\
+                "ResponseHeader: fixed16\n"
+          response = parse(exec(cmd))
+          statuses[service] = response[0] unless response.empty?
+        end
+        notify(:msg => "[#{@name}] Retrieved Nagios status for service(s) #{services} on host #{host}",
                :tags => [:nagios, :trace])
+        result
       else
         notify(:msg => "[#{@name}] Retrieved Nagios status for host #{host}",
                :tags => [:nagios, :trace])
+        result.empty? ? nil : result[0]
       end
-      response
     end
 
     # This is a simple wrapper around the `#status` method that extracts from the returned
@@ -100,64 +100,114 @@ module Cosmic
     end
 
     # Enables all configured Nagios check notifications for the given host. This is equivalent
-    # to the `ENABLE_HOST_SVC_NOTIFICATIONS` and `ENABLE_SVC_NOTIFICATIONS` Nagios commands.
+    # to the `ENABLE_HOST_SVC_NOTIFICATIONS`, `ENABLE_SVC_NOTIFICATIONS` and
+    # `ENABLE_HOST_NOTIFICATIONS` Nagios commands.
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The host to enable checks for
-    # @option params [String,nil] :service The service on the host to enable checks for;
-    #                                      if not specified then all services will be enabled
-    # @return [Hash] The Nagios status of the host/service as a Hash
+    # @option params [String,Array<String>,:all,nil] :services The service(s) on the host to enable checks for.
+    #                               If not specified then notifications for the host itself will be enabled.
+    #                               When given the special argument `:all` then all services on the host will
+    #                               be disabled.
+    # @return [Hash,nil] The Nagios status of the host as a hash/service(s) as a hash of hashes.
+    #                    If `:all` is specified, then the host status is returned
     def enable(params)
       host = get_param(params, :host)
       if @environment.in_dry_run_mode
         if params.has_key?(:service)
-          notify(:msg => "[#{@name}] Would enable Nagios notifications for service #{params[:service]} on host #{host}",
-                 :tags => [:nagios, :dryrun])
+          services = params[:services]
+          if services == :all
+            notify(:msg => "[#{@name}] Would enable Nagios notifications for all services on host #{host}",
+                   :tags => [:nagios, :dryrun])
+          else
+            notify(:msg => "[#{@name}] Would enable Nagios notifications for service(s) #{params[:services]} on host #{host}",
+                   :tags => [:nagios, :dryrun])
+          end
         else
           notify(:msg => "[#{@name}] Would enable Nagios notifications for host #{host}",
                  :tags => [:nagios, :dryrun])
         end
       else
-        if params.has_key?(:service)
-          notify(:msg => "[#{@name}] Enabling notifications for service #{params[:service]} on host #{host}",
-                 :tags => [:nagios, :trace])
-          exec("COMMAND [#{Time.now.to_i}] ENABLE_SVC_NOTIFICATIONS;#{host};#{params[:service]}\n\n")
+        real_host = find_host(params)
+        if real_host.nil?
+          raise "Host #{host} does not seem to be present in Nagios"
+        end
+        notify(:msg => "[#{@name}] Host #{host} is registered in Nagios as #{real_host}",
+               :tags => [:nagios, :trace])
+        if params.has_key?(:services)
+          services = params[:services]
+          if services == :all
+            notify(:msg => "[#{@name}] Enabling notifications for all services on host #{host}",
+                   :tags => [:nagios, :trace])
+            exec("COMMAND [#{Time.now.to_i}] ENABLE_HOST_SVC_NOTIFICATIONS;#{real_host}\n\n")
+          else
+            notify(:msg => "[#{@name}] Enabling notifications for service(s) #{params[:service]} on host #{host}",
+                   :tags => [:nagios, :trace])
+            arrayify(services).each do |service|
+              exec("COMMAND [#{Time.now.to_i}] ENABLE_SVC_NOTIFICATIONS;#{real_host};#{service}\n\n")
+            end
+          end
         else
           notify(:msg => "[#{@name}] Enabling notifications for host #{host}",
                  :tags => [:nagios, :trace])
-          exec("COMMAND [#{Time.now.to_i}] ENABLE_HOST_SVC_NOTIFICATIONS;#{host}\n\n")
+          exec("COMMAND [#{Time.now.to_i}] ENABLE_HOST_NOTIFICATIONS;#{real_host}\n\n")
         end
       end
       status(params)
     end
 
     # Enables all configured Nagios check notifications for the given host. This is equivalent
-    # to the `DISABLE_HOST_SVC_NOTIFICATIONS` and `DISABLE_SVC_NOTIFICATIONS` Nagios commands.
+    # to the `DISABLE_HOST_SVC_NOTIFICATIONS`, `DISABLE_SVC_NOTIFICATIONS` and
+    # `DISABLE_HOST_NOTIFICATIONS` Nagios commands.
     #
     # @param [Hash] params The parameters
     # @option params [String] :host The host to disable checks for
-    # @option params [String,nil] :service The service on the host to disable checks for;
-    #                                      if not specified then all services will be disabled
-    # @return [Hash] The Nagios status of the host/service as a Hash
+    # @option params [String,Array<String>,:all,nil] :services The service(s) on the host to enable checks for.
+    #                               If not specified then notifications for the host itself will be enabled.
+    #                               When given the special argument `:all` then all services on the host will
+    #                               be disabled.
+    # @return [Hash,nil] The Nagios status of the host as a hash/service(s) as a hash of hashes.
+    #                    If `:all` is specified, then the host status is returned
     def disable(params)
       host = get_param(params, :host)
       if @environment.in_dry_run_mode
         if params.has_key?(:service)
-          notify(:msg => "[#{@name}] Would disable Nagios notifications for service #{params[:service]} on host #{host}",
-                 :tags => [:nagios, :dryrun])
+          services = params[:services]
+          if services == :all
+            notify(:msg => "[#{@name}] Would disable Nagios notifications for all services on host #{host}",
+                   :tags => [:nagios, :dryrun])
+          else
+            notify(:msg => "[#{@name}] Would disable Nagios notifications for service(s) #{params[:services]} on host #{host}",
+                   :tags => [:nagios, :dryrun])
+          end
         else
           notify(:msg => "[#{@name}] Would disable Nagios notifications for host #{host}",
                  :tags => [:nagios, :dryrun])
         end
       else
-        if params.has_key?(:service)
-          notify(:msg => "[#{@name}] Disabling notifications for service #{params[:service]} on host #{host}",
-                 :tags => [:nagios, :trace])
-          exec("COMMAND [#{Time.now.to_i}] DISABLE_SVC_NOTIFICATIONS;#{host};#{params[:service]}\n\n")
+        real_host = find_host(params)
+        if real_host.nil?
+          raise "Host #{host} does not seem to be present in Nagios"
+        end
+        notify(:msg => "[#{@name}] Host #{host} is registered in Nagios as #{real_host}",
+               :tags => [:nagios, :trace])
+        if params.has_key?(:services)
+          services = params[:services]
+          if services == :all
+            notify(:msg => "[#{@name}] Disabling notifications for all services on host #{host}",
+                   :tags => [:nagios, :trace])
+            exec("COMMAND [#{Time.now.to_i}] DISABLE_HOST_SVC_NOTIFICATIONS;#{real_host}\n\n")
+          else
+            notify(:msg => "[#{@name}] Disabling notifications for service(s) #{params[:service]} on host #{host}",
+                   :tags => [:nagios, :trace])
+            arrayify(services).each do |service|
+              exec("COMMAND [#{Time.now.to_i}] DISABLE_SVC_NOTIFICATIONS;#{real_host};#{service}\n\n")
+            end
+          end
         else
           notify(:msg => "[#{@name}] Disabling notifications for host #{host}",
                  :tags => [:nagios, :trace])
-          exec("COMMAND [#{Time.now.to_i}] DISABLE_HOST_SVC_NOTIFICATIONS;#{host}\n\n")
+          exec("COMMAND [#{Time.now.to_i}] DISABLE_HOST_NOTIFICATIONS;#{real_host}\n\n")
         end
       end
       status(params)
@@ -182,7 +232,7 @@ module Cosmic
       host = @config[:nagios_host]
       user = @config[:auth][:username]
       if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would execute mk_livestatus command via ssh as user #{user} on nagios host #{host}",
+        notify(:msg => "[#{@name}] Would execute mk_livestatus command via ssh as user #{user} on nagios host #{host}:\n#{cmd}",
                :tags => [:nagios, :dryrun])
       else
         full_cmd = "echo '#{cmd}' | unixcat #{@config[:mk_livestatus_socket_path]}"
@@ -192,7 +242,7 @@ module Cosmic
             response = ssh.exec!(full_cmd)
           end
         rescue Net::SSH::AuthenticationFailed => e
-          if @config[:auth_type] =~ /^credentials$/ && !params.has_key?(:password)
+          if @config[:auth_type] =~ /^credentials$/ && !@config.has_key?(:password)
             puts "Invalid username or password. Please try again"
             @environment.resolve_service_auth(:service_name => @name.to_sym, :config => @config, :force => true)
             init_opts
@@ -201,18 +251,32 @@ module Cosmic
             raise e
           end
         end
-        notify(:msg => "[#{@name}] Executed mk_livestatus command via ssh as user #{user} on nagios host #{host}",
+        notify(:msg => "[#{@name}] Executed mk_livestatus command via ssh as user #{user} on nagios host #{host}:\n#{cmd}",
                :tags => [:nagios, :trace])
         response
       end
     end
 
+    def find_host(params)
+      host = get_param(params, :host)
+      cmd = "GET hosts\n"\
+            "Filter: host_name = #{host}\n"\
+            "Filter: alias = #{host}\n"\
+            "Filter: address = #{host}\n"\
+            "Or: 3\n"\
+            "ColumnHeaders: on\n"\
+            "ResponseHeader: fixed16\n"
+      response = parse(exec(cmd))
+      response.empty? ? nil : response[0]['name']
+    end
+
     def parse(response)
       result = []
       if response
-        header = response.shift.chomp
-        columns = response.shift.chomp.split(';')
-        response.each do |line|
+        lines = response.split("\n")
+        header = lines.shift.chomp
+        columns = lines.shift.chomp.split(';')
+        lines.each do |line|
           hsh = {}
           columns = Array.new(columns)
           values = line.chomp.split(';')
