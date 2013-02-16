@@ -49,6 +49,8 @@ module Cosmic
     # @return [Hash,nil] The Nagios status of the host as a hash/service(s) as a hash of hashes
     def status(params)
       host = get_param(params, :host)
+      notify(:msg => "[#{@name}] Retrieving Nagios status for host #{host}",
+             :tags => [:nagios, :trace])
       cmd = "GET hosts\n"\
             "Filter: host_name = #{host}\n"\
             "Filter: alias = #{host}\n"\
@@ -61,6 +63,8 @@ module Cosmic
         real_host = result[0]["name"]
         services = arrayify(params[:services])
 
+        notify(:msg => "[#{@name}] Retrieving Nagios status for service(s) #{services} on host #{host}",
+               :tags => [:nagios, :trace])
         result = arrayify(params[:services]).inject({}) do |statuses, service|
           cmd = "GET services\n"\
                 "Filter: host_name = #{real_host}\n"\
@@ -71,12 +75,8 @@ module Cosmic
           response = parse(exec(cmd))
           statuses[service] = response[0] unless response.empty?
         end
-        notify(:msg => "[#{@name}] Retrieved Nagios status for service(s) #{services} on host #{host}",
-               :tags => [:nagios, :trace])
         result
       else
-        notify(:msg => "[#{@name}] Retrieved Nagios status for host #{host}",
-               :tags => [:nagios, :trace])
         result.empty? ? nil : result[0]
       end
     end
@@ -132,8 +132,6 @@ module Cosmic
         if real_host.nil?
           raise "Host #{host} does not seem to be present in Nagios"
         end
-        notify(:msg => "[#{@name}] Host #{host} is registered in Nagios as #{real_host}",
-               :tags => [:nagios, :trace])
         if params.has_key?(:services)
           services = params[:services]
           if services == :all
@@ -189,8 +187,6 @@ module Cosmic
         if real_host.nil?
           raise "Host #{host} does not seem to be present in Nagios"
         end
-        notify(:msg => "[#{@name}] Host #{host} is registered in Nagios as #{real_host}",
-               :tags => [:nagios, :trace])
         if params.has_key?(:services)
           services = params[:services]
           if services == :all
@@ -231,10 +227,7 @@ module Cosmic
     def exec(cmd)
       host = @config[:nagios_host]
       user = @config[:auth][:username]
-      if @environment.in_dry_run_mode
-        notify(:msg => "[#{@name}] Would execute mk_livestatus command via ssh as user #{user} on nagios host #{host}:\n#{cmd}",
-               :tags => [:nagios, :dryrun])
-      else
+      unless @environment.in_dry_run_mode
         full_cmd = "echo '#{cmd}' | unixcat #{@config[:mk_livestatus_socket_path]}"
         response = nil
         begin
@@ -251,8 +244,6 @@ module Cosmic
             raise e
           end
         end
-        notify(:msg => "[#{@name}] Executed mk_livestatus command via ssh as user #{user} on nagios host #{host}:\n#{cmd}",
-               :tags => [:nagios, :trace])
         response
       end
     end
