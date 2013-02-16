@@ -34,7 +34,7 @@ module Cosmic
       @name = name.to_s
       @environment = environment
       @config = @environment.get_plugin_config(:name => name.to_sym)
-      @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config)
+      @environment.resolve_service_auth(:service_name => name.to_sym, :config => @config, :force => true)
       init_opts
     end
 

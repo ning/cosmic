@@ -299,7 +299,7 @@ module Cosmic
     # Whether dry run mode is turned on (off by default)
     attr_reader :in_dry_run_mode
 
-    # Creates a new environment instance from the configuration in a file. The 
+    # Creates a new environment instance from the configuration in a file. The
     # passed-in parameters hash is merged on top of the file configuration
     # thus allowing to modify configuration settings before the environment is
     # created. If no file was specified, then it will try to load `.cosmicrc` in
@@ -391,8 +391,8 @@ module Cosmic
           end
         when /^credentials$/
           if force || (username.nil? && password.nil?)
-            username = ask("Username for #{service_name.to_s}?\n")
-            password = ask("Password for #{service_name.to_s}?\n") { |q| q.echo = false }
+            username = ask("Username for #{service_name.to_s}?\n") if username.nil?
+            password = ask("Password for user #{username} for #{service_name.to_s}?\n") { |q| q.echo = false }
           end
         when /^keys$/
           auth_config[:keys] = arrayify(service_config[:keys])
