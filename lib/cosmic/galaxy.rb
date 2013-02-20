@@ -170,7 +170,9 @@ module Cosmic
       end
       command = ::Galaxy::Commands::ShowCommand.new([], @galaxy_options)
       command.report = GalaxyGatheringReport.new(@environment)
-      execute_with_agents(command, {})
+      agents = command.select_agents({})
+      agents.each { |agent| agent.proxy = ::Galaxy::Transport.locate(agent.url) if agent.url }
+      command.execute(agents)
       command.report.results.select {|result| selector.nil? || selector.call(result) }
     end
 
@@ -203,7 +205,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Assigned #{agent.host} to /' + env + '/' + version + '/' + type,
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
@@ -231,7 +233,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Started #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
@@ -259,7 +261,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Restarted #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
@@ -287,7 +289,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Stopped #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
@@ -317,7 +319,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Updated #{agent.host} (#{agent.type}) to ' + to,
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
@@ -347,7 +349,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Updated the configuration of #{agent.host} (#{agent.type}) to ' + to,
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
@@ -377,7 +379,7 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Rolled back #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
@@ -437,12 +439,12 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Cleared #{agent.host} (#{agent.type})',
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
 
-    # Performs a custom command on a host. Use one of `:service`, `:services`, `:host`, or 
+    # Performs a custom command on a host. Use one of `:service`, `:services`, `:host`, or
     # `:hosts` to select which hosts to perform the command on. This method will do nothing
     # in dryrun mode except create a message tagged as `:dryrun`.
     #
@@ -469,13 +471,13 @@ module Cosmic
         command.report = GalaxyGatheringReport.new(@environment,
                                                    '[' + @name + '] Performed command ' + cmd + ' with arguments ' + args.join(" ") + ' on #{agent.host}. Output: #{output}',
                                                    [:galaxy, :trace])
-        command.execute(services)
+        execute(command, services)
         command.report.results
       end
     end
 
     # Utility method that returns a textual representation of the given service(s).
-    # 
+    #
     # @param [Hash] params The parameters
     # @option params [Galaxy::Agent] :service The service to print
     # @option params [Array<Galaxy::Agent>] :services The services to print
@@ -486,7 +488,7 @@ module Cosmic
 
       result = ""
       services.each do |service|
-        result += sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n", 
+        result += sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
                           format_field(service.host),
                           format_field(service.config_path),
                           format_field(service.status),
@@ -501,10 +503,26 @@ module Cosmic
 
     private
 
-    def execute_with_agents(command, filters)
-      agents = command.select_agents(filters)
-      agents.each { |agent| agent.proxy = ::Galaxy::Transport.locate(agent.url) if agent.url }
-      command.execute(agents)
+    def execute(command, agents)
+      command.report.start
+      begin
+        agents.each do |agent|
+          unless agent.agent_status == 'online'
+            raise "Agent is not online"
+          end
+          begin
+            ::Galaxy::AgentUtils::ping_agent(agent)
+            result = command.execute_for_agent(agent)
+            command.report.record_result result
+          rescue TimeoutError
+            raise "Error: Timed out communicating with agent #{agent.host}"
+          rescue Exception => e
+            raise "Error: #{agent.host}: #{e}"
+          end
+        end
+      ensure
+        command.report.finish
+      end
     end
 
     def services_from_params(params)
