@@ -47,11 +47,15 @@ module Cosmic
         threads << Thread.new(stdout) do |out|
           out.each do |line|
             output << "\n#{line.chomp.strip}"
+            notify(:msg => "[#{@name}][stdout] #{line.rstrip}",
+                   :tags => [:execute, :trace])
           end
         end
         threads << Thread.new(stderr) do |err|
           err.each do |line|
             output << "\n#{line.chomp.strip}"
+            notify(:msg => "[#{@name}][stderr] #{line.rstrip}",
+                   :tags => [:execute, :trace])
           end
         end
         threads.each do |thread|
