@@ -119,6 +119,7 @@ module Cosmic
     # @option params [String] :local The local path to the file to upload
     # @option params [String] :remote The remote path to the file to upload; if not specified then
     #                                 it will use the local path for this
+    # @option params [Boolean] :recursive Whether to upload recursively (for directories)
     # @yield An optional block of arity 4 that will be executed whenever a new chunk of data is sent;
     #        the arguments are: the chunk, the filename, the number of bytes sent so far, the size
     #        of the file
@@ -134,8 +135,12 @@ module Cosmic
         begin
           user = params[:user] || @config[:auth][:username]
           opts = merge_with_ssh_opts(params)
+          upload_opts = {}
+          if params.has_key?(:recursive) && !!params[:recursive]
+            upload_opts[:recursive] = true
+          end
           Net::SCP.start(host, user, opts) do |scp|
-            scp.upload!(local, remote, &block)
+            scp.upload!(local, remote, upload_opts, &block)
           end
         rescue Net::SSH::AuthenticationFailed => e
           if @config[:auth_type] =~ /^credentials$/ && !params.has_key?(:password)
@@ -167,6 +172,7 @@ module Cosmic
     # @option params [String] :local The local target path for the downloaded file to upload; if not
     #                                specified then it will use the remote path for this
     # @option params [String] :remote The remote path to the file to download
+    # @option params [Boolean] :recursive Whether to download recursively (for directories)
     # @yield An optional block of arity 4 that will be executed whenever a new chunk of data is received;
     #        the arguments are: the chunk, the filename, the number of bytes received so far, the size
     #        of the file
@@ -182,8 +188,12 @@ module Cosmic
         begin
           user = params[:user] || @config[:auth][:username]
           opts = merge_with_ssh_opts(params)
+          download_opts = {}
+          if params.has_key?(:recursive) && !!params[:recursive]
+            download_opts[:recursive] = true
+          end
           Net::SCP.start(host, user, merge_with_ssh_opts(params)) do |scp|
-            scp.download!(remote, local, &block)
+            scp.download!(remote, local, download_opts, &block)
           end
         rescue Net::SSH::AuthenticationFailed => e
           if @config[:auth_type] =~ /^credentials$/ && !params.has_key?(:password)
