@@ -76,8 +76,17 @@ module Cosmic
         begin
           user = params[:user] || @config[:auth][:username]
           opts = merge_with_ssh_opts(params)
+          response = ""
           Net::SSH.start(host, user, opts) do |ssh|
-            response = ssh.exec!(cmd)
+            ssh.exec!(cmd) do |ch, stream, line|
+              line.rstrip.split("\n").each do |str|
+                unless str.nil? || str.length == 0
+                  response = response + str + "\n"
+                  notify(:msg => "[#{@name}][#{user}@#{host}] #{str}",
+                         :tags => [:ssh, :trace])
+                end
+              end
+            end
           end
         rescue Net::SSH::AuthenticationFailed => e
           if @config[:auth_type] =~ /^credentials$/ && !params.has_key?(:password)

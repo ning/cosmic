@@ -227,7 +227,10 @@ module Cosmic
     # @option params [Array<Symbol>] :tags The message's tags
     # @return [void]
     def on_message(params)
-      $stdout.printf("#{params[:msg]}\n")
+      msg = params[:msg]
+      unless msg.nil?
+        $stdout.puts("#{msg}\n")
+      end
     end
   end
 
