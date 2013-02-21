@@ -54,14 +54,15 @@ module Cosmic
     # command.
     #
     # @param [Hash] params The parameters
-    # @option params [String] :host The host to connect to 
+    # @option params [String] :host The host to connect to
     # @option params [String] :user The user to use for the ssh connection; if not specified
     #                               then it will use the username from the credentials if configured,
     #                               or the current user
+    # @option params [Array<String>] :keys The keys to use for the ssh connection, use this or a password
     # @option params [String] :password The password to use for the ssh connection; if not specified
-    #                                   then it will use the one from the credentials if configured,
-    #                                   or leave it to the ssh agent otherwise (which will use a key
-    #                                   if possible or ask otherwise)
+    #                                   and no key is specified, then it will use the one from the,
+    #                                   credentials if configured or leave it to the ssh agent otherwise
+    #                                   (which will use a key if possible or ask otherwise)
     # @option params [String] :cmd The command to run on the host
     # @return [String] All output of the command (stdout and stderr combined)
     def exec(params)
@@ -101,10 +102,11 @@ module Cosmic
     # @option params [String] :user The user to use for the ssh connection; if not specified
     #                               then it will use the username from the credentials if configured,
     #                               or the current user
+    # @option params [Array<String>] :keys The keys to use for the ssh connection, use this or a password
     # @option params [String] :password The password to use for the ssh connection; if not specified
-    #                                   then it will use the one from the credentials if configured,
-    #                                   or leave it to the ssh agent otherwise (which will use a key
-    #                                   if possible or ask otherwise)
+    #                                   and no key is specified, then it will use the one from the,
+    #                                   credentials if configured or leave it to the ssh agent otherwise
+    #                                   (which will use a key if possible or ask otherwise)
     # @option params [String] :local The local path to the file to upload
     # @option params [String] :remote The remote path to the file to upload; if not specified then
     #                                 it will use the local path for this
@@ -148,10 +150,11 @@ module Cosmic
     # @option params [String] :user The user to use for the ssh connection; if not specified
     #                               then it will use the username from the credentials if configured,
     #                               or the current user
+    # @option params [String,Array<String>] :keys The keys to use for the ssh connection, use this or a password
     # @option params [String] :password The password to use for the ssh connection; if not specified
-    #                                   then it will use the one from the credentials if configured,
-    #                                   or leave it to the ssh agent otherwise (which will use a key
-    #                                   if possible or ask otherwise)
+    #                                   and no key is specified, then it will use the one from the,
+    #                                   credentials if configured or leave it to the ssh agent otherwise
+    #                                   (which will use a key if possible or ask otherwise)
     # @option params [String] :local The local target path for the downloaded file to upload; if not
     #                                specified then it will use the remote path for this
     # @option params [String] :remote The remote path to the file to download
@@ -202,11 +205,13 @@ module Cosmic
     end
 
     def merge_with_ssh_opts(params)
+      opts = @ssh_opts
       if params.has_key?(:password)
-        @ssh_opts.merge(:password => params[:password])
-      else
-        @ssh_opts
+        opts = opts.merge(:password => params[:password])
+      elsif params.has_key?(:keys)
+        opts = opts.merge(:keys => arrayify(params[:keys]))
       end
+      opts
     end
   end
 end
