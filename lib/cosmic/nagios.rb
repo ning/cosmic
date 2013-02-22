@@ -139,7 +139,7 @@ module Cosmic
                    :tags => [:nagios, :trace])
             exec("COMMAND [#{Time.now.to_i}] ENABLE_HOST_SVC_NOTIFICATIONS;#{real_host}\n\n")
           else
-            notify(:msg => "[#{@name}] Enabling notifications for service(s) #{params[:service]} on host #{host}",
+            notify(:msg => "[#{@name}] Enabling notifications for service(s) #{params[:services]} on host #{host}",
                    :tags => [:nagios, :trace])
             arrayify(services).each do |service|
               exec("COMMAND [#{Time.now.to_i}] ENABLE_SVC_NOTIFICATIONS;#{real_host};#{service}\n\n")
@@ -194,7 +194,7 @@ module Cosmic
                    :tags => [:nagios, :trace])
             exec("COMMAND [#{Time.now.to_i}] DISABLE_HOST_SVC_NOTIFICATIONS;#{real_host}\n\n")
           else
-            notify(:msg => "[#{@name}] Disabling notifications for service(s) #{params[:service]} on host #{host}",
+            notify(:msg => "[#{@name}] Disabling notifications for service(s) #{params[:services]} on host #{host}",
                    :tags => [:nagios, :trace])
             arrayify(services).each do |service|
               exec("COMMAND [#{Time.now.to_i}] DISABLE_SVC_NOTIFICATIONS;#{real_host};#{service}\n\n")
