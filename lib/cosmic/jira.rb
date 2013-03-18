@@ -392,15 +392,28 @@ module Cosmic
         notify(:msg => "[#{@name}] Would login to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
                :tags => [:jira, :dryrun])
       else
-        @jira = Jira4R::JiraTool.new(2, @config[:address])
-        log = CosmicLogger.new(:environment => @environment,
-                               Logger::WARN => [:jira, :warn],
-                               Logger::ERROR => [:jira, :error],
-                               Logger::FATAL => [:jira, :error])
-        @jira.logger = log
-        login()
-        notify(:msg => "[#{@name}] Logged in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
-               :tags => [:jira, :trace])
+        begin
+          @jira = Jira4R::JiraTool.new(2, @config[:address])
+          log = CosmicLogger.new(:environment => @environment,
+                                 Logger::WARN => [:jira, :warn],
+                                 Logger::ERROR => [:jira, :error],
+                                 Logger::FATAL => [:jira, :error])
+          @jira.logger = log
+          if @config.has_key?(:driver_options)
+            @config[:driver_options].each do |(key, value)|
+              notify(:msg => "[#{@name}] Setting JIRA driver option #{key} to '#{value}'",
+                     :tags => [:jira, :trace])
+              @jira.driver.options[key.to_s] = value
+            end
+          end
+          login()
+          notify(:msg => "[#{@name}] Logged in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}",
+                 :tags => [:jira, :trace])
+        rescue => e
+          notify(:msg => "[#{@name}] Error when trying to log in to JIRA server #{@config[:address]} as user #{@config[:auth][:username]}: #{e.message}}",
+                 :tags => [:jira, :error])
+          raise e
+        end
       end
     end
 

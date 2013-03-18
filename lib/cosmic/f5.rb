@@ -436,10 +436,16 @@ module Cosmic
     private
 
     def authenticate
-      @f5 = ::F5::IControl.new(@config[:host],
-                               @config[:auth][:username],
-                               @config[:auth][:password],
-                               ['LocalLB.Pool', 'LocalLB.PoolMember', 'LocalLB.NodeAddress', 'System.ConfigSync']).get_interfaces
+      begin
+        @f5 = ::F5::IControl.new(@config[:host],
+                                 @config[:auth][:username],
+                                 @config[:auth][:password],
+                                 ['LocalLB.Pool', 'LocalLB.PoolMember', 'LocalLB.NodeAddress', 'System.ConfigSync']).get_interfaces
+      rescue => e
+        notify(:msg => "[#{@name}] Error when trying to log in to the load balancer #{@config[:host]} as user #{@config[:auth][:username]}: #{e.message}",
+               :tags => [:f5, :error])
+        raise e
+      end
     end
 
     def with_f5(interface, &block)
